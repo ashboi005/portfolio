@@ -22,7 +22,7 @@ export function createAuth() {
     advanced: {
       defaultCookieAttributes: {
         sameSite: "none",
-        secure: true,
+        secure: env.NODE_ENV === "production",
         httpOnly: true,
       },
     },

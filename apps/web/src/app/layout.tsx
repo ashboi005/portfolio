@@ -1,23 +1,38 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Chakra_Petch, IBM_Plex_Sans, JetBrains_Mono, Press_Start_2P } from "next/font/google";
 
 import "../index.css";
-import Header from "@/components/header";
 import Providers from "@/components/providers";
+import { site } from "@/lib/content";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const chakra = Chakra_Petch({
+  variable: "--font-chakra",
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plex = IBM_Plex_Sans({
+  variable: "--font-plex",
+  weight: ["400", "500", "600"],
+  subsets: ["latin"],
+});
+
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  weight: ["400", "500"],
+  subsets: ["latin"],
+});
+
+// Minecraft-flavoured pixel font, used sparingly in the Deploy History section.
+const pixel = Press_Start_2P({
+  variable: "--font-pixel",
+  weight: ["400"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "portfolio",
-  description: "portfolio",
+  title: site.title,
+  description: site.description,
 };
 
 export default function RootLayout({
@@ -27,13 +42,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
-            {children}
-          </div>
-        </Providers>
+      <body
+        className={`${chakra.variable} ${plex.variable} ${jetbrains.variable} ${pixel.variable} dark antialiased`}
+      >
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

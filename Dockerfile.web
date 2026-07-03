@@ -1,0 +1,44 @@
+# Frontend (Next.js) — build from the REPO ROOT so workspace packages resolve:
+#   docker build -f Dockerfile.web \
+#     --build-arg NEXT_PUBLIC_SERVER_URL=https://api.yourdomain.com \
+#     -t ashwath-web .
+#   docker run -p 3001:3001 ashwath-web
+
+FROM oven/bun:1-alpine AS base
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# ---- deps + build (monorepo, standalone output) ----
+FROM base AS builder
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# NEXT_PUBLIC_* must exist at build time — they're inlined into the bundle.
+ARG NEXT_PUBLIC_SERVER_URL
+ARG NEXT_PUBLIC_CLOUDFRONT_URL
+ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL \
+    NEXT_PUBLIC_CLOUDFRONT_URL=$NEXT_PUBLIC_CLOUDFRONT_URL
+
+COPY . .
+RUN bun install --frozen-lockfile
+RUN bun run --cwd apps/web build
+
+# ---- runtime ----
+FROM base AS runner
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3001
+ENV HOSTNAME="0.0.0.0"
+
+RUN addgroup --system --gid 1001 nodejs \
+    && adduser --system --uid 1001 nextjs
+
+# Standalone bundle is rooted at the monorepo root (outputFileTracingRoot),
+# so server.js lives at apps/web/server.js inside it.
+COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+
+USER nextjs
+EXPOSE 3001
+CMD ["bun", "apps/web/server.js"]

@@ -1,0 +1,447 @@
+{
+  "site": {
+    "brand": "ASHWATH",
+    "brandSuffix": ".SYS",
+    "version": "v5.2.1",
+    "region": "ap-south-1",
+    "title": "ASHWATH.SYS — Backend Engineer & System Design Enthusiast",
+    "description": "Ashwath Soni builds the parts of the internet you're not supposed to see. Distributed systems, cloud infrastructure, and AI agents — served from Punjab, India."
+  },
+
+  "statusQuips": [
+    "it works on my machine ¯\\_(ツ)_/¯",
+    "99 little bugs in the code…",
+    "cache invalidation: still hard",
+    "0 hobbies, 100% uptime",
+    "the cat pushed to prod again",
+    "psst — pet the cats 🐈",
+    "find the 10 hidden sprite cans 🥤",
+    "press ~ for a terminal",
+    "rm -rf /doubt",
+    "TODO: sleep"
+  ],
+
+  "hero": {
+    "statusLine": {
+      "label": "ashwath.service",
+      "since": "08-04-2025 8:48 AM IST",
+      "note": "hobbies.service dead (by design)"
+    },
+    "titles": [
+      { "text": "Backend Engineer" },
+      { "text": "System Design Enthusiast" },
+      { "text": "AI Agent Builder" },
+      { "text": "RAG Pipeline Plumber" },
+      { "text": "Distributed Systems Nerd" },
+      { "text": "Professional Nerd" },
+      { "text": "Open Source Enjoyer" },
+      { "text": "Tea-Powered Developer", "strike": "Coffee" },
+      { "text": "3 AM Debugger" },
+      { "text": "Chronically Online, Perpetually Shipping" }
+    ],
+    "terminalHint": "psst — press [~] to open the terminal. it doesn't bite (the cats might)"
+  },
+
+  "profile": {
+    "name": "Ashwath Soni",
+    "role": "Backend Engineer & System Design Enthusiast",
+    "tagline": "I build the parts of the internet you're not supposed to see.",
+    "status": "Final-year B.Tech CSE @ Guru Nanak Dev University (2023–2027)",
+    "location": "Amritsar/Ludhiana, Punjab, India · UTC+05:30",
+    "bio": "Chronically online, terminally curious. I have exactly zero hobbies — no movies, no music, no touching grass. Just distributed systems, cloud infrastructure, and AI agents doing my bidding. My idea of a good time is watching a queue drain at 3 AM. Everything I ship is built with a production-first mindset: real SaaS, real users, real pager anxiety.",
+    "githubUrl": "https://github.com/ashboi005",
+    "linkedinUrl": "https://linkedin.com/in/ashwath-soni-b5bba32ba",
+    "email": "ashwathsoni005@gmail.com",
+    "interests": [
+      "Distributed Systems",
+      "Event-Driven Architecture",
+      "Agentic AI",
+      "RAG Pipelines",
+      "Cloud Infrastructure",
+      "System Design"
+    ],
+    "arsenal": {
+      "Backend Frameworks": ["FastAPI", "Elysia", "Hono", "Express", "Flask", "Django"],
+      "Languages of Choice": ["Python", "TypeScript"],
+      "Frontend & Web": ["Next.js", "React", "Tailwind CSS", "HTML5", "CSS3"],
+      "Data & Caching": [
+        "PostgreSQL",
+        "MongoDB",
+        "Redis",
+        "Supabase",
+        "Firebase",
+        "Neon",
+        "Meilisearch",
+        "SQLAlchemy",
+        "Drizzle"
+      ],
+      "DevOps & Infra": [
+        "Docker",
+        "AWS Lambda",
+        "AWS S3",
+        "AWS EC2",
+        "AWS Rekognition",
+        "VPS / Linux",
+        "Coolify",
+        "GitHub Actions",
+        "Cloudflare",
+        "GCP",
+        "Vercel"
+      ],
+      "AI & Architecture": [
+        "LLM Agents",
+        "RAG Pipelines",
+        "LangChain",
+        "Prompt Engineering",
+        "Event-Driven Architecture"
+      ],
+      "Daily Drivers": ["Git", "Postman", "Postico", "Terminal-everything", "Claude Code", "Codex", "OpenCode"]
+    }
+  },
+
+  "sections": {
+    "whoami": {
+      "sigil": "SYS",
+      "telemetry": "identity.service — cat /etc/ashwath/release",
+      "title": "whoami"
+    },
+    "vitals": {
+      "sigil": "MON",
+      "telemetry": "vitals.service — htop -u ashwath · sampling live",
+      "title": "System Vitals"
+    },
+    "deploys": {
+      "sigil": "LOG",
+      "telemetry": "career.timeline — tail -f /var/log/deploys · 3 entries",
+      "title": "Deploy History"
+    },
+    "services": {
+      "sigil": "SVC",
+      "telemetry": "portfolio.services — 6 registered · 1 live · 0 crashed",
+      "title": "Running Services"
+    },
+    "wins": {
+      "sigil": "EVT",
+      "telemetry": "community.stream — 5 events · severity: impressive",
+      "title": "Event Stream"
+    },
+    "contact": {
+      "sigil": "API",
+      "telemetry": "contact.gateway — POST /api/v1/contact · auth: none · rate limit: be reasonable",
+      "title": "Send a Request"
+    }
+  },
+
+  "vitals": {
+    "stats": [
+      { "value": 3000, "suffix": "+", "label": "frontline workers upskilled", "note": "one WhatsApp bot" },
+      { "value": 500, "suffix": "+", "label": "records reconciled in < 3s", "note": "InsureZeal engine" },
+      { "value": 90, "suffix": "%", "label": "manual entry time erased", "note": "OCR + Gemini" },
+      { "value": 15, "suffix": "+", "label": "hidden endpoints uncovered", "note": "CodeSentinel, authorized" },
+      { "value": 20, "suffix": "+", "label": "hackathons led as backend", "note": "still counting" },
+      { "value": 0, "suffix": "", "label": "hobbies detected", "note": "as designed", "critical": true }
+    ],
+    "loads": [
+      { "label": "backend & APIs", "pct": 96 },
+      { "label": "distributed systems", "pct": 88 },
+      { "label": "cloud & devops", "pct": 91 },
+      { "label": "ai / agents & RAG", "pct": 84 },
+      { "label": "frontend (allegedly)", "pct": 68 },
+      { "label": "touching grass", "pct": 3, "critical": true }
+    ],
+    "readouts": [
+      { "label": "requests / sec", "base": 1240, "spread": 180, "unit": " rps" },
+      { "label": "p99 latency", "base": 42, "spread": 14, "unit": " ms" },
+      { "label": "cache hit rate", "base": 97, "spread": 4, "unit": " %" },
+      { "label": "coffee level", "base": 12, "spread": 8, "unit": " %" }
+    ]
+  },
+
+  "processes": [
+    { "pid": "001", "name": "coding.exe", "base": 96, "state": "R" },
+    { "pid": "002", "name": "caffeine.daemon", "base": 12, "state": "R" },
+    { "pid": "003", "name": "overthinking.js", "base": 71, "state": "R" },
+    { "pid": "004", "name": "side-quest.rs", "base": 58, "state": "D" },
+    { "pid": "005", "name": "cat-petting.service", "base": 84, "state": "R" },
+    { "pid": "006", "name": "sleep.service", "base": 3, "state": "Z" },
+    { "pid": "007", "name": "touch-grass.sh", "base": 0, "state": "X" }
+  ],
+
+  "experience": [
+    {
+      "id": "autonomix",
+      "role": "Backend Developer Intern",
+      "company": "Autonomix Solutions",
+      "duration": "Aug 2025 – Present",
+      "location": "Remote",
+      "description": "Engineering automation workflows and scalable systems that real companies bet real money on.",
+      "highlights": [
+        "Built the core Elysia API layer for a **RAG-as-a-Service** platform: **multi-tenant architecture**, billing, invite workflows, and knowledge-base-linked chat systems.",
+        "Engineered a corporate WhatsApp learning bot upskilling 3,000+ frontline workers — stateful training engine, AWS Rekognition selfie verification, automated assessment lockouts, OTP-based certificates.",
+        "Developed the backend for an EdTech live-session module used by top Indian institutes (IITs/IIMs): faculty onboarding, automatic scheduling, automated invoicing, systematized email pipelines."
+      ],
+      "isActive": true
+    },
+    {
+      "id": "saaz-lead",
+      "role": "Freelance Backend & Team Lead",
+      "company": "Saaz Creations",
+      "duration": "2025 – Present",
+      "location": "Remote",
+      "description": "Wearing the architect hat and the team-lead hat at the same time. Both fit.",
+      "highlights": [
+        "Architected and deployed a production-grade e-commerce backend on a custom VPS: Docker, PostgreSQL, Redis, AWS S3.",
+        "Led direct client communications and managed a small backend team — enforcing code quality and shipping features that stay shipped."
+      ],
+      "isActive": true
+    },
+    {
+      "id": "hesh",
+      "role": "Freelance Backend Developer",
+      "company": "Hesh Media",
+      "duration": "Dec 2024 – Sep 2025",
+      "location": "Amritsar, Punjab",
+      "description": "The foundational engineer for multiple commercial clients — cloud accounts, database schemas, and CI/CD, all from an empty repo.",
+      "highlights": [
+        "Developed a live insurance operations platform (NDA): **OCR/Gemini AI** policy ingestion cut manual entry time by 90%.",
+        "Built an automated reconciliation system processing 500+ records in under 3 seconds.",
+        "Implemented a patient appointment system with Next.js server actions and EmailJS."
+      ],
+      "isActive": false
+    }
+  ],
+
+  "projects": [
+    {
+      "id": "codesentinel",
+      "title": "CodeSentinel",
+      "tagline": "The cyber-defense agent that never sleeps. (Neither do I, but that's beside the point.)",
+      "description": "An **autonomous, privacy-first** security agent built to democratize cybersecurity. It reads intent, context, and patterns instead of just grepping for CVEs — a force multiplier for teams that can't afford a red team.",
+      "status": "lab",
+      "year": "2025",
+      "highlights": [
+        "Static mode: audits local repos, auto-fixes vulnerabilities, and packages the changes into ready-to-merge GitHub PRs.",
+        "Dynamic mode: explores live URLs like a security researcher — uncovered 15+ hidden endpoints (including exposed Supabase REST/storage URLs) on an authorized target.",
+        "Reached **plaintext credentials** on a live authorized target in under 10 minutes."
+      ],
+      "techStack": ["Docker", "Agentic AI", "OpenAI", "Anthropic", "Ollama", "Security Tooling"],
+      "githubUrl": null,
+      "liveUrl": null,
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "insurezeal",
+      "title": "InsureZeal",
+      "tagline": "Insurance paperwork, minus the humans who hate doing it.",
+      "description": "A **fully automated** insurance management SaaS covering the entire policy lifecycle: creation, claims workflows, customer portal, analytics, document processing, and multi-channel comms — all gated behind **granular role-based access control**.",
+      "status": "nda",
+      "year": "2025",
+      "highlights": [
+        "OCR + Gemini AI policy ingestion cut manual data entry time by 90%.",
+        "Automated reconciliation engine chews through 500+ records in under 3 seconds.",
+        "Granular RBAC so the intern can't nuke the claims table."
+      ],
+      "techStack": ["FastAPI", "PostgreSQL", "Redis", "Gemini AI", "OCR", "Next.js"],
+      "githubUrl": null,
+      "liveUrl": null,
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "saaz",
+      "title": "Saaz Creations",
+      "tagline": "A real store, making real money, on a VPS I babysit personally.",
+      "description": "A **live e-commerce platform** with smooth browsing and checkout, WhatsApp marketing, Fast2SMS broadcasting, Razorpay payment workflows, and automated campaign management. Deployed on a **custom VPS** I run like a tiny data center.",
+      "status": "live",
+      "year": "2025",
+      "highlights": [
+        "Production-grade backend on self-managed infrastructure: Docker, PostgreSQL, Redis, AWS S3.",
+        "Integrated WhatsApp + SMS campaign automation that actually converts.",
+        "Razorpay checkout flows hardened against every weird payment state I could produce."
+      ],
+      "techStack": ["Docker", "PostgreSQL", "Redis", "AWS S3", "Razorpay", "Next.js"],
+      "githubUrl": null,
+      "liveUrl": null,
+      "image": null,
+      "featured": true
+    },
+    {
+      "id": "kmaxx",
+      "title": "Kmaxx Hospital",
+      "tagline": "Hospital management with a CMS the staff actually use.",
+      "description": "A comprehensive hospital management and showcase platform with department management, doctor profiles, and a fully integrated appointment booking system that fires off email notifications automatically.",
+      "status": "shipped",
+      "year": "2024",
+      "highlights": [
+        "Custom-built Sanity CMS workflows for non-technical staff.",
+        "Appointment booking with automatic email notifications to doctors and patients."
+      ],
+      "techStack": ["Next.js", "Sanity CMS", "EmailJS"],
+      "githubUrl": null,
+      "liveUrl": null,
+      "image": null,
+      "featured": false
+    },
+    {
+      "id": "mundra",
+      "title": "Mundra Dental Clinic",
+      "tagline": "Proof that I can, in fact, make things look nice.",
+      "description": "A dedicated frontend showcase for a dental clinic — services, treatment specializations, and a highly responsive design optimized for patients browsing at 11 PM with a toothache.",
+      "status": "shipped",
+      "year": "2024",
+      "highlights": [
+        "Fully responsive patient-first design.",
+        "Service and treatment discovery tuned for conversion."
+      ],
+      "techStack": ["Next.js", "Tailwind CSS"],
+      "githubUrl": null,
+      "liveUrl": null,
+      "image": null,
+      "featured": false
+    },
+    {
+      "id": "maps-scraper",
+      "title": "Google Maps Scraping Extension",
+      "tagline": "Location intelligence for people who'd rather not click 400 times.",
+      "description": "A browser extension that efficiently extracts and processes business data from Google Maps — streamlined lead generation and location intelligence without the manual grind.",
+      "status": "lab",
+      "year": "2024",
+      "highlights": [
+        "In-browser extraction pipeline with structured data output.",
+        "Built for lead-gen workflows: scrape, clean, export, done."
+      ],
+      "techStack": ["Browser Extension", "TypeScript", "Data Pipelines"],
+      "githubUrl": null,
+      "liveUrl": null,
+      "image": null,
+      "featured": false
+    }
+  ],
+
+  "rank": {
+    "tier": "Hackathon Veteran",
+    "podium": 3,
+    "teamsLed": 20,
+    "teamsSuffix": "+",
+    "xpPct": 87,
+    "nextTier": "Certified Nerd Emeritus"
+  },
+
+  "achievements": [
+    {
+      "id": "gdgoc",
+      "title": "GDGoC Lead & CESS Tech Club Co-Lead",
+      "detail": "Lead Organizer for Google Developer Groups on Campus at GNDU. Spearheaded 2 major offline hackathons (150+ participants each) and 4 online hackathons.",
+      "year": "2025–2026",
+      "kind": "lead"
+    },
+    {
+      "id": "statusbrew",
+      "title": "2nd Prize — StatusBrew Hackathon 1.0 & 2.0",
+      "detail": "Back-to-back podium finishes. Same hackathon, twice the silverware.",
+      "year": "2025",
+      "kind": "win"
+    },
+    {
+      "id": "tutedude",
+      "title": "3rd Place — Tutedude Buildathon",
+      "detail": "Built fast, shipped faster.",
+      "year": "2025",
+      "kind": "win"
+    },
+    {
+      "id": "nitj",
+      "title": "Ranked 7th of 70+ teams — NIT Jalandhar National Hackathon",
+      "detail": "National-level competition, top 10 percent.",
+      "year": "2025",
+      "kind": "win"
+    },
+    {
+      "id": "hackathons",
+      "title": "Backend / Team Lead across 20+ hackathons",
+      "detail": "Task planning, code reviews, and keeping the demo from crashing at minute 59.",
+      "year": "ongoing",
+      "kind": "community"
+    }
+  ],
+
+  "facts": [
+    "I once reached plaintext creds on a live target in under 10 minutes. Ethically. With permission. Mostly for the bragging rights.",
+    "My commit history has more activity between 1 AM and 4 AM than the entire rest of the day.",
+    "Ask me about queues. Please. I will not stop.",
+    "I've led 20+ hackathon teams and my hoarse voice at hour 23 is basically a load-bearing feature.",
+    "Hobbies: null. Not undefined — explicitly null. It was a choice.",
+    "I run a production e-commerce store on a VPS I babysit like it's a Tamagotchi."
+  ],
+
+  "activity": [
+    "cat.service: knocked mug off desk (exit 137)",
+    "deploy: saaz-creations → prod ok (2.1s)",
+    "redis: evicted 42 keys, judged them silently",
+    "merged PR #418: 'i swear this is the last refactor'",
+    "3am.timer fired: began overthinking the architecture",
+    "coffee.level critical → failing over to tea",
+    "gc: collected 3 zombie promises",
+    "ssh: someone knocking on port 22 again",
+    "build: green. deeply suspicious.",
+    "cron: fed the cats (0 0 * * *)",
+    "queue drained. serotonin +5",
+    "webhook: InsureZeal reconciled 500 rows in 2.9s",
+    "rekognition: verified 1 selfie, 0 impostors",
+    "cat.service: requested pets (priority: high)"
+  ],
+
+  "boot": {
+    "lines": [
+      "> POST /boot HTTP/2 200",
+      "> negotiating TLS handshake … ok",
+      "> kernel: ashwath-5.2.1-prod (bun runtime)",
+      "> modules: [distributed-systems] [agentic-ai] [caffeine] … ok",
+      "> fsck /dev/backend … clean (0 bad sectors, unlike my sleep schedule)",
+      "> mount /var/hobbies … NOT FOUND (working as intended)",
+      "> spawning cats … 2 daemons online 🐈",
+      "> systemd: reached target ALIVE."
+    ],
+    "granted": "> ACCESS GRANTED — welcome to the system."
+  },
+
+  "contact": {
+    "responseMessage": "Request accepted. Response SLA: faster than my CI pipeline."
+  },
+
+  "game": {
+    "total": 10,
+    "intro": "Oh — you found one! Confession: I drink Sprite way too often and keep leaving cans all over my website. Can you help me find them all and give them back? There are 10 in total.",
+    "lines": [
+      "Can #{n} recovered! The recycling gods smile upon you.",
+      "That's #{n}. My dentist is thanking you already.",
+      "#{n} down. This one was behind a semicolon.",
+      "#{n}! You're better at this than my garbage collector.",
+      "Halfway-ish. #{n} cans. The cats are watching, impressed.",
+      "#{n} found. Fizz levels stabilizing.",
+      "#{n}! Somewhere a vending machine feels seen.",
+      "#{n} cans. Your git blame is spotless.",
+      "Almost there — #{n}. One more sip… I mean, can.",
+      "#{n} of 10. Caffeine-free and victorious."
+    ],
+    "reward": "ACHIEVEMENT UNLOCKED: Certified Snack Locator 🥤 — you found all 10 sprite cans. Your reward is this deep sense of accomplishment (and the knowledge that the cats drank the rest). A real prize is loading… ETA: never. Thanks for cleaning up after me."
+  },
+
+  "floaters": [
+    "/floaters/braces.svg",
+    "/floaters/terminal.svg",
+    "/floaters/database.svg",
+    "/floaters/cloud.svg",
+    "/floaters/cube.svg",
+    "/floaters/gear.svg",
+    "/floaters/git.svg",
+    "/floaters/paw.svg"
+  ],
+
+  "footer": {
+    "note": "// there are 10 types of people: those who read this footer, and those who don't.",
+    "copyright": "handcrafted, then aggressively over-engineered. no cats were rate-limited in the making of this site.",
+    "stackLine": "built on Next.js · one editable JSON file · Bun · far too much CSS"
+  }
+}

@@ -8,19 +8,26 @@
     "start": "next start"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.4.9",
+    "@gsap/react": "^2.1.2",
     "@portfolio/auth": "workspace:*",
     "@portfolio/env": "workspace:*",
     "@portfolio/ui": "workspace:*",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "@tanstack/react-form": "^1.28.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
+    "gsap": "^3.15.0",
     "lucide-react": "catalog:",
+    "motion": "^12.42.2",
     "next": "^16.2.0",
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sonner": "catalog:",
+    "three": "^0.185.1",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -29,6 +36,7 @@
     "@types/node": "^20",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@types/three": "^0.185.0",
     "tailwindcss": "catalog:",
     "typescript": "catalog:"
   }

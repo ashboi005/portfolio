@@ -1,1 +1,872 @@
 @import "@portfolio/ui/globals.css";
+
+/* ---------------------------------- */
+/* ASHWATH.SYS — effect & HUD layer   */
+/* ---------------------------------- */
+
+/* Mono service eyebrow above every section title */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.eyebrow .sigil {
+  color: var(--cyan);
+}
+
+/* Gold = keywords only. Used inline inside prose. */
+.keyword {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Red = critical only. */
+.critical {
+  color: var(--signal-red);
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Instrument panel */
+.panel {
+  background: color-mix(in srgb, var(--surface-raw) 88%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.panel-hover:hover {
+  border-color: rgba(51, 224, 255, 0.35);
+  box-shadow: 0 0 0 1px rgba(51, 224, 255, 0.12), 0 0 32px rgba(51, 224, 255, 0.05);
+}
+
+/* Corner ticks — instrument framing on featured panels */
+.corner-ticks {
+  position: relative;
+}
+.corner-ticks::before,
+.corner-ticks::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(51, 224, 255, 0.5);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-ticks::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+.corner-ticks::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 1px 1px 0;
+}
+
+/* Blinking terminal cursor */
+@keyframes cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.blink-cursor {
+  animation: cursor-blink 1.06s steps(2, start) infinite;
+}
+
+/* Status LED pulse */
+@keyframes led-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 6px currentColor;
+  }
+  50% {
+    opacity: 0.45;
+    box-shadow: 0 0 2px currentColor;
+  }
+}
+.led {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: led-pulse 2.4s ease-in-out infinite;
+}
+
+/* Glitch — two clipped color-shifted copies behind the text.
+   Data comes from data-text attr. Triggered by .glitch-active or hover. */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.glitch-active::before,
+.glitch:hover::before {
+  opacity: 0.8;
+  color: var(--cyan);
+  animation: glitch-shift-a 0.32s steps(2, jump-none) 1;
+}
+.glitch-active::after,
+.glitch:hover::after {
+  opacity: 0.8;
+  color: var(--signal-red);
+  animation: glitch-shift-b 0.32s steps(2, jump-none) 1;
+}
+@keyframes glitch-shift-a {
+  0% {
+    transform: translate(-3px, 2px);
+    clip-path: inset(12% 0 58% 0);
+  }
+  50% {
+    transform: translate(3px, -1px);
+    clip-path: inset(62% 0 8% 0);
+  }
+  100% {
+    transform: translate(0, 0);
+    clip-path: inset(40% 0 40% 0);
+  }
+}
+@keyframes glitch-shift-b {
+  0% {
+    transform: translate(3px, -2px);
+    clip-path: inset(58% 0 12% 0);
+  }
+  50% {
+    transform: translate(-3px, 1px);
+    clip-path: inset(8% 0 66% 0);
+  }
+  100% {
+    transform: translate(0, 0);
+    clip-path: inset(45% 0 45% 0);
+  }
+}
+
+/* Faint blueprint grid behind sections */
+.grid-texture {
+  background-image:
+    linear-gradient(rgba(230, 233, 242, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 233, 242, 0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Scanline sweep across the hero — one thin line drifting down */
+@keyframes scanline-drift {
+  0% {
+    top: -2%;
+  }
+  100% {
+    top: 102%;
+  }
+}
+.scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(51, 224, 255, 0.25), transparent);
+  animation: scanline-drift 9s linear infinite;
+  pointer-events: none;
+}
+
+/* Log line hover — the deploy log rows */
+.log-row {
+  border-left: 1px solid var(--line);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+.log-row:hover {
+  border-left-color: var(--cyan);
+  background: rgba(51, 224, 255, 0.03);
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* -------------------------------------------------- */
+/* Custom cursor — hide the OS cursor on fine pointers */
+/* -------------------------------------------------- */
+@media (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+  /* keep a caret where people actually type */
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+.cursor-core {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  pointer-events: none;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  transform: translate3d(-100px, -100px, 0) rotate(45deg);
+  background: var(--cyan);
+  box-shadow: 0 0 10px 1px rgba(51, 224, 255, 0.9);
+  transition: width 140ms ease, height 140ms ease, background-color 140ms ease, border-radius 140ms ease;
+  will-change: transform;
+}
+/* over interactive targets: open into a reticle ring */
+.cursor-core.is-hovering {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  border-radius: 2px;
+  box-shadow: 0 0 14px rgba(51, 224, 255, 0.35);
+}
+/* mousedown: snap to a red targeting square (transmit / lock) */
+.cursor-core.is-down {
+  background: var(--signal-red);
+  box-shadow: 0 0 14px 2px rgba(255, 70, 85, 0.9);
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+}
+.cursor-core.is-down.is-hovering {
+  background: transparent;
+  border-color: var(--signal-red);
+  box-shadow: 0 0 16px rgba(255, 70, 85, 0.4);
+}
+
+.cursor-packet {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 89;
+  pointer-events: none;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  background: var(--cyan);
+  border-radius: 1px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* click ripple ping */
+.cursor-ping {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 88;
+  pointer-events: none;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 1px solid var(--cyan);
+  border-radius: 2px;
+  opacity: 0;
+}
+@keyframes cursor-ping-out {
+  0% {
+    transform: scale(0.4) rotate(45deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(4.2) rotate(45deg);
+    opacity: 0;
+  }
+}
+.cursor-ping.fire {
+  animation: cursor-ping-out 520ms ease-out 1;
+}
+
+/* -------------------------------------------------- */
+/* Boot / power-on overlay                            */
+/* -------------------------------------------------- */
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--void);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.boot-overlay.crt-off {
+  animation: crt-power-off 620ms cubic-bezier(0.7, 0, 0.3, 1) forwards;
+}
+@keyframes crt-power-off {
+  0% {
+    transform: scale(1, 1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  55% {
+    transform: scale(1.02, 0.006);
+    opacity: 1;
+    filter: brightness(3);
+  }
+  80% {
+    transform: scale(0.4, 0.004);
+    filter: brightness(6);
+  }
+  100% {
+    transform: scale(0, 0);
+    opacity: 0;
+    filter: brightness(8);
+  }
+}
+.boot-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(51, 224, 255, 0.04) 0px,
+    rgba(51, 224, 255, 0.04) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: screen;
+}
+
+/* -------------------------------------------------- */
+/* Live monitors (vitals)                             */
+/* -------------------------------------------------- */
+.meter-track {
+  height: 6px;
+  background: var(--surface-2-raw);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--cyan-deep), var(--cyan));
+  box-shadow: 0 0 10px rgba(51, 224, 255, 0.5);
+  transition: width 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* scrolling sine "signal" strip that lives in the vitals monitor */
+@keyframes signal-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -80px 0;
+  }
+}
+.signal-strip {
+  height: 40px;
+  background-image: radial-gradient(circle at 10px 20px, rgba(51, 224, 255, 0.5) 1px, transparent 2px);
+  background-size: 20px 40px;
+  animation: signal-scroll 1.6s linear infinite;
+  opacity: 0.5;
+}
+
+/* -------------------------------------------------- */
+/* Horizontal scroll-jack track                       */
+/* -------------------------------------------------- */
+.hscroll-viewport {
+  overflow: hidden;
+}
+.hscroll-track {
+  display: flex;
+  gap: 24px;
+  will-change: transform;
+}
+
+/* -------------------------------------------------- */
+/* Roaming cats                                       */
+/* -------------------------------------------------- */
+.cat-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 32;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cat-root {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  will-change: transform;
+}
+/* Pixel cats — crisp blocky sprites, cyan only */
+.cat svg {
+  display: block;
+  overflow: visible;
+  shape-rendering: crispEdges;
+}
+.cat .leg,
+.cat .cat-tail,
+.cat .cat-eye,
+.cat .cat-body {
+  transform-box: fill-box;
+}
+.cat .leg {
+  transform-origin: 50% 100%;
+}
+.cat .cat-tail {
+  transform-origin: 100% 100%;
+  animation: cat-tail-flick 1.4s steps(2, jump-none) infinite;
+}
+.cat .cat-eye {
+  transform-origin: center;
+  animation: cat-blink 4.2s steps(1, jump-none) infinite;
+}
+@keyframes cat-tail-flick {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@keyframes cat-blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.15);
+  }
+}
+/* 2-frame stepped walk — legs jump between two positions (retro sprite feel) */
+.is-walking .leg-b1,
+.is-walking .leg-f2 {
+  animation: pix-step-a 0.34s steps(1, jump-none) infinite;
+}
+.is-walking .leg-b2,
+.is-walking .leg-f1 {
+  animation: pix-step-b 0.34s steps(1, jump-none) infinite;
+}
+.is-walking .cat-body {
+  animation: cat-bob 0.34s steps(2, jump-none) infinite;
+}
+@keyframes pix-step-a {
+  0%,
+  49% {
+    transform: translateY(0);
+  }
+  50%,
+  100% {
+    transform: translateY(-3px);
+  }
+}
+@keyframes pix-step-b {
+  0%,
+  49% {
+    transform: translateY(-3px);
+  }
+  50%,
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes cat-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+/* Sleepy-cat Zzz drift */
+@keyframes zzz-rise {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-26px) scale(1.2);
+    opacity: 0;
+  }
+}
+.zzz {
+  animation: zzz-rise 2.8s ease-out infinite;
+}
+
+/* Edge-crawler cat container */
+.edge-cat {
+  position: fixed;
+  z-index: 33;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Card knocked by a cat landing */
+@keyframes card-knock {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    transform: translateY(10px) rotate(-2.2deg);
+  }
+  45% {
+    transform: translateY(-4px) rotate(1.4deg);
+  }
+  70% {
+    transform: translateY(3px) rotate(-0.6deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+.card-knock {
+  animation: card-knock 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Arsenal scan sweep */
+@keyframes arsenal-scan {
+  0% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+.arsenal-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(51, 224, 255, 0.12), transparent);
+  animation: arsenal-scan 5.5s ease-in-out infinite;
+}
+
+/* Cursor dev-glyph trail */
+.cursor-glyph {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 89;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cyan);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* HTTP-code burst on click */
+.http-pop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+/* -------------------------------------------------- */
+/* Minecraft-flavoured blocks (Deploy History)        */
+/* -------------------------------------------------- */
+.font-pixel {
+  font-family: var(--font-pixel);
+}
+/* a block with the classic beveled Minecraft edge, tinted cyan */
+.mc-block {
+  background: #0c1017;
+  border: 3px solid #0a0c13;
+  box-shadow:
+    inset 3px 3px 0 rgba(51, 224, 255, 0.14),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.55);
+  image-rendering: pixelated;
+  transition: transform 120ms steps(2, jump-none), box-shadow 160ms ease;
+}
+.mc-block:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 3px 3px 0 rgba(51, 224, 255, 0.28),
+    inset -3px -3px 0 rgba(0, 0, 0, 0.55),
+    0 0 22px rgba(51, 224, 255, 0.14);
+}
+/* dirt/grass-style top strip but in cyan */
+.mc-grass-top {
+  height: 8px;
+  background:
+    repeating-linear-gradient(90deg, #33e0ff 0 6px, #22b8d8 6px 12px);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+}
+@keyframes mc-spawn {
+  0% {
+    transform: translateY(18px) scale(0.9);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-4px) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* -------------------------------------------------- */
+/* Floating icons (physics layer)                     */
+/* -------------------------------------------------- */
+.floaters-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.floater {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  filter: grayscale(1) brightness(1.6) opacity(0.12);
+}
+.floater img,
+.floater svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Sprite-can hunt */
+.sprite-can {
+  position: absolute;
+  z-index: 20;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: drop-shadow(0 0 6px rgba(51, 224, 255, 0.35));
+  transition: transform 150ms ease;
+}
+.sprite-can:hover {
+  transform: scale(1.15) rotate(-6deg);
+}
+@keyframes can-collect {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8) translateY(-40px);
+    opacity: 0;
+  }
+}
+.can-collected {
+  animation: can-collect 0.5s ease-out forwards;
+}
+
+/* pet-the-cat hearts */
+@keyframes heart-float {
+  0% {
+    transform: translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-46px) scale(1.1);
+    opacity: 0;
+  }
+}
+.pet-heart {
+  position: fixed;
+  z-index: 85;
+  pointer-events: none;
+  color: var(--signal);
+  font-size: 16px;
+  animation: heart-float 1s ease-out forwards;
+}
+
+/* Event-stream rank badge shine */
+@keyframes badge-shine {
+  0% {
+    background-position: -150% 0;
+  }
+  60%,
+  100% {
+    background-position: 250% 0;
+  }
+}
+.badge-shine {
+  background-image: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(51, 224, 255, 0.35) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: badge-shine 3.2s ease-in-out infinite;
+}
+@keyframes trophy-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px rgba(245, 197, 24, 0.4));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 16px rgba(245, 197, 24, 0.7));
+  }
+}
+.trophy-pulse {
+  animation: trophy-pulse 2.6s ease-in-out infinite;
+}
+
+/* -------------------------------------------------- */
+/* Ambient floating 2D/3D glyphs                      */
+/* -------------------------------------------------- */
+.float-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.float-glyph {
+  position: absolute;
+  color: var(--cyan);
+  opacity: 0.14;
+  font-family: var(--font-mono);
+  will-change: transform;
+  animation: glyph-drift var(--dur, 18s) ease-in-out infinite;
+}
+@keyframes glyph-drift {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-22px) translateX(10px) rotate(8deg);
+  }
+  66% {
+    transform: translateY(12px) translateX(-14px) rotate(-6deg);
+  }
+}
+/* CSS 3D wireframe cube */
+.wire-cube {
+  position: absolute;
+  transform-style: preserve-3d;
+  animation: cube-spin var(--dur, 16s) linear infinite;
+  opacity: 0.16;
+}
+.wire-cube .face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--cyan);
+}
+@keyframes cube-spin {
+  from {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Deploy pipeline (draws on scroll)                  */
+/* -------------------------------------------------- */
+.pipeline-line {
+  stroke: var(--cyan);
+  stroke-width: 2;
+  fill: none;
+  filter: drop-shadow(0 0 4px rgba(51, 224, 255, 0.5));
+}
+.pipeline-node {
+  transition: fill 300ms ease, r 300ms ease;
+}
+
+/* falling chip (knocked into the box) */
+.chip-fall {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-packet,
+  .cursor-ping,
+  .signal-strip,
+  .cat .cat-tail,
+  .cat .cat-eye,
+  .is-walking .leg-b1,
+  .is-walking .leg-b2,
+  .is-walking .leg-f1,
+  .is-walking .leg-f2,
+  .is-walking .cat-body,
+  .float-glyph,
+  .wire-cube,
+  .zzz,
+  .arsenal-scan,
+  .badge-shine,
+  .trophy-pulse,
+  .cursor-glyph,
+  .boot-overlay.crt-off {
+    animation: none !important;
+  }
+}
+
+/* JSON syntax colors for the contact API console */
+.json-key {
+  color: var(--cyan);
+}
+.json-string {
+  color: var(--gold);
+}
+.json-plain {
+  color: var(--text-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink-cursor,
+  .led,
+  .scanline,
+  .glitch::before,
+  .glitch::after {
+    animation: none !important;
+  }
+  .scanline {
+    display: none;
+  }
+}
