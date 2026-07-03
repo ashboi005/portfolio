@@ -9,16 +9,38 @@
   },
 
   "statusQuips": [
-    "it works on my machine ¯\\_(ツ)_/¯",
-    "99 little bugs in the code…",
-    "cache invalidation: still hard",
     "0 hobbies, 100% uptime",
-    "the cat pushed to prod again",
-    "psst — pet the cats 🐈",
-    "find the 10 hidden sprite cans 🥤",
-    "press ~ for a terminal",
+    "have you tried turning the Docker container off and on?",
+    "git commit -m 'fixed stuff'",
+    "the cat pushed to prod again (wasn't me, I swear)",
+    "HTTP 418 I'm a teapot 🫖",
+    "Elysia + Bun = 🏎️💨",
     "rm -rf /doubt",
-    "TODO: sleep"
+    "just one more refactor, I swear",
+    "my AI agent wrote this quip",
+    "it works on my machine ¯\\_(ツ)_/¯",
+    "SELECT * FROM motivation WHERE tea_quantity > 0;",
+    "hobbies? never heard of that npm package",
+    "psst — pet the cats 🐈",
+    "currently arguing with a RAG pipeline",
+    "99 little bugs in the code…",
+    "touching grass is just a mock API call away",
+    "localhost:3000 is my actual home address",
+    "find the 10 hidden sprite cans 🥤",
+    "Postgres > your favorite database",
+    "powered by tea and unhandled promise rejections",
+    "deploying to prod on a Friday... what could go wrong?",
+    "TODO: sleep",
+    "I'd have a hobby if it had a REST API",
+    "hallucinating slightly less than the LLMs I use",
+    "eventual consistency means 'it'll work eventually, right?'",
+    "press ~ for a terminal",
+    "prompt injection protected (hopefully)",
+    "sudo make me a sandwich",
+    "currently touching grass... virtually",
+    "*sips tea* — ah, the taste of productivity",
+    "cache invalidation: still hard",
+    "Where's my Sprite can? 🥤"
   ],
 
   "hero": {
@@ -30,24 +52,27 @@
     "titles": [
       { "text": "Backend Engineer" },
       { "text": "System Design Enthusiast" },
+      { "text": "Learning DevOps" },
       { "text": "AI Agent Builder" },
       { "text": "RAG Pipeline Plumber" },
       { "text": "Distributed Systems Nerd" },
+      { "text": "Minecraft Enjoyer" },
+      { "text": "I suck at making nice UI/UX" },
       { "text": "Professional Nerd" },
-      { "text": "Open Source Enjoyer" },
       { "text": "Tea-Powered Developer", "strike": "Coffee" },
       { "text": "3 AM Debugger" },
-      { "text": "Chronically Online, Perpetually Shipping" }
+      { "text": "Chronically Online, Perpetually Shipping" },
+      { "text": "I am bad at math (like really bad)" }
     ],
     "terminalHint": "psst — press [~] to open the terminal. it doesn't bite (the cats might)"
   },
 
   "profile": {
     "name": "Ashwath Soni",
-    "role": "Backend Engineer & System Design Enthusiast",
+    "role": "Backend Engineer",
     "tagline": "I build the parts of the internet you're not supposed to see.",
     "status": "Final-year B.Tech CSE @ Guru Nanak Dev University (2023–2027)",
-    "location": "Amritsar/Ludhiana, Punjab, India · UTC+05:30",
+    "location": "Amritsar, Punjab, India · UTC+05:30",
     "bio": "Chronically online, terminally curious. I have exactly zero hobbies — no movies, no music, no touching grass. Just distributed systems, cloud infrastructure, and AI agents doing my bidding. My idea of a good time is watching a queue drain at 3 AM. Everything I ship is built with a production-first mindset: real SaaS, real users, real pager anxiety.",
     "githubUrl": "https://github.com/ashboi005",
     "linkedinUrl": "https://linkedin.com/in/ashwath-soni-b5bba32ba",
@@ -61,9 +86,9 @@
       "System Design"
     ],
     "arsenal": {
-      "Backend Frameworks": ["FastAPI", "Elysia", "Hono", "Express", "Flask", "Django"],
+      "Backend Frameworks": ["FastAPI", "Elysia", "HONO", "Express", "Flask", "Django"],
       "Languages of Choice": ["Python", "TypeScript"],
-      "Frontend & Web": ["Next.js", "React", "Tailwind CSS", "HTML5", "CSS3"],
+      "Frontend & Web": ["Next.js", "React", "Tailwind CSS", "Sanity CMS"],
       "Data & Caching": [
         "PostgreSQL",
         "MongoDB",
@@ -73,7 +98,8 @@
         "Neon",
         "Meilisearch",
         "SQLAlchemy",
-        "Drizzle"
+        "Drizzle",
+        "Prisma"
       ],
       "DevOps & Infra": [
         "Docker",
@@ -86,16 +112,24 @@
         "GitHub Actions",
         "Cloudflare",
         "GCP",
-        "Vercel"
+        "Vercel",
+        "Tailscale"
       ],
       "AI & Architecture": [
         "LLM Agents",
         "RAG Pipelines",
         "LangChain",
         "Prompt Engineering",
-        "Event-Driven Architecture"
+        "AI Agents & Orchestration",
+        "Event-Driven Architecture",
+        "Pub/Sub Systems",
+        "Message Queues",
+        "Webhooks",
+        "WebSockets",
+        "gRPC",
+        "REST APIs"
       ],
-      "Daily Drivers": ["Git", "Postman", "Postico", "Terminal-everything", "Claude Code", "Codex", "OpenCode"]
+      "Daily Drivers": ["VS Code", "Git", "Postman", "Postico", "Terminal-everything", "Claude Code", "Codex", "OpenCode", "Discord"]
     }
   },
 
@@ -135,10 +169,10 @@
   "vitals": {
     "stats": [
       { "value": 3000, "suffix": "+", "label": "frontline workers upskilled", "note": "one WhatsApp bot" },
-      { "value": 500, "suffix": "+", "label": "records reconciled in < 3s", "note": "InsureZeal engine" },
+      { "value": 500, "suffix": "+", "label": "records reconciled in < 2s", "note": "InsureZeal engine" },
       { "value": 90, "suffix": "%", "label": "manual entry time erased", "note": "OCR + Gemini" },
       { "value": 15, "suffix": "+", "label": "hidden endpoints uncovered", "note": "CodeSentinel, authorized" },
-      { "value": 20, "suffix": "+", "label": "hackathons led as backend", "note": "still counting" },
+      { "value": 20, "suffix": "+", "label": "hackathons led as team lead", "note": "still counting" },
       { "value": 0, "suffix": "", "label": "hobbies detected", "note": "as designed", "critical": true }
     ],
     "loads": [
@@ -146,22 +180,22 @@
       { "label": "distributed systems", "pct": 88 },
       { "label": "cloud & devops", "pct": 91 },
       { "label": "ai / agents & RAG", "pct": 84 },
-      { "label": "frontend (allegedly)", "pct": 68 },
+      { "label": "frontend (allegedly)", "pct": 40 },
       { "label": "touching grass", "pct": 3, "critical": true }
     ],
     "readouts": [
       { "label": "requests / sec", "base": 1240, "spread": 180, "unit": " rps" },
       { "label": "p99 latency", "base": 42, "spread": 14, "unit": " ms" },
       { "label": "cache hit rate", "base": 97, "spread": 4, "unit": " %" },
-      { "label": "coffee level", "base": 12, "spread": 8, "unit": " %" }
+      { "label": "tea level", "base": 12, "spread": 34, "unit": " %" }
     ]
   },
 
   "processes": [
     { "pid": "001", "name": "coding.exe", "base": 96, "state": "R" },
-    { "pid": "002", "name": "caffeine.daemon", "base": 12, "state": "R" },
-    { "pid": "003", "name": "overthinking.js", "base": 71, "state": "R" },
-    { "pid": "004", "name": "side-quest.rs", "base": 58, "state": "D" },
+    { "pid": "002", "name": "tea.daemon", "base": 12, "state": "R" },
+    { "pid": "003", "name": "overthinking.ts", "base": 71, "state": "R" },
+    { "pid": "004", "name": "side-quest.py", "base": 58, "state": "D" },
     { "pid": "005", "name": "cat-petting.service", "base": 84, "state": "R" },
     { "pid": "006", "name": "sleep.service", "base": 3, "state": "Z" },
     { "pid": "007", "name": "touch-grass.sh", "base": 0, "state": "X" }
@@ -224,8 +258,8 @@
         "Dynamic mode: explores live URLs like a security researcher — uncovered 15+ hidden endpoints (including exposed Supabase REST/storage URLs) on an authorized target.",
         "Reached **plaintext credentials** on a live authorized target in under 10 minutes."
       ],
-      "techStack": ["Docker", "Agentic AI", "OpenAI", "Anthropic", "Ollama", "Security Tooling"],
-      "githubUrl": null,
+      "techStack": ["Docker", "Agentic AI", "Open Harness", "Open Router", "Ollama", "Security Tooling", "Trufflehog", "Semggrep"],
+      "githubUrl": "https://github.com/ashboi005/code-sentinel",
       "liveUrl": null,
       "image": null,
       "featured": true
@@ -242,7 +276,7 @@
         "Automated reconciliation engine chews through 500+ records in under 3 seconds.",
         "Granular RBAC so the intern can't nuke the claims table."
       ],
-      "techStack": ["FastAPI", "PostgreSQL", "Redis", "Gemini AI", "OCR", "Next.js"],
+      "techStack": ["FastAPI", "PostgreSQL", "Redis", "Gemini AI", "OCR", "Google Sheets API", "Supabase", "Custom VPS","Next.js"],
       "githubUrl": null,
       "liveUrl": null,
       "image": null,
@@ -260,7 +294,7 @@
         "Integrated WhatsApp + SMS campaign automation that actually converts.",
         "Razorpay checkout flows hardened against every weird payment state I could produce."
       ],
-      "techStack": ["Docker", "PostgreSQL", "Redis", "AWS S3", "Razorpay", "Next.js"],
+      "techStack": ["FastAPI", "Docker", "PostgreSQL", "Redis", "AWS S3", "Fast2SMS", "Razorpay", "Next.js"],
       "githubUrl": null,
       "liveUrl": null,
       "image": null,
@@ -294,7 +328,7 @@
         "Fully responsive patient-first design.",
         "Service and treatment discovery tuned for conversion."
       ],
-      "techStack": ["Next.js", "Tailwind CSS"],
+      "techStack": ["React", "Tailwind CSS", "EmailJS"],
       "githubUrl": null,
       "liveUrl": null,
       "image": null,
@@ -311,7 +345,7 @@
         "In-browser extraction pipeline with structured data output.",
         "Built for lead-gen workflows: scrape, clean, export, done."
       ],
-      "techStack": ["Browser Extension", "TypeScript", "Data Pipelines"],
+      "techStack": ["Browser Extension", "JavaScript"],
       "githubUrl": null,
       "liveUrl": null,
       "image": null,
@@ -367,29 +401,37 @@
   ],
 
   "facts": [
-    "I once reached plaintext creds on a live target in under 10 minutes. Ethically. With permission. Mostly for the bragging rights.",
     "My commit history has more activity between 1 AM and 4 AM than the entire rest of the day.",
-    "Ask me about queues. Please. I will not stop.",
-    "I've led 20+ hackathon teams and my hoarse voice at hour 23 is basically a load-bearing feature.",
-    "Hobbies: null. Not undefined — explicitly null. It was a choice.",
-    "I run a production e-commerce store on a VPS I babysit like it's a Tamagotchi."
+    "Ask me about why I love coding. Please. I will not stop.",
+    "I've led 20+ hackathons as team lead and my hoarse voice at hour 23 is basically a load-bearing feature.",
+    "Hobbies: null. Not undefined no, explicitly null. It was a choice.",
+    "Despite all the cats, I have none. My mom doesn't allow it :<",
+    "I have a Instagram playlist made entirely of... you guessed it, CATS. CUTE CATS. I have no shame.",
+    "My friends gifted me 30 Sprite cans on my birthday. 
   ],
 
-  "activity": [
+    "activity": [
+    "kmaxx-mailer: dispatched 12 doctor notifications. zero bounces.",
     "cat.service: knocked mug off desk (exit 137)",
-    "deploy: saaz-creations → prod ok (2.1s)",
-    "redis: evicted 42 keys, judged them silently",
-    "merged PR #418: 'i swear this is the last refactor'",
-    "3am.timer fired: began overthinking the architecture",
-    "coffee.level critical → failing over to tea",
-    "gc: collected 3 zombie promises",
-    "ssh: someone knocking on port 22 again",
+    "rag-pipeline: embedded 500 documents. knowledge base expanding.",
     "build: green. deeply suspicious.",
+    "codesentinel: detected 15 exposed endpoints, sighed deeply",
     "cron: fed the cats (0 0 * * *)",
-    "queue drained. serotonin +5",
-    "webhook: InsureZeal reconciled 500 rows in 2.9s",
+    "redis: evicted 42 keys, judged them silently",
+    "hobby.daemon: failed to start. module 'outside' not found.",
+    "webhook: InsureZeal reconciled 500 rows in 1.9s",
+    "gc: collected 3 zombie promises",
+    "bun: installed 1,402 packages in 0.4s. speed is art.",
+    "deploy: saaz-creations → prod ok (2.1s)",
+    "whatsapp-bot: locked out 3 users for failing the assessment",
+    "tea.level critical → failing over to sprite",
+    "postgres: applied multi-tenant RLS policies. data is isolated.",
+    "ssh: someone knocking on port 22 again",
+    "3am.timer fired: began overthinking the architecture",
+    "cat.service: requested pets (priority: high)",
     "rekognition: verified 1 selfie, 0 impostors",
-    "cat.service: requested pets (priority: high)"
+    "queue drained. serotonin +5",
+    "merged PR #418: 'i swear this is the last refactor'"
   ],
 
   "boot": {
@@ -412,18 +454,18 @@
 
   "game": {
     "total": 10,
-    "intro": "Oh — you found one! Confession: I drink Sprite way too often and keep leaving cans all over my website. Can you help me find them all and give them back? There are 10 in total.",
+    "intro": "Oh — you found one! My bad I drink Sprite way too often and keep leaving cans all over my website. Can you help me find them all?",
     "lines": [
       "Can #{n} recovered! The recycling gods smile upon you.",
-      "That's #{n}. My dentist is thanking you already.",
-      "#{n} down. This one was behind a semicolon.",
+      "That's #{n}. My mom is thanking you already.",
+      "#{n} down. This one was behind a deserted project.",
       "#{n}! You're better at this than my garbage collector.",
       "Halfway-ish. #{n} cans. The cats are watching, impressed.",
       "#{n} found. Fizz levels stabilizing.",
       "#{n}! Somewhere a vending machine feels seen.",
       "#{n} cans. Your git blame is spotless.",
       "Almost there — #{n}. One more sip… I mean, can.",
-      "#{n} of 10. Caffeine-free and victorious."
+      "#{n} of 10. Sprite-free and victorious. Now find the tea cups (just kidding)."
     ],
     "reward": "ACHIEVEMENT UNLOCKED: Certified Snack Locator 🥤 — you found all 10 sprite cans. Your reward is this deep sense of accomplishment (and the knowledge that the cats drank the rest). A real prize is loading… ETA: never. Thanks for cleaning up after me."
   },
@@ -441,7 +483,7 @@
 
   "footer": {
     "note": "// there are 10 types of people: those who read this footer, and those who don't.",
-    "copyright": "handcrafted, then aggressively over-engineered. no cats were rate-limited in the making of this site.",
-    "stackLine": "built on Next.js · one editable JSON file · Bun · far too much CSS"
+    "copyright": "all puns and facts handcrafted, no cats were rate-limited in the making of this site.",
+    "stackLine": "built with love · one editable JSON file · Next.js & Bun · far too much tokens spent on Claude · deployed on a VPS I babysit personally"
   }
 }

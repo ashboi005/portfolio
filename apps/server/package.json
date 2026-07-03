@@ -11,18 +11,14 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
-    "@portfolio/auth": "workspace:*",
-    "@portfolio/db": "workspace:*",
-    "@portfolio/env": "workspace:*",
-    "@sinclair/typebox": "^0.34.49",
-    "better-auth": "catalog:",
     "dotenv": "catalog:",
     "elysia": "^1.4.28",
-    "zod": "catalog:"
+    "nodemailer": "^6.9.16"
   },
   "devDependencies": {
     "@portfolio/config": "workspace:*",
     "@types/bun": "catalog:",
+    "@types/nodemailer": "^6.4.17",
     "tsdown": "^0.21.9",
     "typescript": "catalog:"
   }

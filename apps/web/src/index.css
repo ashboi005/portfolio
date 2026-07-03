@@ -228,7 +228,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 90;
+  z-index: 130;
   pointer-events: none;
   width: 10px;
   height: 10px;
@@ -267,7 +267,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 89;
+  z-index: 128;
   pointer-events: none;
   width: 5px;
   height: 5px;
@@ -283,7 +283,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 88;
+  z-index: 128;
   pointer-events: none;
   width: 12px;
   height: 12px;
@@ -578,7 +578,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 89;
+  z-index: 128;
   pointer-events: none;
   font-family: var(--font-mono);
   font-size: 12px;
@@ -593,7 +593,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 90;
+  z-index: 130;
   pointer-events: none;
   font-family: var(--font-mono);
   font-size: 13px;

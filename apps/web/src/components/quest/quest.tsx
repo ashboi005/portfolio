@@ -45,7 +45,7 @@ export function QuestProvider({ children }: { children: React.ReactNode }) {
   // auto-dismiss non-final popups
   useEffect(() => {
     if (!popup || popup.done) return;
-    const timer = setTimeout(() => setPopup(null), 6000);
+    const timer = setTimeout(() => setPopup(null), 4200);
     return () => clearTimeout(timer);
   }, [popup]);
 
@@ -55,7 +55,7 @@ export function QuestProvider({ children }: { children: React.ReactNode }) {
     <QuestContext.Provider value={value}>
       {children}
       <QuestHud found={found.size} total={total} />
-      <QuestPopup popup={popup} onClose={() => setPopup(null)} />
+      <QuestPopup popup={popup} found={found.size} total={total} onClose={() => setPopup(null)} />
     </QuestContext.Provider>
   );
 }
@@ -118,30 +118,90 @@ function QuestHud({ found, total }: { found: number; total: number }) {
   );
 }
 
-function QuestPopup({ popup, onClose }: { popup: Popup | null; onClose: () => void }) {
+function QuestPopup({
+  popup,
+  found,
+  total,
+  onClose,
+}: {
+  popup: Popup | null;
+  found: number;
+  total: number;
+  onClose: () => void;
+}) {
   return (
     <AnimatePresence>
       {popup && (
         <motion.div
           key={popup.title}
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 26 }}
-          className="panel corner-ticks fixed bottom-6 left-1/2 z-[70] w-[min(92vw,26rem)] -translate-x-1/2 p-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          // fixed, full-screen flex centering — motion only animates scale/opacity
+          // on the card, so it never fights a translate-based centering transform.
+          className="pointer-events-none fixed inset-0 z-[92] flex items-center justify-center p-4"
         >
-          <div className="mb-2 flex items-center justify-between font-mono text-[11px] tracking-wider uppercase">
-            <span className={popup.done ? "text-gold" : "text-cyan"}>🥤 {popup.title}</span>
+          {/* dim backdrop for the big moments (completion) */}
+          {popup.done && (
+            <motion.button
+              type="button"
+              aria-label="Dismiss"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="pointer-events-auto absolute inset-0 bg-void/70 backdrop-blur-sm"
+            />
+          )}
+          <motion.div
+            key={popup.title}
+            initial={{ opacity: 0, scale: 0.8, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 12 }}
+            transition={{ type: "spring", stiffness: 340, damping: 22 }}
+            role="dialog"
+            aria-live="assertive"
+            className="panel corner-ticks pointer-events-auto relative w-[min(92vw,30rem)] p-6 text-center shadow-[0_0_60px_rgba(51,224,255,0.28)]"
+          >
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer text-dim transition-colors hover:text-signal"
+              className="absolute right-3 top-3 cursor-pointer font-mono text-[11px] text-dim transition-colors hover:text-signal"
               aria-label="Dismiss"
             >
               [x]
             </button>
-          </div>
-          <p className="text-sm leading-relaxed text-bright/90">{popup.body}</p>
+
+            <motion.div
+              initial={{ scale: 0.5, rotate: -20 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 500, damping: 14, delay: 0.05 }}
+              className="mb-3 text-5xl"
+            >
+              🥤
+            </motion.div>
+
+            <p className="mb-2 font-mono text-[11px] tracking-widest text-cyan uppercase">
+              {popup.done ? "quest complete" : found === 1 ? "quest started" : "sprite can found"}
+            </p>
+            <p className="mb-3 font-display text-3xl font-bold text-bright">
+              {found} <span className="text-dim">/ {total}</span>
+            </p>
+            <p className="mx-auto max-w-sm text-sm leading-relaxed text-bright/85">{popup.body}</p>
+
+            <div className="meter-track mt-5">
+              <div className="meter-fill" style={{ width: `${(found / total) * 100}%` }} />
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-5 cursor-pointer border border-cyan/50 bg-cyan/10 px-5 py-2 font-mono text-[11px] tracking-wider text-cyan uppercase transition-all hover:bg-cyan/20"
+            >
+              {popup.done ? "nice." : "keep hunting →"}
+            </button>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
