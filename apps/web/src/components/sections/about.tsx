@@ -76,12 +76,6 @@ export default function About({ profile }: { profile: ProfilePayload }) {
                 {(profile.bio ?? "").split(/\n+/).map((paragraph) => (
                   <p key={paragraph.slice(0, 24)}>{highlightKeywords(paragraph)}</p>
                 ))}
-                <p className="font-mono text-xs text-dim">
-                  {"// every word on this page lives in one editable JSON file."}
-                  <br />
-                  {"// no CMS, no database — just content.json and vibes."}
-                  <span className="blink-cursor text-cyan"> ▊</span>
-                </p>
               </div>
             </Reveal>
 
