@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import SleepyCat from "@/components/fx/sleepy-cat";
 import SectionHeader from "@/components/sections/section-header";
-import { content, sections } from "@/lib/content";
+import { sections } from "@/lib/content";
 import type { ProfilePayload } from "@/types/portfolio";
 
 type ResponseState =
   | { phase: "idle" }
   | { phase: "sending" }
+  | { phase: "sent" }
   | { phase: "done"; status: number; latencyMs: number; body: unknown }
   | { phase: "error"; message: string };
 
@@ -42,6 +43,9 @@ export default function Contact({ profile }: { profile: ProfilePayload }) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [response, setResponse] = useState<ResponseState>({ phase: "idle" });
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -51,7 +55,6 @@ export default function Contact({ profile }: { profile: ProfilePayload }) {
     const apiBase = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
     try {
-      // Hit the Elysia contact route; fall back to a mailto handoff if it's down.
       const res = await fetch(`${apiBase}/api/v1/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,25 +62,16 @@ export default function Contact({ profile }: { profile: ProfilePayload }) {
       });
       const latencyMs = Math.round(performance.now() - startedAt);
       const body = await res.json().catch(() => ({ status: res.status }));
-      setResponse({ phase: "done", status: res.status, latencyMs, body });
-    } catch {
-      // Backend unreachable — simulate the console response, then open mail.
+      setResponse({ phase: "sent" });
+      timerRef.current = setTimeout(() => {
+        setResponse({ phase: "done", status: res.status, latencyMs, body });
+      }, 3500);
+    } catch (err) {
       const latencyMs = Math.round(performance.now() - startedAt);
       setResponse({
-        phase: "done",
-        status: 201,
-        latencyMs,
-        body: {
-          status: "201 Created (offline)",
-          message: content.contact.responseMessage,
-          next: "backend asleep — opening your mail client…",
-        },
+        phase: "error",
+        message: `Backend unreachable (${latencyMs}ms). Is the server running on ${apiBase}?`,
       });
-      if (profile.email) {
-        const subject = encodeURIComponent(`portfolio ping from ${name || "a visitor"}`);
-        const mailBody = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
-        window.location.href = `mailto:${profile.email}?subject=${subject}&body=${mailBody}`;
-      }
     }
 
     setName("");
@@ -146,10 +140,10 @@ export default function Contact({ profile }: { profile: ProfilePayload }) {
 
             <button
               type="submit"
-              disabled={response.phase === "sending"}
+              disabled={response.phase === "sending" || response.phase === "sent"}
               className="w-full cursor-pointer border border-cyan/60 bg-cyan/10 px-5 py-3 font-mono text-xs tracking-widest text-cyan uppercase transition-all duration-200 hover:bg-cyan/20 hover:shadow-[0_0_24px_rgba(51,224,255,0.25)] disabled:cursor-wait disabled:opacity-50"
             >
-              {response.phase === "sending" ? "sending…" : "execute request"}
+              {response.phase === "sending" ? "sending…" : response.phase === "sent" ? "message sent!" : "execute request"}
             </button>
           </form>
 
@@ -171,8 +165,10 @@ export default function Contact({ profile }: { profile: ProfilePayload }) {
                   — awaiting request. the socket is open, the engineer is listening.
                 </p>
               )}
-              {response.phase === "sending" && (
-                <p className="font-mono text-xs text-cyan">⇡ transmitting packet…</p>
+              {(response.phase === "sending" || response.phase === "sent") && (
+                <p className="font-mono text-xs text-cyan">
+                  {response.phase === "sending" ? "⇡ transmitting packet…" : "✓ message sent!"}
+                </p>
               )}
               {response.phase === "error" && (
                 <p className="font-mono text-xs text-signal">✗ {response.message}</p>

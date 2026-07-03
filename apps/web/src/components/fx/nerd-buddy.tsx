@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 
-import { facts } from "@/lib/content";
+import { nextFact } from "@/lib/fact-tracker";
 
 /**
  * The classic "well, actually" nerd — 🤓 with a raised index finger ☝️ — parked
@@ -17,13 +17,7 @@ export default function NerdBuddy() {
 
   const speak = () => {
     setNudged(true);
-    // avoid repeating the same fact twice in a row
-    setFact((prev) => {
-      if (facts.length === 1) return facts[0]!;
-      let next = prev;
-      while (next === prev) next = facts[Math.floor(Math.random() * facts.length)]!;
-      return next;
-    });
+    setFact(nextFact());
   };
 
   return (

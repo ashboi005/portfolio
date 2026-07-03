@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-import { facts as funFacts } from "@/lib/content";
+import { nextFact } from "@/lib/fact-tracker";
 import type { ProfilePayload, ProjectPayload } from "@/types/portfolio";
 
 type Line = { kind: "input" | "output" | "error" | "accent"; text: string; instant?: boolean };
@@ -127,7 +127,7 @@ export default function TerminalOverlay({
         break;
       case "fact":
         o("> fetching random fact…", "accent", true);
-        o(funFacts[Math.floor(Math.random() * funFacts.length)]!, "output");
+        o(nextFact(), "output");
         break;
       case "ls":
         for (const project of projects) {
