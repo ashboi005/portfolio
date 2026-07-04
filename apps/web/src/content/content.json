@@ -471,6 +471,8 @@
     "/floaters/paw.svg"
   ],
 
+  "warpFloaters": [],
+
   "footer": {
     "note": "// there are 10 types of people: those who read this footer, and those who don't.",
     "copyright": "all puns and facts handcrafted, no cats were rate-limited in the making of this site.",

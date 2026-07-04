@@ -26,4 +26,5 @@ export const {
   footer,
   game,
   floaters,
+  warpFloaters,
 } = content;

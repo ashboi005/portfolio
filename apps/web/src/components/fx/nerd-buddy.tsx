@@ -12,13 +12,7 @@ import ChatPanel from "@/components/chat/chat-panel";
  */
 export default function NerdBuddy() {
   const [chatOpen, setChatOpen] = useState(false);
-  const [nudged, setNudged] = useState(false);
   const reducedMotion = useReducedMotion();
-
-  const openChat = () => {
-    setNudged(true);
-    setChatOpen(true);
-  };
 
   return (
     <>
@@ -26,7 +20,7 @@ export default function NerdBuddy() {
         <div className="relative flex flex-col items-center gap-3">
           <motion.button
             type="button"
-            onClick={openChat}
+            onClick={() => setChatOpen(true)}
             aria-label="Chat with Ashwath"
             className="pointer-events-auto relative cursor-pointer select-none leading-none drop-shadow-[0_0_24px_rgba(51,224,255,0.3)]"
             animate={reducedMotion ? undefined : { y: [0, -10, 0] }}
@@ -46,7 +40,8 @@ export default function NerdBuddy() {
             </span>
           </motion.button>
 
-          {!nudged && (
+          {/* hint hides while chatting, comes back when the panel closes */}
+          {!chatOpen && (
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 1, 1, 0.4] }}

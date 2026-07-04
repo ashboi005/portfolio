@@ -16,12 +16,16 @@ export default function HomePage() {
         <Hero profile={profile} />
         {/* desktop-only warp corridor — scroll velocity turns the starfield into hyperlapse streaks */}
         <HyperlapseGate />
-        <About profile={profile} />
-        <Experience experiences={experience} />
-        <Projects projects={projects} />
-        <Achievements achievements={achievements} />
-        <Vitals />
-        <Contact profile={profile} />
+        {/* pulled up one viewport so whoami rises over the end of the warp
+            instead of waiting below it; solid bg covers the canvas */}
+        <div className="relative z-10 bg-void lg:-mt-[100svh]">
+          <About profile={profile} />
+          <Experience experiences={experience} />
+          <Projects projects={projects} />
+          <Achievements achievements={achievements} />
+          <Vitals />
+          <Contact profile={profile} />
+        </div>
       </main>
 
       <footer className="relative border-t border-line">

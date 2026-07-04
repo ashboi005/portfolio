@@ -102,5 +102,6 @@ export type SiteContent = {
   contact: { responseMessage: string };
   game: { total: number; intro: string; lines: string[]; reward: string };
   floaters: string[];
+  warpFloaters: string[];
   footer: { note: string; copyright: string; stackLine: string };
 };
