@@ -241,6 +241,7 @@ export default function HyperlapseGate() {
     // last 100svh doubles as whoami's entrance (WarpReveal pins + fades over it)
     <div
       ref={wrapperRef}
+      id="warp-corridor"
       className="relative hidden lg:block"
       style={{ height: `${Math.max(200, warp.lengthVh)}vh` }}
       aria-hidden

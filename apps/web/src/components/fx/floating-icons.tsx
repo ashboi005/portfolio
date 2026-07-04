@@ -112,9 +112,31 @@ export default function FloatingIcons() {
     };
     window.addEventListener("resize", onResize);
 
+    // The ambient floaters clear the stage for the warp corridor and whoami —
+    // only the dedicated warp icons fly there. Fade the layer out while
+    // either region is on screen.
+    const hideWhile = ["warp-corridor", "whoami"]
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+    const visible = new Set<Element>();
+    // negative margin so merely touching the viewport edge doesn't count —
+    // the corridor starts exactly at the hero's bottom edge
+    const regionObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+        }
+        layer.style.opacity = visible.size > 0 ? "0" : "1";
+      },
+      { rootMargin: "-12% 0px -12% 0px" },
+    );
+    for (const region of hideWhile) regionObserver.observe(region);
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
+      regionObserver.disconnect();
       for (const b of bodies) b.el.remove();
     };
   }, []);

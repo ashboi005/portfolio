@@ -17,9 +17,11 @@ import { useEffect, useRef, useState } from "react";
  * over the streaking starfield in place, with zero perceived scrolling, and
  * unpins seamlessly once fully solid.
  *
- * The effect is ONE-WAY: progress latches at its max, so scrolling back up
- * from whoami never dissolves the content into the starfield again — the
- * section just scrolls away normally. Desktop only; plain flow otherwise.
+ * The effect is ONE-WAY per descent: while scrolling up the progress holds
+ * (no dissolve back into the starfield — the section just scrolls away),
+ * and it re-arms once the visitor is fully back above the overlap, so the
+ * materialization plays again on every trip down. Desktop only; plain flow
+ * otherwise.
  */
 export default function WarpReveal({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,12 +41,16 @@ export default function WarpReveal({ children }: { children: React.ReactNode }) 
     offset: ["start end", "start start"],
   });
 
-  // latch: only ever increases, so the reveal plays downward-only
+  // hold-and-re-arm latch: follows scrollYProgress downward, holds on the
+  // way up (no reverse dissolve), and resets once fully above the overlap
+  // (the block is off-screen there) so the next descent materializes again
   const progress = useMotionValue(0);
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     if (value > progress.get()) progress.set(value);
+    else if (value < 0.02 && progress.get() > 0) progress.set(0);
   });
   useEffect(() => {
+    // reload mid-page (browser scroll restoration) → start solid, not hidden
     progress.set(scrollYProgress.get());
   }, [progress, scrollYProgress]);
 

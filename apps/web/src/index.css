@@ -654,6 +654,8 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  /* fades out while the warp corridor / whoami are on screen */
+  transition: opacity 0.6s ease;
   overflow: hidden;
 }
 .floater {

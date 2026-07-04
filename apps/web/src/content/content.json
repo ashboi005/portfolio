@@ -469,23 +469,75 @@
     "/floaters/cube.svg",
     "/floaters/gear.svg",
     "/floaters/git.svg",
-    "/floaters/paw.svg"
+    "/floaters/paw.svg",
+    "/warp/vs-code.svg",
+    "/warp/postman.svg",
+    "/warp/notion.svg",
+    "/warp/google.svg",
+    "/warp/discord.svg",
+    "/warp/github.svg",
+    "/warp/claude.svg",
+    "/warp/chatgpt.svg",
+    "/warp/after-effects.svg",
+    "/warp/adobe-premiere-pro.svg",
+    "/warp/reddit.svg",
+    "/warp/youtube.svg",
+    "/warp/whatsapp.svg",
+    "/floaters/docker.svg"
   ],
 
     "warp": {
-    "icons": ["/warp/vs-code.svg", "/warp/postman.svg", "/warp/notion.svg", "/warp/google.svg", "/warp/discord.svg", "/warp/github.svg", "/warp/claude.svg", "/warp/chatgpt.svg", "/warp/after-effects.svg", "/warp/adobe-premiere-pro.svg", "/warp/reddit.svg", "/warp/youtube.svg", "/warp/whatsapp.svg"],
+    "icons": ["/warp/vs-code.svg", "/warp/postman.svg", "/warp/notion.svg", "/warp/google.svg", "/warp/discord.svg", "/warp/github.svg", "/warp/claude.svg", "/warp/chatgpt.svg", "/warp/after-effects.svg", "/warp/adobe-premiere-pro.svg", "/warp/reddit.svg", "/warp/youtube.svg", "/warp/whatsapp.svg", "docker.svg"],
     "words": [
-      "{", "}", "</>", "=>", "&&", "||", "();", "::", "$_", "#!", "0x1F",
-      "async", "await", "sudo", "git push", "404", "NaN", "TODO", "npm i",
-      ";", "*", "%s", "|>", "===", "?.", "curl", "grep", "ssh", "chmod +x",
-      "docker", "SELECT *", "rm -rf", "\u03bb", "<T>", "useEffect", "nil"
-    ],
-    "lengthVh": 750,
-    "count": 1500,
-    "iconShare": 0.25,
-    "wordShare": 0.20,
+    "{", "}", "</>", "=>", "->", "::", "&&", "||", "??", "?.", "...", ";",
+    "*", "&", "|", "^", "~", "%", "$", "@", "#!", "$_", "%s", "|>", "<T>",
+    "===", "!==", "==", "!=", "<=", ">=", "++", "--", "+=", "-=", "*=", "/=",
+    "λ", "NaN", "null", "undefined", "void", "nil", "Infinity",
+
+    "async", "await", "Promise", "callback", "closure", "prototype",
+    "memoization", "event loop", "hoisting", "destructuring",
+
+    "TODO", "FIXME", "HACK", "NOTE", "WIP", "REFACTOR", "OPTIMIZE", "BUG",
+    "LGTM", "ship it",
+
+    "git", "git add", "git commit", "git push", "git pull", "git clone",
+    "git merge", "git rebase", "git stash", "git reset", "git diff",
+    "git log", "git fetch", "HEAD", "origin", "branch", "merge conflict",
+
+    "npm", "npm i", "npx", "yarn", "pnpm", "bun",
+
+    "sudo", "curl", "wget", "grep", "find", "awk", "sed", "xargs",
+    "ssh", "scp", "chmod +x", "chown", "tar", "zip", "unzip",
+    "rm -rf", "mkdir", "touch", "mv", "cp", "cat", "echo",
+
+    "REST", "GraphQL", "gRPC", "WebSocket", "HTTP", "HTTPS",
+    "TCP", "UDP", "DNS", "TLS", "SSL", "JWT", "OAuth", "CORS",
+    "CSRF", "XSS", "SQL Injection",
+
+    "JSON", "YAML", "XML", "CSV", ".env",
+
+    "SELECT *", "INSERT INTO", "UPDATE", "DELETE FROM", "WHERE",
+    "JOIN", "LEFT JOIN", "GROUP BY", "ORDER BY", "LIMIT",
+
+    "Docker", "Kubernetes", "Terraform", "Ansible", "CI/CD",
+    "DevOps", "SRE", "IaC", "microservices", "monolith",
+    "serverless", "edge", "CDN",
+
+    "AI", "LLM", "GPT", "Transformer", "embedding",
+    "token", "prompt", "RAG", "fine-tuning", "LoRA",
+    "quantization", "inference",
+
+    "UTF-8", "Unicode", "ASCII", "Base64", "SHA256",
+    "bcrypt", "AES", "RSA", "UUID",
+
+    "404", "401", "403", "500", "200", "201", "302"
+  ],
+    "lengthVh": 1000,
+    "count": 1800,
+    "iconShare": 0.30,
+    "wordShare": 0.22,
     "iconScale": 2,
-    "wordScale": 1
+    "wordScale": 1.4
   },
 
   "footer": {
