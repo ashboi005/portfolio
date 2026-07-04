@@ -481,10 +481,10 @@
       "docker", "SELECT *", "rm -rf", "\u03bb", "<T>", "useEffect", "nil"
     ],
     "lengthVh": 750,
-    "count": 950,
-    "iconShare": 0.14,
-    "wordShare": 0.22,
-    "iconScale": 1,
+    "count": 1500,
+    "iconShare": 0.25,
+    "wordShare": 0.20,
+    "iconScale": 2,
     "wordScale": 1
   },
 
