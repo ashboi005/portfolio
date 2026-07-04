@@ -154,7 +154,7 @@ const app = new Elysia()
       const { chatId, message, isNew } = body;
       const url = isNew
         ? `${AUTOSAGE_BASE_URL}/api/v1/chats/`
-        : `${AUTOSAGE_BASE_URL}/api/v1/chats/fast-query`;
+        : `${AUTOSAGE_BASE_URL}/api/v1/chats/${encodeURIComponent(chatId)}/messages`;
       // NB: no `title` — AutoSage 400s on an empty title; omitting it
       // auto-generates one from the first message.
       const payload = isNew
@@ -165,15 +165,13 @@ const app = new Elysia()
             message,
             model: AUTOSAGE_MODEL,
             websearch_enable: false,
-            agent_mode: "quick",
+            agent_mode: "deep",
           }
         : {
-            knowledge_base_id: AUTOSAGE_KB_ID,
             content: message,
             model: AUTOSAGE_MODEL,
-            chat_id: chatId,
-            chunk_count: 12,
             websearch_enable: false,
+            agent_mode: "deep",
           };
 
       try {
