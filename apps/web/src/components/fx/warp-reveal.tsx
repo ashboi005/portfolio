@@ -22,6 +22,12 @@ import { useEffect, useRef, useState } from "react";
  * and it re-arms once the visitor is fully back above the overlap, so the
  * materialization plays again on every trip down. Desktop only; plain flow
  * otherwise.
+ *
+ * The corridor is a tall (many-viewport) spacer so the descent has room to
+ * play. On the way UP that would be a long empty black wall between whoami
+ * and the hero, so the moment the visitor scrolls up out of whoami into the
+ * corridor we snap them straight to the hero — the empty spacer is never
+ * traversed upward. Downward is untouched (the full hyperlapse plays).
  */
 export default function WarpReveal({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -34,6 +40,45 @@ export default function WarpReveal({ children }: { children: React.ReactNode }) 
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
+
+  // Skip the empty corridor on the way up (see doc comment).
+  useEffect(() => {
+    if (!enabled) return;
+    let lastY = window.scrollY;
+    let raf = 0;
+    // only skip once the visitor has actually settled into whoami, so a
+    // downward jitter near the boundary during the descent can't yank them up
+    let reachedWhoami = false;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const corridor = document.getElementById("warp-corridor");
+        if (!corridor) return;
+        const cur = window.scrollY;
+        const goingUp = cur < lastY - 1;
+        lastY = cur;
+        const rect = corridor.getBoundingClientRect();
+        const corridorTop = rect.top + cur;
+        // whoami overlaps the corridor's final viewport (-100svh margin)
+        const whoamiTop = corridorTop + corridor.offsetHeight - window.innerHeight;
+        if (cur >= whoamiTop) reachedWhoami = true;
+        // scrolling up out of whoami into the empty spacer → jump to the hero
+        if (reachedWhoami && goingUp && cur > corridorTop + 4 && cur < whoamiTop) {
+          reachedWhoami = false;
+          // instant, not smooth — the site sets scroll-behavior:smooth, which
+          // would animate up through the very wall we're skipping
+          window.scrollTo({ top: 0, behavior: "instant" });
+          lastY = 0;
+        }
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [enabled]);
 
   // p: 0 → block's natural top at viewport bottom · 1 → at viewport top.
   const { scrollYProgress } = useScroll({

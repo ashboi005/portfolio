@@ -36,7 +36,7 @@ export default function FloatingIcons() {
     // which appear so it isn't always just the first few in the list.
     const count = isMobile
       ? Math.min(6, floaters.length)
-      : Math.min(18, floaters.length);
+      : Math.min(21, floaters.length);
 
     const rng = (() => {
       let a = 991;
