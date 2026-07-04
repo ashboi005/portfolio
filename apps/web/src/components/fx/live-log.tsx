@@ -29,7 +29,6 @@ export default function LiveLog() {
   );
 
   useEffect(() => {
-    if (reducedMotion) return;
     let tick = 0;
     const interval = setInterval(() => {
       tick++;
@@ -40,7 +39,7 @@ export default function LiveLog() {
       });
     }, 1900);
     return () => clearInterval(interval);
-  }, [reducedMotion]);
+  }, []);
 
   return (
     <div className="panel mt-8 overflow-hidden p-5">

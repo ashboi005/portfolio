@@ -102,6 +102,14 @@ export type SiteContent = {
   contact: { responseMessage: string };
   game: { total: number; intro: string; lines: string[]; reward: string };
   floaters: string[];
-  warpFloaters: string[];
+  warp: {
+    icons: string[];
+    words: string[];
+    count: number;
+    iconShare: number;
+    wordShare: number;
+    iconScale: number;
+    wordScale: number;
+  };
   footer: { note: string; copyright: string; stackLine: string };
 };

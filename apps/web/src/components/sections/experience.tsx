@@ -6,6 +6,7 @@ import { useRef } from "react";
 import SectionHeader from "@/components/sections/section-header";
 import { sections } from "@/lib/content";
 import { highlightKeywords } from "@/lib/keywords";
+import { useInViewOnce } from "@/lib/use-in-view-once";
 import type { ExperiencePayload } from "@/types/portfolio";
 
 function slugify(value: string) {
@@ -21,28 +22,20 @@ function DeployEntry({
   index: number;
   level: number;
 }) {
-  const reducedMotion = useReducedMotion();
+  const { ref, seen } = useInViewOnce<HTMLElement>("-80px");
   return (
-    <motion.article
-      className="relative pl-10 sm:pl-14"
-      initial={reducedMotion ? undefined : { opacity: 0, x: 60 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.55, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+    <article
+      ref={ref}
+      className={`deploy-fx relative pl-10 sm:pl-14 ${seen ? "is-seen" : ""}`}
+      style={{ "--reveal-delay": `${index * 0.05}s` } as React.CSSProperties}
     >
       {/* node on the pipeline */}
-      <motion.span
-        className="absolute left-[9px] top-2 z-10 flex h-4 w-4 items-center justify-center sm:left-[21px]"
-        initial={reducedMotion ? undefined : { scale: 0 }}
-        whileInView={{ scale: 1 }}
-        viewport={{ once: true, margin: "-120px" }}
-        transition={{ delay: index * 0.05 + 0.2, type: "spring", stiffness: 400, damping: 14 }}
-      >
+      <span className="deploy-node absolute left-[9px] top-2 z-10 flex h-4 w-4 items-center justify-center sm:left-[21px]">
         <span className="absolute h-4 w-4 rounded-full bg-cyan/20" />
         <span className={`h-2 w-2 rounded-full ${entry.isActive ? "bg-cyan" : "bg-dim"}`}>
           {entry.isActive && <span className="led text-cyan" />}
         </span>
-      </motion.span>
+      </span>
 
       <div className="mc-block relative overflow-hidden">
         <div className="mc-grass-top" aria-hidden />
@@ -89,7 +82,7 @@ function DeployEntry({
         )}
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
 

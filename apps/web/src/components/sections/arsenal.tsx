@@ -3,10 +3,10 @@
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, useReducedMotion } from "motion/react";
 import { useRef } from "react";
 
 import Cat from "@/components/fx/cat";
+import { useInViewOnce } from "@/lib/use-in-view-once";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -20,7 +20,7 @@ export default function Arsenal({ arsenal }: { arsenal: Record<string, string[]>
   const gridRef = useRef<HTMLDivElement>(null);
   const catRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const reducedMotion = useReducedMotion();
+  const { ref: chipsRef, seen: chipsSeen } = useInViewOnce<HTMLDivElement>("-40px");
 
   useGSAP(
     () => {
@@ -103,7 +103,7 @@ export default function Arsenal({ arsenal }: { arsenal: Record<string, string[]>
   );
 
   return (
-    <div className="relative mt-20">
+    <div ref={chipsRef} className={`relative mt-20 ${chipsSeen ? "is-seen" : ""}`}>
       <p className="eyebrow mb-6">
         <span className="sigil">[PKG]</span> arsenal.lock — {totalDeps} dependencies, zero
         vulnerabilities (the cat is a known risk)
@@ -133,35 +133,17 @@ export default function Arsenal({ arsenal }: { arsenal: Record<string, string[]>
               <span className="led" aria-hidden />
               {group}
             </h3>
-            <motion.div
-              className="relative flex flex-wrap gap-1.5"
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: "-40px" }}
-              variants={{ show: { transition: { staggerChildren: 0.04 } } }}
-            >
-              {items.map((item) => (
-                <motion.span
+            <div className="relative flex flex-wrap gap-1.5">
+              {items.map((item, chipIndex) => (
+                <span
                   key={item}
-                  variants={
-                    reducedMotion
-                      ? undefined
-                      : {
-                          hidden: { opacity: 0, y: -34, rotate: -8 },
-                          show: {
-                            opacity: 1,
-                            y: 0,
-                            rotate: 0,
-                            transition: { type: "spring", stiffness: 500, damping: 18 },
-                          },
-                        }
-                  }
-                  className="cursor-default border border-line bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-bright/80 transition-all duration-150 hover:-translate-y-0.5 hover:border-cyan/60 hover:text-cyan hover:shadow-[0_0_10px_rgba(51,224,255,0.25)]"
+                  className="chip-fx cursor-default border border-line bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-bright/80 hover:-translate-y-0.5 hover:border-cyan/60 hover:text-cyan hover:shadow-[0_0_10px_rgba(51,224,255,0.25)]"
+                  style={{ "--chip-delay": `${chipIndex * 0.04}s` } as React.CSSProperties}
                 >
                   {item}
-                </motion.span>
+                </span>
               ))}
-            </motion.div>
+            </div>
           </div>
         ))}
       </div>

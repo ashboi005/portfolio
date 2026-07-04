@@ -841,6 +841,85 @@
   }
 }
 
+/* -------------------------------------------------- */
+/* CSS scroll reveals (used via useInViewOnce)         */
+/* Content ALWAYS ends visible — .is-seen is the only  */
+/* steady state, so no device setting can strand these */
+/* at opacity 0 the way JS-driven whileInView could.   */
+/* -------------------------------------------------- */
+.reveal-fx {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal-fx.is-seen {
+  opacity: 1;
+  transform: none;
+}
+
+/* deploy log entries slide in from the right */
+.deploy-fx {
+  opacity: 0;
+  transform: translateX(60px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.deploy-fx.is-seen {
+  opacity: 1;
+  transform: none;
+}
+.deploy-node {
+  transform: scale(0);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(var(--reveal-delay, 0s) + 0.2s);
+}
+.is-seen .deploy-node {
+  transform: scale(1);
+}
+
+/* wins cards swing in from alternating sides */
+.win-fx {
+  opacity: 0;
+  transform: translateX(var(--win-from, -90px)) rotate(var(--win-rot, -3deg));
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.win-fx.is-seen {
+  opacity: 1;
+  transform: none;
+}
+
+/* arsenal chips drop into their boxes, staggered per chip */
+.chip-fx {
+  opacity: 0;
+  transform: translateY(-30px) rotate(-6deg);
+  transition:
+    opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: var(--chip-delay, 0s);
+}
+.is-seen .chip-fx {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-fx,
+  .deploy-fx,
+  .deploy-node,
+  .win-fx,
+  .chip-fx {
+    transition-duration: 0.01s;
+    transition-delay: 0s;
+  }
+}
+
 /* LCD-style status quip ticker (top HUD bar) */
 .quip-ticker {
   display: inline-block;
@@ -869,10 +948,12 @@
   white-space: nowrap;
   will-change: transform;
 }
+/* rest points sit 16px inside the faded edges so the first/last letters
+   are fully readable at both ends of the sweep */
 @keyframes quip-scroll {
   0%,
   14% {
-    transform: translateX(0);
+    transform: translateX(16px);
   }
   86%,
   100% {

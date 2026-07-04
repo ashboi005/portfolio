@@ -8,6 +8,7 @@ import CountUp from "@/components/fx/count-up";
 import LiveLog from "@/components/fx/live-log";
 import SectionHeader from "@/components/sections/section-header";
 import { rank, sections } from "@/lib/content";
+import { useInViewOnce } from "@/lib/use-in-view-once";
 import type { AchievementPayload } from "@/types/portfolio";
 
 const KIND_META: Record<
@@ -23,15 +24,18 @@ function EventRow({ achievement, index }: { achievement: AchievementPayload; ind
   const kind = KIND_META[achievement.kind] ?? KIND_META.community!;
   const { Icon } = kind;
   const fromLeft = index % 2 === 0;
-  const reducedMotion = useReducedMotion();
+  const { ref, seen } = useInViewOnce<HTMLDivElement>("-60px");
 
   return (
-    <motion.div
-      initial={reducedMotion ? undefined : { opacity: 0, x: fromLeft ? -90 : 90, rotate: fromLeft ? -3 : 3 }}
-      whileInView={{ opacity: 1, x: 0, rotate: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`panel panel-hover corner-ticks flex items-start gap-4 border-l-2 ${kind.border} p-5`}
+    <div
+      ref={ref}
+      className={`win-fx panel panel-hover corner-ticks flex items-start gap-4 border-l-2 ${kind.border} p-5 ${seen ? "is-seen" : ""}`}
+      style={
+        {
+          "--win-from": fromLeft ? "-90px" : "90px",
+          "--win-rot": fromLeft ? "-3deg" : "3deg",
+        } as React.CSSProperties
+      }
     >
       <span
         className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center border border-line bg-surface-2 ${kind.className}`}
@@ -48,7 +52,7 @@ function EventRow({ achievement, index }: { achievement: AchievementPayload; ind
           <p className="mt-1 text-sm leading-relaxed text-dim">{achievement.detail}</p>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

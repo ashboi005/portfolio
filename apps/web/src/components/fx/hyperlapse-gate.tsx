@@ -2,25 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { warpFloaters } from "@/lib/content";
+import { warp } from "@/lib/content";
 
 /**
  * The warp corridor between the hero and whoami (desktop only). A sticky
- * full-viewport field of stars, code glyphs and warp-only icons (content.json
- * → `warpFloaters`, files in public/warp — deliberately separate from the
- * ambient background floaters). Flight speed is driven by scroll velocity:
- * scroll and the static stars stretch into streaking lines of light, stop
- * and the field freezes mid-space. The final viewport of the corridor is
- * overlapped by whoami (page.tsx pulls it up 100svh), so finishing the warp
- * lands you directly in the section — no dead scroll in between.
+ * full-viewport field of stars, code words and warp-only icons — everything
+ * tunable from content.json → `warp`:
+ *   icons     — SVG/PNG paths (put files in public/warp/), separate from the
+ *               ambient background `floaters`
+ *   words     — the code snippets that fly past
+ *   count     — total particles in the field
+ *   iconShare / wordShare — fraction of the field that's icons / words
+ *               (the remainder is stars)
+ *   iconScale / wordScale — size multipliers
+ * Flight speed follows downward scroll velocity only — scrolling back up
+ * leaves the field frozen. The final viewport of the corridor is overlapped
+ * by whoami (WarpReveal), which materializes in place out of the starfield.
  */
 
-const GLYPHS = [
-  "{", "}", "</>", "=>", "&&", "||", "();", "::", "$_", "#!", "0x1F",
-  "async", "await", "sudo", "git push", "404", "NaN", "TODO", "npm i",
-  ";", "*", "%s", "|>", "===", "?.", "curl", "grep", "ssh", "chmod +x",
-  "docker", "SELECT *", "rm -rf", "λ", "&&&", "<T>", "useEffect", "nil",
-];
+const GLYPHS = warp.words.length > 0 ? warp.words : ["{", "}", "</>"];
 
 type Particle = {
   x: number;
@@ -40,19 +40,15 @@ const COLORS = {
   white: [245, 250, 255],
 } as const;
 
-// field composition — stars dominate so the streak effect reads as hyperspace
-const STAR_SHARE = 0.64;
-const ICON_SHARE = 0.14;
-const PARTICLE_COUNT = 950;
+// field composition from content.json → warp (remainder after icons+words = stars)
+const ICON_SHARE = warp.icons.length > 0 ? warp.iconShare : 0;
+const WORD_SHARE = warp.wordShare;
+const PARTICLE_COUNT = Math.max(50, Math.min(3000, warp.count));
 
 function makeParticle(z?: number): Particle {
   const roll = Math.random();
   const kind: Particle["kind"] =
-    roll < STAR_SHARE
-      ? "star"
-      : roll < STAR_SHARE + ICON_SHARE && warpFloaters.length > 0
-        ? "icon"
-        : "glyph";
+    roll < ICON_SHARE ? "icon" : roll < ICON_SHARE + WORD_SHARE ? "glyph" : "star";
   const hueRoll = Math.random();
   return {
     x: (Math.random() - 0.5) * 2.6,
@@ -60,7 +56,7 @@ function makeParticle(z?: number): Particle {
     z: z ?? 0.05 + Math.random(),
     kind,
     glyph: GLYPHS[Math.floor(Math.random() * GLYPHS.length)]!,
-    icon: Math.floor(Math.random() * Math.max(1, warpFloaters.length)),
+    icon: Math.floor(Math.random() * Math.max(1, warp.icons.length)),
     hue:
       kind === "star"
         ? hueRoll > 0.6
@@ -73,7 +69,10 @@ function makeParticle(z?: number): Particle {
           : hueRoll > 0.55
             ? "bright"
             : "cyan",
-    size: kind === "star" ? 1 + Math.random() * 2.2 : 9 + Math.random() * 8,
+    size:
+      kind === "star"
+        ? 1 + Math.random() * 2.2
+        : (9 + Math.random() * 8) * (kind === "icon" ? warp.iconScale : warp.wordScale),
   };
 }
 
@@ -94,7 +93,7 @@ export default function HyperlapseGate() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const icons = warpFloaters.map((src) => {
+    const icons = warp.icons.map((src) => {
       const image = new Image();
       image.src = src;
       return image;
@@ -135,10 +134,11 @@ export default function HyperlapseGate() {
       raf = 0;
       if (!active) return;
 
-      // scroll velocity → warp speed (decays to zero when the user stops)
+      // downward scroll velocity → warp speed (decays to zero when the user
+      // stops; scrolling back up leaves the field frozen instead of reversing)
       const dy = window.scrollY - lastY;
       lastY = window.scrollY;
-      const target = reduced ? 0 : Math.max(-0.13, Math.min(0.13, dy * 0.001));
+      const target = reduced ? 0 : Math.max(0, Math.min(0.13, dy * 0.001));
       speed += (target - speed) * 0.16;
       if (Math.abs(speed) < 0.00001) speed = 0;
 
@@ -236,7 +236,7 @@ export default function HyperlapseGate() {
 
   return (
     // last 100svh doubles as whoami's entrance (WarpReveal pins + fades over it)
-    <div ref={wrapperRef} className="relative hidden lg:block lg:h-[620vh]" aria-hidden>
+    <div ref={wrapperRef} className="relative hidden lg:block lg:h-[750vh]" aria-hidden>
       <div className="sticky top-0 h-svh w-full overflow-hidden">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 

@@ -1,16 +1,27 @@
-# warp icons
+# warp assets
 
-SVGs that fly past inside the hyperlapse corridor (hero → whoami), separate
-from the ambient background floaters so colored logos (VS Code, GitHub, …)
-don't clutter the rest of the site.
+Icons that fly past inside the hyperlapse corridor (hero → whoami),
+**separate** from the ambient background floaters so colored logos
+(VS Code, GitHub, …) don't clutter the rest of the site.
 
-To add one:
-
-1. Drop the `.svg` in this folder (e.g. `vscode.svg`).
-2. List it in `apps/web/src/content/content.json` → `warpFloaters`:
+Everything is controlled from `apps/web/src/content/content.json` → `warp`:
 
 ```json
-"warpFloaters": ["/warp/vscode.svg", "/warp/github.svg"]
+"warp": {
+  "icons": ["/warp/vscode.svg", "/warp/github.png"],
+  "words": ["async", "await", "git push", "..."],
+  "count": 950,
+  "iconShare": 0.14,
+  "wordShare": 0.22,
+  "iconScale": 1,
+  "wordScale": 1
+}
 ```
 
-While the list is empty the corridor flies on stars + code glyphs alone.
+- **icons** — drop `.svg` **or `.png`** files in this folder and list their
+  paths here. While the list is empty the corridor flies on stars + words.
+- **words** — the code snippets that whiz past. Edit freely.
+- **count** — total particles in the field (stars + words + icons).
+- **iconShare / wordShare** — fraction of the field that's icons / words
+  (0–1). Whatever remains is stars. e.g. 0.14 + 0.22 → 64% stars.
+- **iconScale / wordScale** — size multipliers (1 = default, 1.5 = 50% bigger).

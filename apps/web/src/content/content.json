@@ -471,7 +471,20 @@
     "/floaters/paw.svg"
   ],
 
-  "warpFloaters": [],
+    "warp": {
+    "icons": [],
+    "words": [
+      "{", "}", "</>", "=>", "&&", "||", "();", "::", "$_", "#!", "0x1F",
+      "async", "await", "sudo", "git push", "404", "NaN", "TODO", "npm i",
+      ";", "*", "%s", "|>", "===", "?.", "curl", "grep", "ssh", "chmod +x",
+      "docker", "SELECT *", "rm -rf", "\u03bb", "<T>", "useEffect", "nil"
+    ],
+    "count": 950,
+    "iconShare": 0.14,
+    "wordShare": 0.22,
+    "iconScale": 1,
+    "wordScale": 1
+  },
 
   "footer": {
     "note": "// there are 10 types of people: those who read this footer, and those who don't.",

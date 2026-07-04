@@ -1,8 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { useInViewOnce } from "@/lib/use-in-view-once";
 
-/** Fade-up reveal on scroll into view. */
+/**
+ * Fade-up reveal on scroll into view. CSS-transition based (see .reveal-fx):
+ * motion's whileInView left content stranded at opacity 0 on phones that
+ * report prefers-reduced-motion, so visibility must not depend on a JS
+ * animation actually running.
+ */
 export default function Reveal({
   children,
   delay = 0,
@@ -12,21 +17,15 @@ export default function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const reducedMotion = useReducedMotion();
-
-  if (reducedMotion) {
-    return <div className={className}>{children}</div>;
-  }
+  const { ref, seen } = useInViewOnce<HTMLDivElement>("-60px");
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      ref={ref}
+      className={`reveal-fx ${seen ? "is-seen" : ""} ${className ?? ""}`}
+      style={delay ? ({ "--reveal-delay": `${delay}s` } as React.CSSProperties) : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

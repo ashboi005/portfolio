@@ -105,9 +105,10 @@ function QuipTicker({ className }: { className?: string }) {
         style={
           shift > 0
             ? {
-                // px-per-second pace with a floor, ×4 alternate = 2 round trips
+                // px-per-second pace with a floor, ×4 alternate = 2 round trips.
+                // ±16px keeps the end letters clear of the edge fade.
                 animation: `quip-scroll ${Math.max(3, shift / 28)}s linear 4 alternate both`,
-                ["--quip-shift" as string]: `-${shift}px`,
+                ["--quip-shift" as string]: `-${shift + 16}px`,
               }
             : undefined
         }
