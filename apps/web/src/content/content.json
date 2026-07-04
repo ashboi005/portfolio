@@ -400,40 +400,7 @@
     }
   ],
 
-  "facts": [
-    "My commit history has more activity between 1 AM and 4 AM than the entire rest of the day.",
-    "Ask me about why I love coding. Please. I will not stop.",
-    "I've led 20+ hackathons as team lead and my hoarse voice at hour 23 is basically a load-bearing feature.",
-    "Hobbies: null. Not undefined no, explicitly null. It was a choice.",
-    "Despite all the cat drama, I have none. My mom doesn't allow it :<",
-    "I have a Instagram playlist made entirely of... you guessed it, CATS. CUTE CATS. I have no shame.",
-    "My friends gifted me 30 Sprite cans on my birthday. My family tried to give them away.",
-    "Although I do not have hobbies, I do have a hobby of not having hobbies. It's a meta-hobby.",
-    "I own cats, but they are all virtual (cat.service) So technically I own cats without owning cats. It's a paradox.",
-    "The statement that I like tea is an understatement. I am powered by tea.",
-    "I once introduced a bug in a production system that led to credits of users going into negaitve. Least to say my team lead was not happy.",
-    "Please don't talk about why FastAPI is better than Django at a date (I have never been on one, this is just a reminder to self).",
-    "Sometimes I cry at night because I have no hobbies. Then I remember I have a RAG pipeline and I feel better.",
-    "I have a habit of naming my servers after cats. My VPS is called 'cat.service'. My local dev server is called 'cat.local'. My CI/CD server is called 'cat.ci'. My cat is called 'cat.cat'. You get the Idea right?",
-    "I once got zero marks in calculus. No surprises on why I don't go into AI/ML now right?",
-    "My normal speech rate is 2x faster than the average human. I have been told to slow down, but I can't. It's a curse.",
-    "Outside of coding I'm very dumb, not too dumb in my defense but my friends say so anyways.",
-    "I hated travelling as a kid. Then I started travelling for hackathons and now I love it.",
-    "Despite me saying I don't have hobbies, I do watch some anime (ofc only the very popular ones). My fav one is AOT. TATAKAEEEEE!!!!",
-    "I got 100 marks in IP in my 12th board, ik thats not a big deal but I am proud of it.",
-    "Did I mention I was also the head of the ICT club in my school? I hosted 3 inter-school IT festivals for 3 years.",
-    "I used to read alot of books as a kid, but then I got into coding and now I don't read much. I do read some tech blogs though (ok I read alot of tech blogs).",
-    "I respect folks who do DSA but personal unpopular opinion: I do not like the rat race that It has become.",
-    "I have a great memory, that has nothing to do with coding but I just remember random coversations and situations. People always are surprised when I do that.",
-    "I also do like editing, I actually started a youtube channel soley for editing but I liked coding more so I stopped it. I do edit some videos time to time for fun tho",
-    "Did I mention I am a very competitive person? I am very competitive in coding, hackathons and even in games. I have a very bad habit of being competitive in everything.",
-    "Oh also I have a very bad sleep schedule, I sleep at 3-4 AM and wake up at 12 PM. I have tried to fix it but I can't. I'll try again in the future but for now I am just accepting it.",
-    "Did I mention I like coding? I like coding a lot, I like to code for fun, I like to code for hackathons, I like to code for work. I just like coding.",
-    "I am very empathetic, I feel for people and I try to help them as much as I can. I have a very bad habit of overthinking and overanalyzing things. (ok wow this was too deep for a fun fact but I just wanted to say it).",
-    "I sometimes take things too literally."
-  ],
-
-    "activity": [
+  "activity": [
     "kmaxx-mailer: dispatched 12 doctor notifications. zero bounces.",
     "cat.service: knocked mug off desk (exit 137)",
     "rag-pipeline: embedded 500 documents. knowledge base expanding.",

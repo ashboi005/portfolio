@@ -3,10 +3,14 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-import { nextFact } from "@/lib/fact-tracker";
+import { CHAT_GREETING, nextThinkingLine, sendChatMessage } from "@/lib/chat";
 import type { ProfilePayload, ProjectPayload } from "@/types/portfolio";
 
-type Line = { kind: "input" | "output" | "error" | "accent"; text: string; instant?: boolean };
+type Line = {
+  kind: "input" | "output" | "error" | "accent" | "chat" | "chat-user";
+  text: string;
+  instant?: boolean;
+};
 
 const CAT_ART = [" /\\_/\\", "( o.o )", " > ^ <"];
 
@@ -32,6 +36,9 @@ export default function TerminalOverlay({
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [chatMode, setChatMode] = useState(false);
+  const [chatBusy, setChatBusy] = useState(false);
+  const [thinking, setThinking] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
@@ -42,7 +49,7 @@ export default function TerminalOverlay({
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
-  }, [committed, typing]);
+  }, [committed, typing, thinking]);
 
   // typewriter engine: pull from queue, type char-by-char, then commit
   useEffect(() => {
@@ -73,9 +80,60 @@ export default function TerminalOverlay({
 
   const enqueue = (lines: Line[]) => setQueue((prev) => [...prev, ...lines]);
 
+  // Rotate the corny "thinking" one-liners every ~4s while the RAG works.
+  useEffect(() => {
+    if (!chatBusy) {
+      setThinking(null);
+      return;
+    }
+    setThinking(nextThinkingLine());
+    const interval = setInterval(
+      () => setThinking((prev) => nextThinkingLine(prev ?? undefined)),
+      4000,
+    );
+    return () => clearInterval(interval);
+  }, [chatBusy]);
+
+  const askAshwath = async (message: string) => {
+    setChatBusy(true);
+    try {
+      const reply = await sendChatMessage(message);
+      enqueue([{ kind: "chat", text: `ashwath ▸ ${reply}` }]);
+    } catch (error) {
+      enqueue([
+        {
+          kind: "chat",
+          text: `ashwath ▸ ${error instanceof Error ? error.message : "something glitched. try again?"}`,
+        },
+      ]);
+    } finally {
+      setChatBusy(false);
+      inputRef.current?.focus();
+    }
+  };
+
   const run = (raw: string) => {
     const command = raw.trim();
     const lower = command.toLowerCase();
+
+    if (chatMode) {
+      if (!command || chatBusy) return;
+      setCommitted((prev) => [...prev, { kind: "chat-user", text: `you ▸ ${command}`, instant: true }]);
+      setHistory((prev) => [command, ...prev]);
+      setHistoryIndex(-1);
+      setInput("");
+      if (lower === "exit" || lower === "quit") {
+        setChatMode(false);
+        enqueue([
+          { kind: "chat", text: "ashwath ▸ later! disconnecting…", instant: true },
+          { kind: "output", text: "chat session detached. back to the shell.", instant: true },
+        ]);
+        return;
+      }
+      void askAshwath(command);
+      return;
+    }
+
     setCommitted((prev) => [...prev, { kind: "input", text: raw, instant: true }]);
     if (command) {
       setHistory((prev) => [command, ...prev]);
@@ -98,7 +156,7 @@ export default function TerminalOverlay({
         o("  ls [projects]       registered services", "output", true);
         o("  stack               the arsenal", "output", true);
         o("  cat                 ...it's a cat", "output", true);
-        o("  fact                random fact about the maintainer", "output", true);
+        o("  chat                talk to the maintainer directly", "output", true);
         o("  contact             reach the maintainer", "output", true);
         o("  sudo hire-me        escalate privileges", "output", true);
         o("  matrix              follow the white rabbit", "output", true);
@@ -125,9 +183,12 @@ export default function TerminalOverlay({
         CAT_ART.forEach((art) => o(art, "accent", true));
         o("meow. (that is the entire feature set.)", "output");
         break;
-      case "fact":
-        o("> fetching random fact…", "accent", true);
-        o(nextFact(), "output");
+      case "chat":
+        setChatMode(true);
+        o("establishing secure channel to ashwath@prod… ok", "chat", true);
+        o("——— chat mode · plaintext human protocol ———", "chat", true);
+        o(`ashwath ▸ ${CHAT_GREETING}`, "chat");
+        o('(type "exit" to detach)', "chat", true);
         break;
       case "ls":
         for (const project of projects) {
@@ -228,11 +289,15 @@ export default function TerminalOverlay({
         ? "text-signal"
         : kind === "accent"
           ? "text-cyan"
-          : "text-dim";
+          : kind === "chat"
+            ? "text-[#00ff41] drop-shadow-[0_0_6px_rgba(0,255,65,0.35)]"
+            : kind === "chat-user"
+              ? "text-[#b6ffc4]"
+              : "text-dim";
 
   return (
     <div
-      className="fixed inset-0 z-[95] flex items-end justify-center bg-void/70 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[95] flex items-center justify-center bg-void/70 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Terminal"
@@ -245,7 +310,7 @@ export default function TerminalOverlay({
         initial={reducedMotion ? undefined : { opacity: 0, scale: 0.94, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-        className="panel corner-ticks m-4 flex h-[460px] w-full max-w-2xl flex-col overflow-hidden shadow-[0_0_60px_rgba(51,224,255,0.12)]"
+        className="panel corner-ticks m-4 flex h-[min(460px,72dvh)] w-full max-w-2xl flex-col overflow-hidden shadow-[0_0_60px_rgba(51,224,255,0.12)]"
         onClick={(event) => event.stopPropagation()}
       >
         {/* window chrome */}
@@ -271,7 +336,11 @@ export default function TerminalOverlay({
             <div
               // biome-ignore lint: append-only log
               key={index}
-              className={`whitespace-pre ${lineClass(line.kind)}`}
+              className={`${
+                line.kind === "chat" || line.kind === "chat-user"
+                  ? "whitespace-pre-wrap break-words"
+                  : "whitespace-pre"
+              } ${lineClass(line.kind)}`}
             >
               {line.kind === "input" ? (
                 <>
@@ -284,9 +353,21 @@ export default function TerminalOverlay({
             </div>
           ))}
           {typing && (
-            <div className={`whitespace-pre ${lineClass(typing.line.kind)}`}>
+            <div
+              className={`${
+                typing.line.kind === "chat" || typing.line.kind === "chat-user"
+                  ? "whitespace-pre-wrap break-words"
+                  : "whitespace-pre"
+              } ${lineClass(typing.line.kind)}`}
+            >
               {typing.line.text.slice(0, typing.shown)}
-              <span className="blink-cursor text-cyan">▊</span>
+              <span className={`blink-cursor ${chatMode ? "text-[#00ff41]" : "text-cyan"}`}>▊</span>
+            </div>
+          )}
+          {thinking && !typing && (
+            <div className="whitespace-pre-wrap break-words text-[#00ff41]/70 italic" aria-live="polite">
+              {thinking}
+              <span className="blink-cursor text-[#00ff41]">▊</span>
             </div>
           )}
         </div>
@@ -298,17 +379,21 @@ export default function TerminalOverlay({
             run(input);
           }}
         >
-          <span className="text-cyan">$</span>
+          <span className={chatMode ? "text-[#00ff41]" : "text-cyan"}>
+            {chatMode ? "you ▸" : "$"}
+          </span>
           <input
             ref={inputRef}
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={onKeyDown}
-            className="flex-1 bg-transparent text-bright outline-none placeholder:text-dim/50"
-            placeholder="help"
+            className={`flex-1 bg-transparent outline-none placeholder:text-dim/50 ${
+              chatMode ? "text-[#b6ffc4] caret-[#00ff41]" : "text-bright"
+            }`}
+            placeholder={chatMode ? "say something…" : "help"}
             spellCheck={false}
             autoComplete="off"
-            aria-label="Terminal command"
+            aria-label={chatMode ? "Message Ashwath" : "Terminal command"}
           />
         </form>
       </motion.div>

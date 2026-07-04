@@ -1,0 +1,106 @@
+/**
+ * Shared client for the "chat with Ashwath" RAG service. Used by both the
+ * website chat widget (🤓) and the terminal `chat` command so they share one
+ * conversation. The frontend keeps no history — it generates a chat id once,
+ * stores it in localStorage, and the backend remembers the rest.
+ */
+
+const CHAT_ID_KEY = "ashwath.sys/chat-id";
+const CHAT_CREATED_KEY = "ashwath.sys/chat-created";
+
+export const CHAT_GREETING =
+  'Hi, I\'m Ashwath. Ask me anything about myself, or type "fact" if you\'d like to hear a random fact about me.';
+
+function apiBase() {
+  return process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+}
+
+function getChatId(): string {
+  let id = localStorage.getItem(CHAT_ID_KEY);
+  if (!id) {
+    id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}-${Math.random().toString(16).slice(2, 10)}`;
+    localStorage.setItem(CHAT_ID_KEY, id);
+  }
+  return id;
+}
+
+/**
+ * Sends one message. The first message ever creates the chat on the RAG side
+ * (same uuid from then on); everything after goes through fast-query.
+ * Resolves to Ashwath's reply — rejects with a human-sounding Error otherwise.
+ */
+export async function sendChatMessage(message: string): Promise<string> {
+  const chatId = getChatId();
+  const isNew = localStorage.getItem(CHAT_CREATED_KEY) !== "1";
+
+  const response = await fetch(`${apiBase()}/api/v1/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chatId, message, isNew }),
+  });
+
+  const data = (await response.json().catch(() => null)) as { reply?: string } | null;
+
+  if (!response.ok) {
+    throw new Error(
+      data?.reply ?? "Hm, my memory service just glitched. Give it another shot in a second?",
+    );
+  }
+  if (isNew) localStorage.setItem(CHAT_CREATED_KEY, "1");
+  return data?.reply ?? "…I blanked. Ask me that again?";
+}
+
+/**
+ * The RAG takes a few seconds, so the wait is covered by Ashwath "thinking
+ * out loud" instead of a spinner. Rotate one of these every ~4s.
+ */
+export const THINKING_LINES = [
+  "Thinking...",
+  "Hold on, let me finish my Sprite.",
+  "One second... I need another sip of tea.",
+  "Searching through my questionable life choices...",
+  "Trying to remember whether I actually did that...",
+  "Compiling memories... hopefully without segmentation faults.",
+  "Consulting the Ashwath archives...",
+  "Running a very scientific \"trust me, bro\" algorithm.",
+  "Debugging my own memories...",
+  "Loading... because even I need a second sometimes.",
+  "Grepping through 3 AM commit messages...",
+  "Waking up the part of my brain that isn't on-call...",
+  "Querying SELECT * FROM ashwath WHERE relevant = true;",
+  "Hold on, a cat just walked across my keyboard.",
+  "Re-reading my own résumé to make sure I'm not lying...",
+  "Spinning up a memory pod... it's still in CrashLoopBackOff.",
+  "Asking my rubber duck for a second opinion...",
+  "Retrieving context... my context window is mostly cats.",
+  "Doing a quick vibe check on that question...",
+  "Cache miss. Fetching from cold storage (my brain)...",
+  "Let me check with the intern (also me)...",
+  "Restarting the Docker container in my head...",
+  "Buffering... blame my rural bandwidth of thoughts.",
+  "Cross-referencing with my hackathon war stories...",
+  "Hmm, good question. Pretending I didn't panic just now...",
+  "Fetching... this is the p99 latency they warned you about.",
+  "Consulting the 30 Sprite cans of wisdom...",
+  "Untangling a RAG pipeline... ironically, about myself.",
+  "Checking whether that memory is in prod or staging...",
+  "Rolling back to a stable version of this thought...",
+  "My thoughts are eventually consistent. Almost there...",
+  "Indexing my life. It's mostly backend work and cats.",
+  "Hold on, arguing with an LLM about who I am...",
+  "Warming up the tea-powered inference engine...",
+  "That's in my brain's dead-letter queue. Retrying...",
+  "Escalating this question to senior me (same guy, more tea)...",
+] as const;
+
+/** Random thinking line, avoiding an immediate repeat. */
+export function nextThinkingLine(previous?: string): string {
+  let line = previous;
+  while (line === previous) {
+    line = THINKING_LINES[Math.floor(Math.random() * THINKING_LINES.length)]!;
+  }
+  return line!;
+}

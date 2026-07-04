@@ -28,6 +28,60 @@ if (!transporter) {
   console.warn("[contact] GMAIL_USER / GMAIL_APP_PASSWORD not set — emails will be logged, not sent.");
 }
 
+// ---- AutoSage RAG proxy ("chat with Ashwath") ----
+// The website/terminal chat talks to this route; the route forwards to the
+// AutoSage RAG service so the API key never reaches the browser.
+const AUTOSAGE_BASE_URL = process.env.AUTOSAGE_BASE_URL?.replace(/\/+$/, "");
+const AUTOSAGE_TENANT_ID = process.env.AUTOSAGE_TENANT_ID;
+const AUTOSAGE_KB_ID = process.env.AUTOSAGE_KB_ID;
+const AUTOSAGE_API_KEY = process.env.AUTOSAGE_API_KEY;
+const AUTOSAGE_MODEL = "google/gemini-3-flash-preview";
+
+const chatConfigured = Boolean(
+  AUTOSAGE_BASE_URL && AUTOSAGE_TENANT_ID && AUTOSAGE_KB_ID && AUTOSAGE_API_KEY,
+);
+if (!chatConfigured) {
+  console.warn(
+    "[chat] AutoSage env incomplete (AUTOSAGE_BASE_URL / AUTOSAGE_TENANT_ID / AUTOSAGE_KB_ID / AUTOSAGE_API_KEY) — chat will return 503.",
+  );
+}
+
+/**
+ * Fish the reply out of the AutoSage response. Observed shapes:
+ *  - create chat:  { response: { assistant_message: { content } } }
+ *  - fast-query:   { final_answer }
+ * The rest are fallbacks in case the API evolves.
+ */
+function extractReply(payload: unknown, depth = 0): string | null {
+  if (payload == null || depth > 3) return null;
+  if (typeof payload === "string") return payload.trim() || null;
+  if (typeof payload !== "object") return null;
+  const record = payload as Record<string, unknown>;
+  for (const key of [
+    "final_answer",
+    "reply",
+    "response",
+    "assistant_message",
+    "answer",
+    "content",
+    "message",
+    "text",
+    "output",
+    "result",
+    "data",
+  ]) {
+    if (key in record) {
+      const found = extractReply(record[key], depth + 1);
+      if (found) return found;
+    }
+  }
+  const choices = record.choices;
+  if (Array.isArray(choices) && choices.length > 0) {
+    return extractReply(choices[0], depth + 1);
+  }
+  return null;
+}
+
 /**
  * Lean Elysia API. The site is content-driven from a static JSON file; this
  * server handles the contact form, emailing submissions to Ashwath via Gmail.
@@ -83,6 +137,82 @@ const app = new Elysia()
         name: t.String({ minLength: 2 }),
         email: t.String({ format: "email" }),
         message: t.String({ minLength: 10 }),
+      }),
+    },
+  )
+  .post(
+    "/api/v1/chat",
+    async ({ body, set }) => {
+      if (!chatConfigured) {
+        set.status = 503;
+        return {
+          reply:
+            "My brain service isn't wired up on this server yet. Email me instead — I answer faster than my CI pipeline.",
+        };
+      }
+
+      const { chatId, message, isNew } = body;
+      const url = isNew
+        ? `${AUTOSAGE_BASE_URL}/api/v1/chats/`
+        : `${AUTOSAGE_BASE_URL}/api/v1/chats/fast-query`;
+      // NB: no `title` — AutoSage 400s on an empty title; omitting it
+      // auto-generates one from the first message.
+      const payload = isNew
+        ? {
+            id: chatId,
+            tenant_id: AUTOSAGE_TENANT_ID,
+            knowledge_base_id: AUTOSAGE_KB_ID,
+            message,
+            model: AUTOSAGE_MODEL,
+            websearch_enable: false,
+            agent_mode: "quick",
+          }
+        : {
+            knowledge_base_id: AUTOSAGE_KB_ID,
+            content: message,
+            model: AUTOSAGE_MODEL,
+            chat_id: chatId,
+            chunk_count: 12,
+            websearch_enable: false,
+          };
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${AUTOSAGE_API_KEY}`,
+          },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(45_000),
+        });
+
+        if (!response.ok) {
+          const detail = await response.text().catch(() => "");
+          console.error(`[chat] AutoSage ${response.status} on ${url}:`, detail.slice(0, 400));
+          set.status = 502;
+          return { reply: "Hm, my memory service just glitched. Give it another shot in a second?" };
+        }
+
+        const data = await response.json().catch(() => null);
+        const reply = extractReply(data);
+        if (!reply) {
+          console.error("[chat] could not find reply in AutoSage response:", JSON.stringify(data)?.slice(0, 400));
+          set.status = 502;
+          return { reply: "I definitely thought of something, but it got lost on the way. Ask me again?" };
+        }
+        return { reply };
+      } catch (error) {
+        console.error("[chat] request failed:", error);
+        set.status = 502;
+        return { reply: "My brain took too long to respond (even I'm surprised). Try that again?" };
+      }
+    },
+    {
+      body: t.Object({
+        chatId: t.String({ minLength: 8, maxLength: 64 }),
+        message: t.String({ minLength: 1, maxLength: 4000 }),
+        isNew: t.Boolean(),
       }),
     },
   )

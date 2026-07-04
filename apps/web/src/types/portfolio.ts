@@ -97,7 +97,6 @@ export type SiteContent = {
     nextTier: string;
   };
   achievements: AchievementPayload[];
-  facts: string[];
   activity: string[];
   boot: { lines: string[]; granted: string };
   contact: { responseMessage: string };
