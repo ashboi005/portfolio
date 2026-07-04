@@ -31,8 +31,12 @@ export default function FloatingIcons() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobile = window.innerWidth < 768;
-    // scale count to viewport; keep it calm
-    const count = isMobile ? Math.min(5, floaters.length) : Math.min(12, floaters.length * 2);
+    // Show a good spread of the icon set without clutter. Desktop shows up to
+    // 18 (mobile 6); if there are more entries than that, a shuffle decides
+    // which appear so it isn't always just the first few in the list.
+    const count = isMobile
+      ? Math.min(6, floaters.length)
+      : Math.min(18, floaters.length);
 
     const rng = (() => {
       let a = 991;
@@ -42,6 +46,13 @@ export default function FloatingIcons() {
       };
     })();
 
+    // shuffled pool so the visible subset draws from the whole list
+    const pool = [...floaters];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+    }
+
     let W = window.innerWidth;
     let H = window.innerHeight;
     const bodies: Body[] = [];
@@ -49,7 +60,7 @@ export default function FloatingIcons() {
     for (let i = 0; i < count; i++) {
       const el = document.createElement("div");
       el.className = "floater";
-      const src = floaters[i % floaters.length]!;
+      const src = pool[i % pool.length]!;
       const img = document.createElement("img");
       img.src = src;
       img.alt = "";

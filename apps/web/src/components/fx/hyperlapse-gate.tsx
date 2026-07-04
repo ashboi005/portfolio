@@ -80,12 +80,14 @@ function makeParticle(z?: number): Particle {
 export default function HyperlapseGate() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const [warpPct, setWarpPct] = useState(0);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
     const canvas = canvasRef.current;
-    if (!wrapper || !canvas) return;
+    const stage = stageRef.current;
+    if (!wrapper || !canvas || !stage) return;
     // the wrapper is display:none below lg — nothing to run
     if (wrapper.offsetParent === null && wrapper.getClientRects().length === 0) return;
 
@@ -121,7 +123,19 @@ export default function HyperlapseGate() {
     let active = false;
     const observer = new IntersectionObserver(
       (entries) => {
-        active = entries.some((entry) => entry.isIntersecting);
+        const nowActive = entries.some((entry) => entry.isIntersecting);
+        if (nowActive && !active) {
+          // resuming: sync scroll baseline (avoids a huge first-frame dy) and
+          // start hidden so re-entering from below never flashes the field
+          lastY = window.scrollY;
+          if (!reduced) {
+            vis = 0;
+            visTarget = 0;
+            stage.style.opacity = "0";
+            lastVis = 0;
+          }
+        }
+        active = nowActive;
         if (active) schedule();
       },
       { rootMargin: "10% 0px" },
@@ -132,6 +146,12 @@ export default function HyperlapseGate() {
     let lastY = window.scrollY;
     let speed = 0;
     let lastPct = -1;
+    // visibility of the whole field: fades in on downward warp, fades out when
+    // scrolling back up so the corridor isn't a static "wall" of icons on the
+    // way up. Holds when paused, so static stars still show mid-descent.
+    let vis = reduced ? 1 : 0;
+    let visTarget = reduced ? 1 : 0;
+    let lastVis = -1;
 
     const draw = () => {
       raf = 0;
@@ -144,6 +164,19 @@ export default function HyperlapseGate() {
       const target = reduced ? 0 : Math.max(0, Math.min(0.13, dy * 0.001));
       speed += (target - speed) * 0.16;
       if (Math.abs(speed) < 0.00001) speed = 0;
+
+      // scroll direction drives field visibility (down = show, up = hide)
+      if (!reduced) {
+        if (dy > 0.5) visTarget = 1;
+        else if (dy < -0.5) visTarget = 0;
+      }
+      vis += (visTarget - vis) * 0.09;
+      if (vis < 0.001) vis = 0;
+      const visRounded = Math.round(vis * 1000) / 1000;
+      if (visRounded !== lastVis) {
+        lastVis = visRounded;
+        stage.style.opacity = String(visRounded);
+      }
 
       // progress through the corridor, for the warp readout
       const rect = wrapper.getBoundingClientRect();
@@ -246,7 +279,7 @@ export default function HyperlapseGate() {
       style={{ height: `${Math.max(200, warp.lengthVh)}vh` }}
       aria-hidden
     >
-      <div className="sticky top-0 h-svh w-full overflow-hidden">
+      <div ref={stageRef} className="sticky top-0 h-svh w-full overflow-hidden">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
         {/* blend the entry edge into the hero above */}
