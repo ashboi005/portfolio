@@ -94,9 +94,11 @@ export default function HyperlapseGate() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    // tolerate paths written without the leading slash; files that don't
+    // exist simply never draw (the naturalWidth guard below)
     const icons = warp.icons.map((src) => {
       const image = new Image();
-      image.src = src;
+      image.src = src.startsWith("/") || src.includes("://") ? src : `/${src}`;
       return image;
     });
 

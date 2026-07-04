@@ -473,7 +473,7 @@
   ],
 
     "warp": {
-    "icons": ["/warp/vs-code.svg", "/warp/postman.svg", "/warp/notion.svg", "/warp/google.svg", "/warp/discord.svg", "/warp/github.svg", "/warp/claude.svg", "/warp/chatgpt.svg", "warp/"],
+    "icons": ["/warp/vs-code.svg", "/warp/postman.svg", "/warp/notion.svg", "/warp/google.svg", "/warp/discord.svg", "/warp/github.svg", "/warp/claude.svg", "/warp/chatgpt.svg", "/warp/after-effects.svg", "/warp/adobe-premiere-pro.svg", "/warp/reddit.svg", "/warp/youtube.svg", "/warp/whatsapp.svg"],
     "words": [
       "{", "}", "</>", "=>", "&&", "||", "();", "::", "$_", "#!", "0x1F",
       "async", "await", "sudo", "git push", "404", "NaN", "TODO", "npm i",
