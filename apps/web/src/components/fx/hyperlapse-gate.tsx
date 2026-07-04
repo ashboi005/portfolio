@@ -41,9 +41,9 @@ const COLORS = {
 } as const;
 
 // field composition — stars dominate so the streak effect reads as hyperspace
-const STAR_SHARE = 0.62;
-const ICON_SHARE = 0.16;
-const PARTICLE_COUNT = 560;
+const STAR_SHARE = 0.64;
+const ICON_SHARE = 0.14;
+const PARTICLE_COUNT = 950;
 
 function makeParticle(z?: number): Particle {
   const roll = Math.random();
@@ -235,8 +235,8 @@ export default function HyperlapseGate() {
   }, []);
 
   return (
-    // last 100svh doubles as whoami's entrance (About is pulled up over it)
-    <div ref={wrapperRef} className="relative hidden lg:block lg:h-[380vh]" aria-hidden>
+    // last 100svh doubles as whoami's entrance (WarpReveal pins + fades over it)
+    <div ref={wrapperRef} className="relative hidden lg:block lg:h-[620vh]" aria-hidden>
       <div className="sticky top-0 h-svh w-full overflow-hidden">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 

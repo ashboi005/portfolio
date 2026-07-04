@@ -27,6 +27,38 @@ function getChatId(): string {
   return id;
 }
 
+export type ChatHistoryMessage = { role: "user" | "ashwath"; text: string };
+
+/** True once a chat has been created on the RAG side (survives reloads). */
+export function hasExistingChat(): boolean {
+  try {
+    return localStorage.getItem(CHAT_CREATED_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Pulls the previous conversation for the stored chat id so a reload doesn't
+ * wipe the visible history. On a 404 (chat gone server-side) the local
+ * session is reset so the next message starts a fresh chat.
+ */
+export async function fetchChatHistory(): Promise<ChatHistoryMessage[]> {
+  const chatId = getChatId();
+  const response = await fetch(
+    `${apiBase()}/api/v1/chat/history?chatId=${encodeURIComponent(chatId)}`,
+  );
+  if (response.status === 404) {
+    localStorage.removeItem(CHAT_CREATED_KEY);
+    return [];
+  }
+  if (!response.ok) return [];
+  const data = (await response.json().catch(() => null)) as {
+    messages?: ChatHistoryMessage[];
+  } | null;
+  return data?.messages ?? [];
+}
+
 /**
  * Sends one message. The first message ever creates the chat on the RAG side
  * (same uuid from then on); everything after goes through fast-query.

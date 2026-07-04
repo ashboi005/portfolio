@@ -216,6 +216,48 @@ const app = new Elysia()
       }),
     },
   )
+  .get(
+    "/api/v1/chat/history",
+    async ({ query, set }) => {
+      if (!chatConfigured) {
+        set.status = 503;
+        return { messages: [] };
+      }
+      try {
+        const response = await fetch(
+          `${AUTOSAGE_BASE_URL}/api/v1/chats/${encodeURIComponent(query.chatId)}/messages`,
+          {
+            headers: { Authorization: `Bearer ${AUTOSAGE_API_KEY}` },
+            signal: AbortSignal.timeout(15_000),
+          },
+        );
+        if (!response.ok) {
+          // unknown chat id (wiped server-side, etc.) — client falls back to a fresh session
+          set.status = response.status === 404 ? 404 : 502;
+          return { messages: [] };
+        }
+        const data = (await response.json().catch(() => null)) as {
+          messages?: { role?: string; content?: string }[];
+        } | null;
+        const messages = (data?.messages ?? [])
+          .filter((m) => typeof m.content === "string" && m.content.trim())
+          .map((m) => ({
+            role: m.role === "user" ? ("user" as const) : ("ashwath" as const),
+            text: m.content!,
+          }));
+        return { messages };
+      } catch (error) {
+        console.error("[chat] history fetch failed:", error);
+        set.status = 502;
+        return { messages: [] };
+      }
+    },
+    {
+      query: t.Object({
+        chatId: t.String({ minLength: 8, maxLength: 64 }),
+      }),
+    },
+  )
   .listen(Number(process.env.PORT) || 3000, (server) => {
     console.log(`ashwath.sys api on http://localhost:${server.port}`);
   });

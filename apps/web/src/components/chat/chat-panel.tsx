@@ -4,7 +4,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { CHAT_GREETING, nextThinkingLine, sendChatMessage } from "@/lib/chat";
+import {
+  CHAT_GREETING,
+  fetchChatHistory,
+  hasExistingChat,
+  nextThinkingLine,
+  sendChatMessage,
+} from "@/lib/chat";
 
 type ChatMessage = { role: "user" | "ashwath"; text: string };
 
@@ -21,10 +27,32 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
   const [busy, setBusy] = useState(false);
   const [thinking, setThinking] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+  const historyLoaded = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => setMounted(true), []);
+
+  // Returning visitor: same chatId lives in localStorage, so pull the old
+  // conversation back instead of greeting them like a stranger.
+  useEffect(() => {
+    if (!open || historyLoaded.current) return;
+    historyLoaded.current = true;
+    if (!hasExistingChat()) return;
+    setRestoring(true);
+    fetchChatHistory()
+      .then((history) => {
+        if (history.length > 0) {
+          setMessages([
+            { role: "ashwath", text: "Oh hey, you're back! Let me pull up where we left off…" },
+            ...history,
+          ]);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setRestoring(false));
+  }, [open]);
 
   useEffect(() => {
     if (open) inputRef.current?.focus({ preventScroll: true });
@@ -32,7 +60,7 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, thinking]);
+  }, [messages, thinking, restoring]);
 
   // Rotate the corny "thinking" one-liners every ~4s while waiting on the RAG.
   useEffect(() => {
@@ -142,6 +170,17 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
                 </div>
               </div>
             ))}
+
+            {restoring && (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] border border-line bg-surface-2 px-3 py-2">
+                  <p className="font-mono text-xs text-dim italic" aria-live="polite">
+                    retrieving our previous conversation…
+                    <span className="blink-cursor text-cyan">▊</span>
+                  </p>
+                </div>
+              </div>
+            )}
 
             {thinking && (
               <div className="flex justify-start">

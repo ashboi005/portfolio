@@ -1,4 +1,5 @@
 import HyperlapseGate from "@/components/fx/hyperlapse-gate";
+import WarpReveal from "@/components/fx/warp-reveal";
 import SystemShell from "@/components/hud/system-shell";
 import About from "@/components/sections/about";
 import Achievements from "@/components/sections/achievements";
@@ -16,16 +17,16 @@ export default function HomePage() {
         <Hero profile={profile} />
         {/* desktop-only warp corridor — scroll velocity turns the starfield into hyperlapse streaks */}
         <HyperlapseGate />
-        {/* pulled up one viewport so whoami rises over the end of the warp
-            instead of waiting below it; solid bg covers the canvas */}
-        <div className="relative z-10 bg-void lg:-mt-[100svh]">
+        {/* whoami materializes from inside the warp — pinned + fading over the
+            starfield during the corridor's final viewport (see WarpReveal) */}
+        <WarpReveal>
           <About profile={profile} />
           <Experience experiences={experience} />
           <Projects projects={projects} />
           <Achievements achievements={achievements} />
           <Vitals />
           <Contact profile={profile} />
-        </div>
+        </WarpReveal>
       </main>
 
       <footer className="relative border-t border-line">

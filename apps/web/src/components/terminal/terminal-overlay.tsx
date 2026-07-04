@@ -3,7 +3,13 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-import { CHAT_GREETING, nextThinkingLine, sendChatMessage } from "@/lib/chat";
+import {
+  CHAT_GREETING,
+  fetchChatHistory,
+  hasExistingChat,
+  nextThinkingLine,
+  sendChatMessage,
+} from "@/lib/chat";
 import type { ProfilePayload, ProjectPayload } from "@/types/portfolio";
 
 type Line = {
@@ -187,7 +193,28 @@ export default function TerminalOverlay({
         setChatMode(true);
         o("establishing secure channel to ashwath@prod… ok", "chat", true);
         o("——— chat mode · plaintext human protocol ———", "chat", true);
-        o(`ashwath ▸ ${CHAT_GREETING}`, "chat");
+        if (hasExistingChat()) {
+          // same chatId as the website widget — replay the old session
+          o("known peer detected — retrieving our previous conversation…", "chat", true);
+          void fetchChatHistory()
+            .then((history) => {
+              if (history.length === 0) {
+                enqueue([{ kind: "chat", text: `ashwath ▸ ${CHAT_GREETING}` }]);
+                return;
+              }
+              enqueue([
+                ...history.map((m) => ({
+                  kind: (m.role === "user" ? "chat-user" : "chat") as Line["kind"],
+                  text: `${m.role === "user" ? "you" : "ashwath"} ▸ ${m.text}`,
+                  instant: true,
+                })),
+                { kind: "chat", text: "——— session restored · carry on ———", instant: true },
+              ]);
+            })
+            .catch(() => enqueue([{ kind: "chat", text: `ashwath ▸ ${CHAT_GREETING}` }]));
+        } else {
+          o(`ashwath ▸ ${CHAT_GREETING}`, "chat");
+        }
         o('(type "exit" to detach)', "chat", true);
         break;
       case "ls":

@@ -43,9 +43,10 @@ export default function NerdBuddy() {
           {/* hint hides while chatting, comes back when the panel closes */}
           {!chatOpen && (
             <motion.span
+              key="talk-hint"
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 1, 1, 0.4] }}
-              transition={{ delay: 1.6, duration: 2.4, repeat: Number.POSITIVE_INFINITY }}
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ delay: 0.4, duration: 2.4, repeat: Number.POSITIVE_INFINITY }}
               className="font-mono text-[10px] tracking-wider text-dim uppercase"
             >
               talk to me →
