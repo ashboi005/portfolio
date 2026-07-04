@@ -28,10 +28,13 @@ export default function Arsenal({ arsenal }: { arsenal: Record<string, string[]>
       const grid = gridRef.current;
       if (!cat || !grid) return;
 
-      gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
+      // Hidden until the leap timeline runs — on phones (where it never runs)
+      // a separate static cat perches on the first box instead.
+      gsap.set(cat, { x: -80, y: -33, opacity: 0 });
+
+      gsap.matchMedia().add("(min-width: 640px) and (prefers-reduced-motion: no-preference)", () => {
         const catW = 46;
         const catH = 33;
-        gsap.set(cat, { x: -80, y: -catH, opacity: 0 });
 
         const knock = (card: HTMLDivElement | null) => {
           if (!card) return;
@@ -106,9 +109,14 @@ export default function Arsenal({ arsenal }: { arsenal: Record<string, string[]>
         vulnerabilities (the cat is a known risk)
       </p>
 
-      <div ref={gridRef} className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {/* the hopping cat rides above the grid */}
-        <div ref={catRef} className="cat pointer-events-none absolute left-0 top-0 z-20">
+      <div ref={gridRef} className="relative mt-12 grid gap-4 sm:mt-0 sm:grid-cols-2 lg:grid-cols-3">
+        {/* the hopping cat rides above the grid (sm+) */}
+        <div ref={catRef} className="cat pointer-events-none absolute left-0 top-0 z-20 hidden sm:block">
+          <Cat variant="cyan" scale={0.7} />
+        </div>
+
+        {/* on phones the known risk just stands guard on top of the first box */}
+        <div className="pointer-events-none absolute right-6 -top-[33px] z-20 sm:hidden" aria-hidden>
           <Cat variant="cyan" scale={0.7} />
         </div>
 

@@ -824,26 +824,59 @@
   will-change: transform;
 }
 
+/* Heavy/decorative motion only — small "the system is alive" ticks (zzz,
+   blink-cursor, led, cat tail, quip ticker…) stay on so phones that report
+   reduced motion (battery saver etc.) don't read as a dead site. */
 @media (prefers-reduced-motion: reduce) {
   .cursor-packet,
   .cursor-ping,
-  .signal-strip,
-  .cat .cat-tail,
-  .cat .cat-eye,
-  .is-walking .leg-b1,
-  .is-walking .leg-b2,
-  .is-walking .leg-f1,
-  .is-walking .leg-f2,
-  .is-walking .cat-body,
   .float-glyph,
   .wire-cube,
-  .zzz,
   .arsenal-scan,
   .badge-shine,
   .trophy-pulse,
   .cursor-glyph,
   .boot-overlay.crt-off {
     animation: none !important;
+  }
+}
+
+/* LCD-style status quip ticker (top HUD bar) */
+.quip-ticker {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.quip-ticker-fade {
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent 100%
+  );
+}
+.quip-ticker-text {
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+}
+@keyframes quip-scroll {
+  0%,
+  14% {
+    transform: translateX(0);
+  }
+  86%,
+  100% {
+    transform: translateX(var(--quip-shift, 0px));
   }
 }
 
@@ -859,9 +892,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .blink-cursor,
-  .led,
-  .scanline,
   .glitch::before,
   .glitch::after {
     animation: none !important;

@@ -23,7 +23,6 @@ export default function ProcessMonitor() {
   const [load, setLoad] = useState("4.20");
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const interval = setInterval(() => {
       setCpu(
         PROCS.map((p) =>

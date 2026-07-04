@@ -7,7 +7,8 @@ export type Title = { text: string; strike?: string };
 /**
  * Types out each title, holds, deletes, and moves to the next — forever.
  * A `strike` prefix (e.g. "Coffee") renders struck-through and stays visible
- * while that title is typing. Reduced motion shows the first title statically.
+ * while that title is typing. Runs everywhere, including phones that report
+ * reduced motion — a typewriter is text, not vestibular motion.
  */
 export default function TypingCycle({
   titles,
@@ -19,15 +20,9 @@ export default function TypingCycle({
   const [index, setIndex] = useState(0);
   const [sub, setSub] = useState(0);
   const [deleting, setDeleting] = useState(false);
-  const [reduced, setReduced] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    setReduced(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
-
-  useEffect(() => {
-    if (reduced) return;
     const current = titles[index]!;
     const full = current.text;
 
@@ -43,18 +38,9 @@ export default function TypingCycle({
       );
     }
     return () => clearTimeout(timer.current);
-  }, [sub, deleting, index, titles, reduced]);
+  }, [sub, deleting, index, titles]);
 
   const current = titles[index]!;
-
-  if (reduced) {
-    return (
-      <span className={className}>
-        {current.strike && <s className="text-dim/60">{current.strike} </s>}
-        {current.text}
-      </span>
-    );
-  }
 
   return (
     <span className={className} aria-live="polite">

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import Cat from "@/components/fx/cat";
@@ -56,10 +56,8 @@ function PixelLaptop({ angry }: { angry: boolean }) {
 export default function SleepyCat({ className }: { className?: string }) {
   const [angry, setAngry] = useState(false);
   const [paw, setPaw] = useState(false);
-  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (reducedMotion) return;
     let timers: ReturnType<typeof setTimeout>[] = [];
     const cycle = () => {
       timers.push(
@@ -80,14 +78,13 @@ export default function SleepyCat({ className }: { className?: string }) {
       for (const t of timers) clearTimeout(t);
       timers = [];
     };
-  }, [reducedMotion]);
+  }, []);
 
   return (
     <div className={`pointer-events-none flex items-end gap-1 ${className ?? ""}`} aria-hidden>
       {/* Zzz */}
       <div className="relative w-4">
-        {!reducedMotion &&
-          ["Z", "z", "z"].map((z, i) => (
+        {["Z", "z", "z"].map((z, i) => (
             <span
               // biome-ignore lint: static
               key={i}
@@ -106,13 +103,7 @@ export default function SleepyCat({ className }: { className?: string }) {
 
       {/* the napping cat, breathing + occasional paw */}
       <motion.div
-        animate={
-          reducedMotion
-            ? undefined
-            : paw
-              ? { rotate: 6, x: 4 }
-              : { scale: [1, 1.05, 1] }
-        }
+        animate={paw ? { rotate: 6, x: 4 } : { scale: [1, 1.05, 1] }}
         transition={paw ? { duration: 0.16 } : { duration: 3, repeat: Number.POSITIVE_INFINITY }}
         style={{ transformOrigin: "bottom right", pointerEvents: "auto" }}
         className="cursor-pointer"

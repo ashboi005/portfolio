@@ -16,7 +16,6 @@ const READOUTS = vitalsContent.readouts;
 function LiveReadout({ label, base, spread, unit }: { label: string; base: number; spread: number; unit: string }) {
   const [value, setValue] = useState(base);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const interval = setInterval(() => {
       setValue(base + Math.round((Math.random() - 0.5) * spread));
     }, 1200);
@@ -33,10 +32,11 @@ function LiveReadout({ label, base, spread, unit }: { label: string; base: numbe
   );
 }
 
-/** Meter bars that fill only once scrolled into view. */
+/** Meter bars that fill once scrolled into view, then keep breathing ±2%. */
 function LoadMeters() {
   const ref = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState(false);
+  const [pcts, setPcts] = useState<number[]>(LOADS.map((load) => load.pct));
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
@@ -53,21 +53,36 @@ function LoadMeters() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!live) return;
+    const interval = setInterval(() => {
+      setPcts(
+        LOADS.map((load) =>
+          Math.max(1, Math.min(99, load.pct + Math.round((Math.random() - 0.5) * 4))),
+        ),
+      );
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [live]);
+
   return (
     <div ref={ref} className="space-y-4">
-      {LOADS.map((load) => (
+      {LOADS.map((load, index) => (
         <div key={load.label}>
           <div className="mb-1.5 flex items-center justify-between font-mono text-[11px]">
             <span className="text-dim">{load.label}</span>
-            <span className={load.critical ? "text-signal" : "text-cyan"}>
-              {live ? load.pct : 0}%
+            <span
+              className={`tabular-nums ${load.critical ? "text-signal" : "text-cyan"}`}
+              suppressHydrationWarning
+            >
+              {live ? pcts[index] : 0}%
             </span>
           </div>
           <div className="meter-track">
             <div
               className="meter-fill"
               style={{
-                width: live ? `${load.pct}%` : "0%",
+                width: live ? `${pcts[index]}%` : "0%",
                 background: load.critical
                   ? "linear-gradient(90deg, #7a1d24, var(--signal))"
                   : undefined,

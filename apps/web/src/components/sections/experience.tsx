@@ -12,7 +12,15 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function DeployEntry({ entry, index }: { entry: ExperiencePayload; index: number }) {
+function DeployEntry({
+  entry,
+  index,
+  level,
+}: {
+  entry: ExperiencePayload;
+  index: number;
+  level: number;
+}) {
   const reducedMotion = useReducedMotion();
   return (
     <motion.article
@@ -40,7 +48,7 @@ function DeployEntry({ entry, index }: { entry: ExperiencePayload; index: number
         <div className="mc-grass-top" aria-hidden />
         <div className="p-5">
         <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-dim">
-          <span className="font-pixel text-[8px] text-cyan">LVL&nbsp;{index + 1}</span>
+          <span className="font-pixel text-[8px] text-cyan">LVL&nbsp;{level}</span>
           <span className="text-cyan">
             deploy: {slugify(entry.company)}/{slugify(entry.role)}
           </span>
@@ -115,8 +123,14 @@ export default function Experience({ experiences }: { experiences: ExperiencePay
             aria-hidden
           />
 
+          {/* newest deploy = highest level, like any respectable XP bar */}
           {experiences.map((entry, index) => (
-            <DeployEntry key={entry.id} entry={entry} index={index} />
+            <DeployEntry
+              key={entry.id}
+              entry={entry}
+              index={index}
+              level={experiences.length - index}
+            />
           ))}
         </div>
       </div>

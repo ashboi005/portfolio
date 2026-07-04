@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion, useScroll } from "motion/react";
 import { TerminalSquare } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { site, statusQuips as QUIPS } from "@/lib/content";
 
@@ -53,13 +53,71 @@ function useClock() {
 }
 
 
-function useQuip() {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => setIndex((i) => (i + 1) % QUIPS.length), 5200);
-    return () => clearInterval(interval);
+/**
+ * Status quips, in random order, that behave like an LCD ticker: a quip that
+ * fits just sits for a beat; one that overflows scrolls back and forth (two
+ * round trips) behind faded edges before the next random quip loads.
+ */
+function QuipTicker({ className }: { className?: string }) {
+  const [quip, setQuip] = useState(QUIPS[0]!);
+  const [shift, setShift] = useState(0);
+  const containerRef = useRef<HTMLSpanElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  const nextQuip = useCallback(() => {
+    setQuip((prev) => {
+      if (QUIPS.length < 2) return prev;
+      let candidate = prev;
+      while (candidate === prev) {
+        candidate = QUIPS[Math.floor(Math.random() * QUIPS.length)]!;
+      }
+      return candidate;
+    });
   }, []);
-  return QUIPS[index]!;
+
+  // Deterministic SSR markup; shuffle begins on the client.
+  useEffect(() => {
+    nextQuip();
+  }, [nextQuip]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const text = textRef.current;
+    if (!container || !text) return;
+    const excess = Math.max(0, Math.ceil(text.scrollWidth - container.clientWidth));
+    setShift(excess);
+    if (excess === 0) {
+      const timer = setTimeout(nextQuip, 5200);
+      return () => clearTimeout(timer);
+    }
+  }, [quip, nextQuip]);
+
+  return (
+    <span
+      ref={containerRef}
+      className={`quip-ticker ${shift > 0 ? "quip-ticker-fade" : ""} ${className ?? ""}`}
+      suppressHydrationWarning
+    >
+      <span
+        ref={textRef}
+        key={quip}
+        className="quip-ticker-text"
+        style={
+          shift > 0
+            ? {
+                // px-per-second pace with a floor, ×4 alternate = 2 round trips
+                animation: `quip-scroll ${Math.max(3, shift / 28)}s linear 4 alternate both`,
+                ["--quip-shift" as string]: `-${shift}px`,
+              }
+            : undefined
+        }
+        onAnimationEnd={nextQuip}
+        suppressHydrationWarning
+      >
+        {quip}
+      </span>
+    </span>
+  );
 }
 
 function useActiveSection() {
@@ -86,7 +144,6 @@ export default function HudFrame({ onOpenTerminal }: { onOpenTerminal: () => voi
   const uptime = useUptime();
   const clock = useClock();
   const active = useActiveSection();
-  const quip = useQuip();
   const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
 
@@ -102,17 +159,15 @@ export default function HudFrame({ onOpenTerminal }: { onOpenTerminal: () => voi
       {/* Top status bar */}
       <header className="fixed inset-x-0 top-0.5 z-40 border-b border-line bg-void/80 backdrop-blur-sm">
         <div className="flex h-9 items-center justify-between gap-4 px-4 font-mono text-[11px] tracking-wider text-dim lg:px-6">
-          <div className="flex items-center gap-4">
-            <a href="#boot" className="text-bright transition-colors hover:text-cyan">
+          <div className="flex min-w-0 flex-1 items-center gap-4">
+            <a href="#boot" className="shrink-0 text-bright transition-colors hover:text-cyan">
               {site.brand}
               <span className="text-cyan">{site.brandSuffix}</span>
             </a>
-            <span className="hidden sm:inline">{site.version}</span>
-            <span className="hidden text-dim/80 md:inline" suppressHydrationWarning>
-              {quip}
-            </span>
+            <span className="hidden shrink-0 sm:inline">{site.version}</span>
+            <QuipTicker className="min-w-0 flex-1 text-dim/80" />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-4">
             <span className="hidden sm:inline" suppressHydrationWarning>
               uptime {uptime}
             </span>
