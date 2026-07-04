@@ -1,96 +1,107 @@
-# portfolio
+# ASHWATH.SYS
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Elysia, and more.
+> A portfolio that pretends to be a living operating system. Boot sequence, fake terminal, wandering pixel cats, hidden Sprite cans — the whole thing is themed as `ASHWATH.SYS v5.2.1`.
+
+A Bun monorepo: a **Next.js 16** frontend styled as a boot-to-desktop terminal HUD, backed by a lean **Elysia** API whose one real job is emailing contact-form submissions. All site content lives in a single JSON file — no database at runtime.
+
+## Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Runtime / tooling | Bun 1.3 workspaces (with dependency catalog), TypeScript 6 |
+| Frontend | Next.js 16 (App Router, React Compiler, typed routes, standalone output), React 19 |
+| Styling | Tailwind CSS v4, shadcn/ui primitives (`@portfolio/ui`), next-themes |
+| Animation | GSAP + ScrollTrigger, Motion (Framer Motion 12) |
+| 3D | Three.js via @react-three/fiber + drei |
+| Backend | Elysia 1.4 on Bun, Nodemailer (Gmail SMTP), Eden for typed client |
+| Fonts | Chakra Petch, IBM Plex Sans, JetBrains Mono, Press Start 2P |
+| Scaffold (not used at runtime) | Drizzle ORM + Postgres, Better-Auth — Better-T-Stack leftovers kept for future use |
 
 ## Features
 
-- **TypeScript** - For type safety and improved developer experience
-- **Next.js** - Full-stack React framework
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Elysia** - Type-safe, high-performance framework
-- **Bun** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **PostgreSQL** - Database engine
-- **Authentication** - Better-Auth
+Everything is driven from `apps/web/src/content/content.json` (typed by `src/types/portfolio.ts`), and every effect respects `prefers-reduced-motion`.
 
-## Getting Started
+### System chrome
+- **Boot sequence** (`fx/boot-overlay.tsx`) — CRT power-on, scrolling boot log, loader bar, monitor-off collapse. Skippable with any key.
+- **HUD frame** (`hud/hud-frame.tsx`) — scroll progress bar, rotating status quips, live uptime counter, live IST clock, and a left-side process-list nav where each section is a PID (`001 boot`, `017 whoami`, `042 deploys`…).
+- **Terminal** — press `~` for a full fake shell (`terminal/terminal-overlay.tsx`) with history and typewriter output: `whoami`/`neofetch`, `ls projects`, `stack`, `cat` (ASCII cat), `fact`, `sudo hire-me`, `matrix`, `rm` ("nice try"), and more.
 
-First, install the dependencies:
+### Playful layer
+- **Custom cursor** (`fx/custom-cursor.tsx`) — cyan "packet" cursor with a dot trail and drifting dev glyphs; clicks emit floating HTTP status codes (404, 418, 200 OK…).
+- **Cats everywhere** — a wandering colony (`fx/cat-colony.tsx`), an edge-crawling cat circling the viewport (`fx/edge-crawler.tsx`), and a sleepy cat napping on a laptop in the contact section (`fx/sleepy-cat.tsx`). Petting any cat bursts hearts (`lib/pet.ts`).
+- **Sprite-can quest** (`quest/`) — 10 pixel Sprite cans hidden down the page, with a HUD counter, popup banter, and a reward dialog when all are found.
+- **Nerd buddy** (`fx/nerd-buddy.tsx`) — a floating 🤓 next to the hero that dispenses non-repeating fun facts (`lib/fact-tracker.ts`).
+- **Floating icons** (`fx/floating-icons.tsx`) — tool SVGs drifting and bouncing off viewport edges.
 
-```bash
-bun install
-```
+### Sections
+- **Hero** — WebGL network constellation with packets pulsing along edges (`three/system-constellation.tsx`), glitch-text name, rotating job titles, cinematic scroll zoom.
+- **About / whoami** — identity card rendered as a syntax-highlighted `GET /api/v1/profile → 200 OK` JSON response, plus a fake `top` process monitor.
+- **Arsenal** — tech chips spring-drop into place on scroll, then a cat hops across and knocks them around.
+- **Experience / deploys** — CI/CD-pipeline timeline where each job is a Minecraft-style grass-block deploy node.
+- **Projects / services** — horizontally-scrolling cards with LIVE / NDA / SHIPPED / LAB status badges.
+- **Achievements / wins** — rank card, count-up stats, and a live `tail -f /var/log/ashwath` log feed.
+- **Vitals** — ticking fake telemetry and load meters.
+- **Contact** — the form is an HTTP request builder (`POST /api/v1/contact`) with a live JSON body preview and an animated status-code + latency response.
 
-## Database Setup
+Shared text FX: decode/scramble/glitch text, typing cycle, count-up, reveal, parallax — plus automatic gold emphasis of metrics via `lib/keywords.tsx`.
 
-This project uses PostgreSQL with Drizzle ORM.
-
-1. Make sure you have a PostgreSQL database set up.
-2. Update your `apps/server/.env` file with your PostgreSQL connection details.
-
-3. Apply the schema to your database:
-
-```bash
-bun run db:push
-```
-
-Then, run the development server:
-
-```bash
-bun run dev
-```
-
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-The API is running at [http://localhost:3000](http://localhost:3000).
-
-## UI Customization
-
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
-
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
-
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
-
-Import shared components like this:
-
-```tsx
-import { Button } from "@portfolio/ui/components/button";
-```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
+### API (`apps/server`)
+- `GET /` and `GET /health` — status checks (`cats: "roaming"`).
+- `POST /api/v1/contact` — validated, HTML-escaped, sent via Gmail SMTP with visitor as reply-to. Gracefully degrades to log-only (`202`) if SMTP isn't configured.
 
 ## Project Structure
 
 ```
 portfolio/
 ├── apps/
-│   ├── web/         # Frontend application (Next.js)
-│   └── server/      # Backend API (Elysia)
+│   ├── web/                # Next.js frontend (port 3001)
+│   │   └── src/
+│   │       ├── app/            # layout, page
+│   │       ├── components/
+│   │       │   ├── fx/         # cats, cursor, boot, glitch, floaters…
+│   │       │   ├── hud/        # system shell + HUD frame
+│   │       │   ├── quest/      # Sprite-can easter-egg game
+│   │       │   ├── sections/   # hero, about, experience, projects…
+│   │       │   ├── terminal/   # fake shell overlay
+│   │       │   └── three/      # WebGL constellation
+│   │       ├── content/content.json   # single source of truth for all copy
+│   │       ├── lib/            # content, fact-tracker, pet, keywords
+│   │       └── types/portfolio.ts
+│   └── server/             # Elysia API (port 3000) — contact email
 ├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+│   ├── ui/                 # shared shadcn/ui components + globals.css
+│   ├── env/                # t3-env + Zod validated env vars
+│   ├── db/                 # Drizzle + Postgres (scaffold, unused at runtime)
+│   ├── auth/               # Better-Auth (scaffold, unused at runtime)
+│   └── config/             # shared config
+├── Dockerfile.web          # Next standalone image
+├── Dockerfile.server       # Elysia image
+└── bts.jsonc               # Better-T-Stack config
 ```
 
-## Available Scripts
+## Getting Started
 
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run dev:server`: Start only the server
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run db:push`: Push schema changes to database
-- `bun run db:generate`: Generate database client/types
-- `bun run db:migrate`: Run database migrations
-- `bun run db:studio`: Open database studio UI
+```bash
+bun install
+
+# env (see .env.example)
+# GMAIL_USER, GMAIL_APP_PASSWORD, CONTACT_TO (optional),
+# CORS_ORIGIN, NEXT_PUBLIC_SERVER_URL, PORT
+
+bun run dev          # everything
+bun run dev:web      # web only → http://localhost:3001
+bun run dev:server   # api only → http://localhost:3000
+```
+
+Other scripts: `bun run build`, `bun run check-types`, and Drizzle helpers (`db:push`, `db:studio`, `db:generate`, `db:migrate`) for the scaffolded DB.
+
+## Deploy
+
+Both apps ship as Docker images built from the repo root (so workspace packages resolve):
+
+```bash
+docker build -f Dockerfile.web -t ashwath-sys-web .       # Next standalone, port 3001
+docker build -f Dockerfile.server -t ashwath-sys-api .    # Elysia, port 3000
+```
+
+`Dockerfile.web` takes `NEXT_PUBLIC_*` as build args; the server reads SMTP + CORS config at runtime.
