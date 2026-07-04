@@ -1,3 +1,4 @@
+import HyperlapseGate from "@/components/fx/hyperlapse-gate";
 import SystemShell from "@/components/hud/system-shell";
 import About from "@/components/sections/about";
 import Achievements from "@/components/sections/achievements";
@@ -13,6 +14,8 @@ export default function HomePage() {
     <SystemShell profile={profile} projects={projects}>
       <main>
         <Hero profile={profile} />
+        {/* desktop-only warp corridor — scroll velocity turns the starfield into hyperlapse streaks */}
+        <HyperlapseGate />
         <About profile={profile} />
         <Experience experiences={experience} />
         <Projects projects={projects} />
