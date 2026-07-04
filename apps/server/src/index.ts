@@ -35,7 +35,7 @@ const AUTOSAGE_BASE_URL = process.env.AUTOSAGE_BASE_URL?.replace(/\/+$/, "");
 const AUTOSAGE_TENANT_ID = process.env.AUTOSAGE_TENANT_ID;
 const AUTOSAGE_KB_ID = process.env.AUTOSAGE_KB_ID;
 const AUTOSAGE_API_KEY = process.env.AUTOSAGE_API_KEY;
-const AUTOSAGE_MODEL = "google/gemini-3-flash-preview";
+const AUTOSAGE_MODEL = "deepseek/deepseek-v4-flash";
 
 const chatConfigured = Boolean(
   AUTOSAGE_BASE_URL && AUTOSAGE_TENANT_ID && AUTOSAGE_KB_ID && AUTOSAGE_API_KEY,

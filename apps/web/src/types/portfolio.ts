@@ -7,6 +7,7 @@ export type ProfilePayload = {
   bio: string | null;
   githubUrl: string | null;
   linkedinUrl: string | null;
+  discordUsername?: string | null;
   email: string | null;
   interests: string[];
   arsenal: Record<string, string[]>;
@@ -105,6 +106,7 @@ export type SiteContent = {
   warp: {
     icons: string[];
     words: string[];
+    lengthVh: number;
     count: number;
     iconShare: number;
     wordShare: number;

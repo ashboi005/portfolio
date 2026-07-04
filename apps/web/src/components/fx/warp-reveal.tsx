@@ -1,6 +1,12 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import {
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -9,7 +15,11 @@ import { useEffect, useRef, useState } from "react";
  * corridor's tail (page.tsx); during that overlap a counter-translation pins
  * it to the top of the screen while opacity/scale ramp — so whoami fades in
  * over the streaking starfield in place, with zero perceived scrolling, and
- * unpins seamlessly once fully solid. Desktop only; plain flow otherwise.
+ * unpins seamlessly once fully solid.
+ *
+ * The effect is ONE-WAY: progress latches at its max, so scrolling back up
+ * from whoami never dissolves the content into the starfield again — the
+ * section just scrolls away normally. Desktop only; plain flow otherwise.
  */
 export default function WarpReveal({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -28,11 +38,21 @@ export default function WarpReveal({ children }: { children: React.ReactNode }) 
     target: ref,
     offset: ["start end", "start start"],
   });
+
+  // latch: only ever increases, so the reveal plays downward-only
+  const progress = useMotionValue(0);
+  useMotionValueEvent(scrollYProgress, "change", (value) => {
+    if (value > progress.get()) progress.set(value);
+  });
+  useEffect(() => {
+    progress.set(scrollYProgress.get());
+  }, [progress, scrollYProgress]);
+
   // counter-translate by the remaining distance so the block stays pinned
   // at the top of the viewport for the whole overlap (materialize, not slide)
-  const y = useTransform(scrollYProgress, (p) => `${-(1 - p) * 100}svh`);
-  const opacity = useTransform(scrollYProgress, [0, 0.25, 0.85, 1], [0, 0.12, 0.92, 1]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
+  const y = useTransform(progress, (p) => `${-(1 - p) * 100}svh`);
+  const opacity = useTransform(progress, [0, 0.25, 0.85, 1], [0, 0.12, 0.92, 1]);
+  const scale = useTransform(progress, [0, 1], [1.1, 1]);
 
   return (
     <motion.div

@@ -11,6 +11,7 @@ import { warp } from "@/lib/content";
  *   icons     — SVG/PNG paths (put files in public/warp/), separate from the
  *               ambient background `floaters`
  *   words     — the code snippets that fly past
+ *   lengthVh  — corridor height in vh (how long the flight lasts)
  *   count     — total particles in the field
  *   iconShare / wordShare — fraction of the field that's icons / words
  *               (the remainder is stars)
@@ -236,7 +237,12 @@ export default function HyperlapseGate() {
 
   return (
     // last 100svh doubles as whoami's entrance (WarpReveal pins + fades over it)
-    <div ref={wrapperRef} className="relative hidden lg:block lg:h-[750vh]" aria-hidden>
+    <div
+      ref={wrapperRef}
+      className="relative hidden lg:block"
+      style={{ height: `${Math.max(200, warp.lengthVh)}vh` }}
+      aria-hidden
+    >
       <div className="sticky top-0 h-svh w-full overflow-hidden">
         <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 

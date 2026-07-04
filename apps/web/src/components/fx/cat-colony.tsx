@@ -27,8 +27,6 @@ export default function CatColony() {
   const catRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     const ctx = gsap.context(() => {
       catRefs.current.forEach((element, index) => {
         if (!element) return;

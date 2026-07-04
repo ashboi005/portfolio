@@ -14,7 +14,6 @@ export default function EdgeCrawler() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const element = ref.current;
     if (!element) return;
 

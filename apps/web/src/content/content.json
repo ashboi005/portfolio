@@ -76,6 +76,7 @@
     "bio": "Chronically online, terminally curious. I have exactly zero hobbies — no movies, no music, no touching grass. Just distributed systems, cloud infrastructure, and AI agents doing my bidding. My idea of a good time is watching a queue drain at 3 AM. Everything I ship is built with a production-first mindset: real SaaS, real users, real pager anxiety.",
     "githubUrl": "https://github.com/ashboi005",
     "linkedinUrl": "https://linkedin.com/in/ashwath-soni-b5bba32ba",
+    "discordUsername": "theasheditzo",
     "email": "ashwathsoni005@gmail.com",
     "interests": [
       "Distributed Systems",
@@ -472,13 +473,14 @@
   ],
 
     "warp": {
-    "icons": [],
+    "icons": ["/warp/vs-code.svg", "/warp/postman.svg", "/warp/notion.svg", "/warp/google.svg", "/warp/discord.svg", "/warp/github.svg", "/warp/claude.svg", "/warp/chatgpt.svg", "warp/"],
     "words": [
       "{", "}", "</>", "=>", "&&", "||", "();", "::", "$_", "#!", "0x1F",
       "async", "await", "sudo", "git push", "404", "NaN", "TODO", "npm i",
       ";", "*", "%s", "|>", "===", "?.", "curl", "grep", "ssh", "chmod +x",
       "docker", "SELECT *", "rm -rf", "\u03bb", "<T>", "useEffect", "nil"
     ],
+    "lengthVh": 750,
     "count": 950,
     "iconShare": 0.14,
     "wordShare": 0.22,
