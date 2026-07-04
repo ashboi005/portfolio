@@ -1,12 +1,11 @@
 /**
  * Shared client for the "chat with Ashwath" RAG service. Used by both the
  * website chat widget (🤓) and the terminal `chat` command so they share one
- * conversation. The frontend keeps no history — it generates a chat id once,
- * stores it in localStorage, and the backend remembers the rest.
+ * conversation. The frontend stores the chat id returned by the backend
+ * (AutoSage creates it, not us) and sends it on subsequent messages.
  */
 
 const CHAT_ID_KEY = "ashwath.sys/chat-id";
-const CHAT_CREATED_KEY = "ashwath.sys/chat-created";
 
 export const CHAT_GREETING =
   'Hi, I\'m Ashwath. Ask me anything about myself, or type "fact" if you\'d like to hear a random fact about me.';
@@ -15,24 +14,20 @@ function apiBase() {
   return process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 }
 
-function getChatId(): string {
-  let id = localStorage.getItem(CHAT_ID_KEY);
-  if (!id) {
-    id =
-      typeof crypto !== "undefined" && "randomUUID" in crypto
-        ? crypto.randomUUID()
-        : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}-${Math.random().toString(16).slice(2, 10)}`;
-    localStorage.setItem(CHAT_ID_KEY, id);
-  }
-  return id;
+function getChatId(): string | null {
+  return localStorage.getItem(CHAT_ID_KEY);
+}
+
+function setChatId(id: string) {
+  localStorage.setItem(CHAT_ID_KEY, id);
 }
 
 export type ChatHistoryMessage = { role: "user" | "ashwath"; text: string };
 
-/** True once a chat has been created on the RAG side (survives reloads). */
+/** True if we have a chat id stored (meaning a conversation exists). */
 export function hasExistingChat(): boolean {
   try {
-    return localStorage.getItem(CHAT_CREATED_KEY) === "1";
+    return getChatId() !== null;
   } catch {
     return false;
   }
@@ -45,11 +40,12 @@ export function hasExistingChat(): boolean {
  */
 export async function fetchChatHistory(): Promise<ChatHistoryMessage[]> {
   const chatId = getChatId();
+  if (!chatId) return [];
   const response = await fetch(
     `${apiBase()}/api/v1/chat/history?chatId=${encodeURIComponent(chatId)}`,
   );
   if (response.status === 404) {
-    localStorage.removeItem(CHAT_CREATED_KEY);
+    localStorage.removeItem(CHAT_ID_KEY);
     return [];
   }
   if (!response.ok) return [];
@@ -60,28 +56,33 @@ export async function fetchChatHistory(): Promise<ChatHistoryMessage[]> {
 }
 
 /**
- * Sends one message. The first message ever creates the chat on the RAG side
- * (same uuid from then on); everything after goes through fast-query.
+ * Sends one message. The first message creates a new chat on AutoSage (no
+ * chat_id sent); subsequent messages include the stored chat_id.
  * Resolves to Ashwath's reply — rejects with a human-sounding Error otherwise.
  */
 export async function sendChatMessage(message: string): Promise<string> {
   const chatId = getChatId();
-  const isNew = localStorage.getItem(CHAT_CREATED_KEY) !== "1";
 
   const response = await fetch(`${apiBase()}/api/v1/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chatId, message, isNew }),
+    body: JSON.stringify({ message, ...(chatId ? { chatId } : {}) }),
   });
 
-  const data = (await response.json().catch(() => null)) as { reply?: string } | null;
+  const data = (await response.json().catch(() => null)) as {
+    reply?: string;
+    chatId?: string;
+  } | null;
 
   if (!response.ok) {
     throw new Error(
       data?.reply ?? "Hm, my memory service just glitched. Give it another shot in a second?",
     );
   }
-  if (isNew) localStorage.setItem(CHAT_CREATED_KEY, "1");
+
+  // Store the chat_id returned by AutoSage (first message only)
+  if (data?.chatId) setChatId(data.chatId);
+
   return data?.reply ?? "…I blanked. Ask me that again?";
 }
 

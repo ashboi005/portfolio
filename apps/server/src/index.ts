@@ -32,54 +32,34 @@ if (!transporter) {
 // The website/terminal chat talks to this route; the route forwards to the
 // AutoSage RAG service so the API key never reaches the browser.
 const AUTOSAGE_BASE_URL = process.env.AUTOSAGE_BASE_URL?.replace(/\/+$/, "");
-const AUTOSAGE_TENANT_ID = process.env.AUTOSAGE_TENANT_ID;
-const AUTOSAGE_KB_ID = process.env.AUTOSAGE_KB_ID;
+const AUTOSAGE_AGENT_ID = process.env.AUTOSAGE_AGENT_ID;
 const AUTOSAGE_API_KEY = process.env.AUTOSAGE_API_KEY;
-const AUTOSAGE_MODEL = "deepseek/deepseek-v4-flash";
 
-const chatConfigured = Boolean(
-  AUTOSAGE_BASE_URL && AUTOSAGE_TENANT_ID && AUTOSAGE_KB_ID && AUTOSAGE_API_KEY,
-);
+const chatConfigured = Boolean(AUTOSAGE_BASE_URL && AUTOSAGE_AGENT_ID && AUTOSAGE_API_KEY);
 if (!chatConfigured) {
   console.warn(
-    "[chat] AutoSage env incomplete (AUTOSAGE_BASE_URL / AUTOSAGE_TENANT_ID / AUTOSAGE_KB_ID / AUTOSAGE_API_KEY) — chat will return 503.",
+    "[chat] AutoSage env incomplete (AUTOSAGE_BASE_URL / AUTOSAGE_AGENT_ID / AUTOSAGE_API_KEY) — chat will return 503.",
   );
 }
 
 /**
- * Fish the reply out of the AutoSage response. Observed shapes:
- *  - create chat:  { response: { assistant_message: { content } } }
- *  - fast-query:   { final_answer }
- * The rest are fallbacks in case the API evolves.
+ * Fish the reply and chat_id out of the AutoSage agent response.
+ * Expected shape: { assistant_message: { content }, chat_id }
  */
-function extractReply(payload: unknown, depth = 0): string | null {
-  if (payload == null || depth > 3) return null;
-  if (typeof payload === "string") return payload.trim() || null;
-  if (typeof payload !== "object") return null;
+function extractAgentResponse(payload: unknown): { reply: string | null; chatId: string | null } {
+  if (payload == null || typeof payload !== "object") {
+    return { reply: null, chatId: null };
+  }
   const record = payload as Record<string, unknown>;
-  for (const key of [
-    "final_answer",
-    "reply",
-    "response",
-    "assistant_message",
-    "answer",
-    "content",
-    "message",
-    "text",
-    "output",
-    "result",
-    "data",
-  ]) {
-    if (key in record) {
-      const found = extractReply(record[key], depth + 1);
-      if (found) return found;
+  const chatId = typeof record.chat_id === "string" ? record.chat_id : null;
+  const assistantMsg = record.assistant_message;
+  if (assistantMsg && typeof assistantMsg === "object") {
+    const content = (assistantMsg as Record<string, unknown>).content;
+    if (typeof content === "string" && content.trim()) {
+      return { reply: content.trim(), chatId };
     }
   }
-  const choices = record.choices;
-  if (Array.isArray(choices) && choices.length > 0) {
-    return extractReply(choices[0], depth + 1);
-  }
-  return null;
+  return { reply: null, chatId };
 }
 
 /**
@@ -151,30 +131,14 @@ const app = new Elysia()
         };
       }
 
-      const { chatId, message, isNew } = body;
-      const url = isNew
-        ? `${AUTOSAGE_BASE_URL}/api/v1/chats/`
-        : `${AUTOSAGE_BASE_URL}/api/v1/chats/${encodeURIComponent(chatId)}/messages`;
-      // NB: no `title` — AutoSage 400s on an empty title; omitting it
-      // auto-generates one from the first message.
-      const payload = isNew
-        ? {
-            id: chatId,
-            tenant_id: AUTOSAGE_TENANT_ID,
-            knowledge_base_id: AUTOSAGE_KB_ID,
-            message,
-            model: AUTOSAGE_MODEL,
-            websearch_enable: false,
-            agent_mode: "deep",
-          }
-        : {
-            content: message,
-            model: AUTOSAGE_MODEL,
-            websearch_enable: false,
-            agent_mode: "deep",
-          };
+      const { chatId, message } = body;
+
+      // Build payload — omit chat_id for the first message so AutoSage creates a new chat
+      const payload: Record<string, string> = { message };
+      if (chatId) payload.chat_id = chatId;
 
       try {
+        const url = `${AUTOSAGE_BASE_URL}/api/v1/agents/${AUTOSAGE_AGENT_ID}/messages`;
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -182,7 +146,7 @@ const app = new Elysia()
             Authorization: `Bearer ${AUTOSAGE_API_KEY}`,
           },
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(45_000),
+          signal: AbortSignal.timeout(60_000),
         });
 
         if (!response.ok) {
@@ -193,13 +157,13 @@ const app = new Elysia()
         }
 
         const data = await response.json().catch(() => null);
-        const reply = extractReply(data);
-        if (!reply) {
+        const result = extractAgentResponse(data);
+        if (!result.reply) {
           console.error("[chat] could not find reply in AutoSage response:", JSON.stringify(data)?.slice(0, 400));
           set.status = 502;
           return { reply: "I definitely thought of something, but it got lost on the way. Ask me again?" };
         }
-        return { reply };
+        return { reply: result.reply, chatId: result.chatId };
       } catch (error) {
         console.error("[chat] request failed:", error);
         set.status = 502;
@@ -208,9 +172,8 @@ const app = new Elysia()
     },
     {
       body: t.Object({
-        chatId: t.String({ minLength: 8, maxLength: 64 }),
+        chatId: t.Optional(t.String({ minLength: 8, maxLength: 64 })),
         message: t.String({ minLength: 1, maxLength: 4000 }),
-        isNew: t.Boolean(),
       }),
     },
   )
