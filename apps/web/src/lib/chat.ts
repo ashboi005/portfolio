@@ -8,7 +8,7 @@
 const CHAT_ID_KEY = "ashwath.sys/chat-id";
 
 export const CHAT_GREETING =
-  'Hi, I\'m Ashwath. Ask me anything about myself, or type "fact" if you\'d like to hear a random fact about me.';
+  'Sup dawg. I am Ashwath but digitized. I have my entire brain loaded up here so ask me whatever you want. We can talk about my backend projects, how I started coding (I can give out advices as well), or how I\'m picky about my food.';
 
 function apiBase() {
   return process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
