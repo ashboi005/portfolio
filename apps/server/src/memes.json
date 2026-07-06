@@ -1,5 +1,5 @@
 {
   "_comment": "Map meme IDs (the same IDs listed in the chatbot's system prompt / meme knowledge doc) to their CloudFront URLs. Keys starting with _ are ignored. Add your 25-30 memes below.",
-  "m_001": "https://REPLACE-ME.cloudfront.net/memes/001.gif",
-  "m_002": "https://REPLACE-ME.cloudfront.net/memes/002.jpg"
+  "testing_meme": "https://d1g02np2fk5d30.cloudfront.net/testing_meme.png",
+  "meme_02": "https://d1g02np2fk5d30.cloudfront.net/memes/002.jpg"
 }
