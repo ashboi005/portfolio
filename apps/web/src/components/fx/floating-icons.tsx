@@ -124,30 +124,32 @@ export default function FloatingIcons() {
     window.addEventListener("resize", onResize);
 
     // The ambient floaters clear the stage for the warp corridor and whoami —
-    // only the dedicated warp icons fly there. Fade the layer out while
-    // either region is on screen.
-    const hideWhile = ["warp-corridor", "whoami"]
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[];
-    const visible = new Set<Element>();
-    // negative margin so merely touching the viewport edge doesn't count —
-    // the corridor starts exactly at the hero's bottom edge
-    const regionObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) visible.add(entry.target);
-          else visible.delete(entry.target);
-        }
-        layer.style.opacity = visible.size > 0 ? "0" : "1";
-      },
-      { rootMargin: "-12% 0px -12% 0px" },
-    );
-    for (const region of hideWhile) regionObserver.observe(region);
+    // only the dedicated warp icons fly there. The corridor element mounts and
+    // unmounts (WarpSequence), so re-query it each check rather than observing
+    // a fixed node. Fade the layer out while either region is on screen.
+    let regionRaf = 0;
+    const updateVisibility = () => {
+      regionRaf = 0;
+      const vh = window.innerHeight;
+      const inView = (id: string) => {
+        const el = document.getElementById(id);
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return r.top < vh * 0.88 && r.bottom > vh * 0.12;
+      };
+      layer.style.opacity = inView("warp-corridor") || inView("whoami") ? "0" : "1";
+    };
+    const onRegionScroll = () => {
+      if (!regionRaf) regionRaf = requestAnimationFrame(updateVisibility);
+    };
+    window.addEventListener("scroll", onRegionScroll, { passive: true });
+    updateVisibility();
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
-      regionObserver.disconnect();
+      window.removeEventListener("scroll", onRegionScroll);
+      if (regionRaf) cancelAnimationFrame(regionRaf);
       for (const b of bodies) b.el.remove();
     };
   }, []);

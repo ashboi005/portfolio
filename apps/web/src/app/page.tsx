@@ -1,5 +1,4 @@
-import HyperlapseGate from "@/components/fx/hyperlapse-gate";
-import WarpReveal from "@/components/fx/warp-reveal";
+import WarpSequence from "@/components/fx/warp-sequence";
 import SystemShell from "@/components/hud/system-shell";
 import About from "@/components/sections/about";
 import Achievements from "@/components/sections/achievements";
@@ -15,18 +14,17 @@ export default function HomePage() {
     <SystemShell profile={profile} projects={projects}>
       <main>
         <Hero profile={profile} />
-        {/* desktop-only warp corridor — scroll velocity turns the starfield into hyperlapse streaks */}
-        <HyperlapseGate />
-        {/* whoami materializes from inside the warp — pinned + fading over the
-            starfield during the corridor's final viewport (see WarpReveal) */}
-        <WarpReveal>
+        {/* Desktop-only warp corridor. WarpSequence mounts it below the hero
+            for the descent (whoami materializes out of it) and unmounts it on
+            the way up so scrolling back to the hero stays smooth. */}
+        <WarpSequence>
           <About profile={profile} />
           <Experience experiences={experience} />
           <Projects projects={projects} />
           <Achievements achievements={achievements} />
           <Vitals />
           <Contact profile={profile} />
-        </WarpReveal>
+        </WarpSequence>
       </main>
 
       <footer className="relative border-t border-line">
