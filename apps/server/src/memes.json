@@ -1,5 +1,13 @@
 {
-  "_comment": "Map meme IDs (the same IDs listed in the chatbot's system prompt / meme knowledge doc) to their CloudFront URLs. Keys starting with _ are ignored. Add your 25-30 memes below.",
-  "testing_meme": "https://d1g02np2fk5d30.cloudfront.net/testing_meme.png",
-  "meme_02": "https://d1g02np2fk5d30.cloudfront.net/memes/002.jpg"
+"_comment": "Map meme IDs to their CloudFront URLs.",
+"meme_delete_feelings": "https://d1g02np2fk5d30.cloudfront.net/memes/delete_feelings.png",
+"meme_gandhi_hell_nah": "https://d1g02np2fk5d30.cloudfront.net/memes/gandhi_hell_nah.jpeg",
+"meme_gandhi_womp_womp": "https://d1g02np2fk5d30.cloudfront.net/memes/gandhi_womp_womp.jpeg",
+"meme_healing_hooling": "https://d1g02np2fk5d30.cloudfront.net/memes/healing_hooling.jpeg",
+"meme_hosla_tuta": "https://d1g02np2fk5d30.cloudfront.net/memes/hosla_tuta.jpeg",
+"meme_khair_ab_kya": "https://d1g02np2fk5d30.cloudfront.net/memes/khair_ab_kya.jpeg",
+"meme_larp_check": "https://d1g02np2fk5d30.cloudfront.net/memes/larp_check.png",
+"meme_lebron_1percent": "https://d1g02np2fk5d30.cloudfront.net/memes/lebron_1percent.jpeg",
+"meme_philosophy_circle": "https://d1g02np2fk5d30.cloudfront.net/memes/philosophy_circle.png",
+"meme_vro_support": "https://d1g02np2fk5d30.cloudfront.net/memes/vro_support.png"
 }
