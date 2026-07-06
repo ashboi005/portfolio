@@ -5,14 +5,45 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import {
+  type ChatHistoryMessage,
+  type ChatPart,
   CHAT_GREETING,
   fetchChatHistory,
+  fetchMemeUrl,
   hasExistingChat,
+  nextPartDelay,
   nextThinkingLine,
+  parseReplyParts,
   sendChatMessage,
 } from "@/lib/chat";
 
-type ChatMessage = { role: "user" | "ashwath"; text: string };
+type ChatMessage = {
+  role: "user" | "ashwath";
+  text?: string;
+  meme?: { url: string; caption?: string };
+};
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Resolve a saved conversation (JSON replies → text/meme bubbles). */
+async function buildHistoryMessages(history: ChatHistoryMessage[]): Promise<ChatMessage[]> {
+  const out: ChatMessage[] = [];
+  for (const h of history) {
+    if (h.role === "user") {
+      out.push({ role: "user", text: h.text });
+      continue;
+    }
+    for (const part of parseReplyParts(h.text)) {
+      if (part.type === "meme") {
+        const url = await fetchMemeUrl(part.memeId);
+        if (url) out.push({ role: "ashwath", meme: { url, caption: part.caption } });
+      } else {
+        out.push({ role: "ashwath", text: part.text });
+      }
+    }
+  }
+  return out;
+}
 
 /**
  * The floating "talk to Ashwath" panel the 🤓 opens. Same cyan instrument-
@@ -24,11 +55,15 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
     { role: "ashwath", text: CHAT_GREETING },
   ]);
   const [input, setInput] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(false); // waiting on the API
+  const [revealing, setRevealing] = useState(false); // dripping out reply parts
+  const [typingNext, setTypingNext] = useState(false); // gap before the next part
   const [thinking, setThinking] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const historyLoaded = useRef(false);
+  // bumped on every new send / close so an in-flight reveal cancels cleanly
+  const revealToken = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,16 +77,25 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
     if (!hasExistingChat()) return;
     setRestoring(true);
     fetchChatHistory()
-      .then((history) => {
+      .then(async (history) => {
         if (history.length > 0) {
           setMessages([
             { role: "ashwath", text: "Oh hey, you're back! Let me pull up where we left off…" },
-            ...history,
+            ...(await buildHistoryMessages(history)),
           ]);
         }
       })
       .catch(() => {})
       .finally(() => setRestoring(false));
+  }, [open]);
+
+  // closing the panel cancels any in-progress reply reveal
+  useEffect(() => {
+    if (!open) {
+      revealToken.current += 1;
+      setRevealing(false);
+      setTypingNext(false);
+    }
   }, [open]);
 
   useEffect(() => {
@@ -60,7 +104,7 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, thinking, restoring]);
+  }, [messages, thinking, restoring, typingNext]);
 
   // Rotate the corny "thinking" one-liners every ~4s while waiting on the RAG.
   useEffect(() => {
@@ -82,15 +126,43 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // Drip the reply out one part at a time — first part immediately, each
+  // subsequent part after a random 1–3s "typing" gap, memes resolved inline.
+  const revealParts = async (parts: ChatPart[], token: number) => {
+    setRevealing(true);
+    for (let i = 0; i < parts.length; i++) {
+      if (token !== revealToken.current) break;
+      if (i > 0) {
+        setTypingNext(true);
+        await sleep(nextPartDelay());
+        setTypingNext(false);
+        if (token !== revealToken.current) break;
+      }
+      const part = parts[i]!;
+      if (part.type === "meme") {
+        const url = await fetchMemeUrl(part.memeId);
+        if (token !== revealToken.current) break;
+        if (url) {
+          setMessages((prev) => [...prev, { role: "ashwath", meme: { url, caption: part.caption } }]);
+        }
+      } else {
+        setMessages((prev) => [...prev, { role: "ashwath", text: part.text }]);
+      }
+    }
+    if (token === revealToken.current) setRevealing(false);
+  };
+
   const send = async () => {
     const message = input.trim();
-    if (!message || busy) return;
+    if (!message || busy || revealing) return;
+    const token = (revealToken.current += 1); // supersede any prior reveal
     setInput("");
+    setTypingNext(false);
     setMessages((prev) => [...prev, { role: "user", text: message }]);
     setBusy(true);
+    let reply: string | null = null;
     try {
-      const reply = await sendChatMessage(message);
-      setMessages((prev) => [...prev, { role: "ashwath", text: reply }]);
+      reply = await sendChatMessage(message);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -101,8 +173,11 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
       ]);
     } finally {
       setBusy(false);
-      inputRef.current?.focus();
     }
+    if (reply !== null && token === revealToken.current) {
+      await revealParts(parseReplyParts(reply), token);
+    }
+    if (open) inputRef.current?.focus({ preventScroll: true });
   };
 
   // Portaled to <body>: any transformed/filtered ancestor (hero zoom, parallax)
@@ -166,10 +241,37 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
                       ashwath
                     </p>
                   )}
-                  <p className="whitespace-pre-wrap">{message.text}</p>
+                  {message.meme ? (
+                    <>
+                      {/* biome-ignore lint/a11y: decorative meme, caption is the label */}
+                      <img
+                        src={message.meme.url}
+                        alt={message.meme.caption ?? "meme"}
+                        className="max-h-64 w-auto max-w-full border border-line"
+                        loading="lazy"
+                      />
+                      {message.meme.caption && (
+                        <p className="mt-1.5 text-[12px] text-bright/70 italic">
+                          {message.meme.caption}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{message.text}</p>
+                  )}
                 </div>
               </div>
             ))}
+
+            {typingNext && (
+              <div className="flex justify-start">
+                <div className="flex items-center gap-1 border border-line bg-surface-2 px-3 py-2.5">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" style={{ animationDelay: "0.15s" }} />
+                  <span className="typing-dot" style={{ animationDelay: "0.3s" }} />
+                </div>
+              </div>
+            )}
 
             {restoring && (
               <div className="flex justify-start">
@@ -220,7 +322,7 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
             />
             <button
               type="submit"
-              disabled={busy || !input.trim()}
+              disabled={busy || revealing || !input.trim()}
               className="cursor-pointer border border-cyan/50 bg-cyan/10 px-2.5 py-1 text-[11px] tracking-wider text-cyan uppercase transition-all enabled:hover:bg-cyan/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               send

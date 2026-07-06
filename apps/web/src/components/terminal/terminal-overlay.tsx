@@ -4,19 +4,50 @@ import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import {
+  type ChatHistoryMessage,
   CHAT_GREETING,
   fetchChatHistory,
+  fetchMemeUrl,
   hasExistingChat,
   nextThinkingLine,
+  parseReplyParts,
   sendChatMessage,
 } from "@/lib/chat";
 import type { ProfilePayload, ProjectPayload } from "@/types/portfolio";
 
 type Line = {
-  kind: "input" | "output" | "error" | "accent" | "chat" | "chat-user";
+  kind: "input" | "output" | "error" | "accent" | "chat" | "chat-user" | "meme";
   text: string;
   instant?: boolean;
+  memeUrl?: string;
 };
+
+/** JSON reply → terminal lines (text parts as green lines, memes as images). */
+async function replyToLines(reply: string): Promise<Line[]> {
+  const lines: Line[] = [];
+  for (const part of parseReplyParts(reply)) {
+    if (part.type === "meme") {
+      const url = await fetchMemeUrl(part.memeId);
+      if (url) lines.push({ kind: "meme", text: part.caption ?? "", memeUrl: url, instant: true });
+    } else {
+      lines.push({ kind: "chat", text: `ashwath ▸ ${part.text}` });
+    }
+  }
+  return lines;
+}
+
+/** Saved history → terminal lines (parses each assistant reply's JSON). */
+async function historyToLines(history: ChatHistoryMessage[]): Promise<Line[]> {
+  const lines: Line[] = [];
+  for (const h of history) {
+    if (h.role === "user") {
+      lines.push({ kind: "chat-user", text: `you ▸ ${h.text}`, instant: true });
+    } else {
+      for (const line of await replyToLines(h.text)) lines.push({ ...line, instant: true });
+    }
+  }
+  return lines;
+}
 
 const CAT_ART = [" /\\_/\\", "( o.o )", " > ^ <"];
 
@@ -104,7 +135,8 @@ export default function TerminalOverlay({
     setChatBusy(true);
     try {
       const reply = await sendChatMessage(message);
-      enqueue([{ kind: "chat", text: `ashwath ▸ ${reply}` }]);
+      const lines = await replyToLines(reply);
+      enqueue(lines.length ? lines : [{ kind: "chat", text: "ashwath ▸ …" }]);
     } catch (error) {
       enqueue([
         {
@@ -197,17 +229,13 @@ export default function TerminalOverlay({
           // same chatId as the website widget — replay the old session
           o("known peer detected — retrieving our previous conversation…", "chat", true);
           void fetchChatHistory()
-            .then((history) => {
+            .then(async (history) => {
               if (history.length === 0) {
                 enqueue([{ kind: "chat", text: `ashwath ▸ ${CHAT_GREETING}` }]);
                 return;
               }
               enqueue([
-                ...history.map((m) => ({
-                  kind: (m.role === "user" ? "chat-user" : "chat") as Line["kind"],
-                  text: `${m.role === "user" ? "you" : "ashwath"} ▸ ${m.text}`,
-                  instant: true,
-                })),
+                ...(await historyToLines(history)),
                 { kind: "chat", text: "——— session restored · carry on ———", instant: true },
               ]);
             })
@@ -359,26 +387,43 @@ export default function TerminalOverlay({
         </div>
 
         <div ref={scrollRef} className="flex-1 space-y-0.5 overflow-y-auto p-4 font-mono text-xs">
-          {committed.map((line, index) => (
-            <div
-              // biome-ignore lint: append-only log
-              key={index}
-              className={`${
-                line.kind === "chat" || line.kind === "chat-user"
-                  ? "whitespace-pre-wrap break-words"
-                  : "whitespace-pre"
-              } ${lineClass(line.kind)}`}
-            >
-              {line.kind === "input" ? (
-                <>
-                  <span className="text-cyan">$ </span>
-                  {line.text}
-                </>
-              ) : (
-                line.text
-              )}
-            </div>
-          ))}
+          {committed.map((line, index) =>
+            line.kind === "meme" && line.memeUrl ? (
+              <div
+                // biome-ignore lint: append-only log
+                key={index}
+                className="py-1"
+              >
+                {/* biome-ignore lint/a11y: decorative meme in terminal */}
+                <img
+                  src={line.memeUrl}
+                  alt={line.text || "meme"}
+                  className="max-h-52 w-auto max-w-full border border-[#00ff41]/50 shadow-[0_0_10px_rgba(0,255,65,0.25)]"
+                  loading="lazy"
+                />
+                {line.text && <div className="mt-1 text-[#00ff41]/70 italic">▓ {line.text}</div>}
+              </div>
+            ) : (
+              <div
+                // biome-ignore lint: append-only log
+                key={index}
+                className={`${
+                  line.kind === "chat" || line.kind === "chat-user"
+                    ? "whitespace-pre-wrap break-words"
+                    : "whitespace-pre"
+                } ${lineClass(line.kind)}`}
+              >
+                {line.kind === "input" ? (
+                  <>
+                    <span className="text-cyan">$ </span>
+                    {line.text}
+                  </>
+                ) : (
+                  line.text
+                )}
+              </div>
+            ),
+          )}
           {typing && (
             <div
               className={`${

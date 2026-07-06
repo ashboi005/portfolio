@@ -5,6 +5,16 @@ import { config } from "dotenv";
 import { Elysia, t } from "elysia";
 import nodemailer from "nodemailer";
 
+import memes from "./memes.json";
+
+// ID → CloudFront URL map for the chatbot memes. Edit apps/server/src/memes.json
+// (no DB, no admin panel — just a hand-maintained map for the ~25-30 memes).
+const MEME_URLS: Record<string, string> = Object.fromEntries(
+  Object.entries(memes as Record<string, string>).filter(
+    ([id, url]) => !id.startsWith("_") && typeof url === "string" && url.startsWith("http"),
+  ),
+);
+
 // Load env for local dev (root .env and, if present, apps/server/.env).
 // In production these come from the container/host environment.
 config({ path: path.resolve(import.meta.dir, "../../../.env") });
@@ -216,6 +226,24 @@ const app = new Elysia()
     {
       query: t.Object({
         chatId: t.String({ minLength: 8, maxLength: 64 }),
+      }),
+    },
+  )
+  // Meme resolver: the chatbot returns a meme id in its JSON; the frontend
+  // hits this to turn that id into the actual CloudFront URL to render.
+  .get(
+    "/api/v1/meme/:id",
+    ({ params, set }) => {
+      const url = MEME_URLS[params.id];
+      if (!url) {
+        set.status = 404;
+        return { error: "unknown meme id" };
+      }
+      return { id: params.id, url };
+    },
+    {
+      params: t.Object({
+        id: t.String({ minLength: 1, maxLength: 80 }),
       }),
     },
   )

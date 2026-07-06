@@ -24,6 +24,90 @@ function setChatId(id: string) {
 
 export type ChatHistoryMessage = { role: "user" | "ashwath"; text: string };
 
+/**
+ * One rendered unit of an assistant reply. The chatbot is instructed (in its
+ * system prompt) to return JSON with an ordered `parts` array so replies can
+ * be delivered line-by-line like a real person texting, with memes inline.
+ *   { "parts": [
+ *       { "type": "text", "text": "…" },
+ *       { "type": "meme", "memeId": "m_014", "caption": "optional" }
+ *   ] }
+ */
+export type ChatPart =
+  | { type: "text"; text: string }
+  | { type: "meme"; memeId: string; caption?: string };
+
+/** Pull a JSON object out of a reply that may be fenced or wrapped in prose. */
+function extractJsonObject(raw: string): Record<string, unknown> | null {
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = (fenced ? fenced[1]! : raw).trim();
+  const tryParse = (s: string): Record<string, unknown> | null => {
+    try {
+      const v = JSON.parse(s);
+      return v && typeof v === "object" && !Array.isArray(v) ? v : null;
+    } catch {
+      return null;
+    }
+  };
+  const whole = tryParse(candidate);
+  if (whole) return whole;
+  const first = candidate.indexOf("{");
+  const last = candidate.lastIndexOf("}");
+  if (first !== -1 && last > first) return tryParse(candidate.slice(first, last + 1));
+  return null;
+}
+
+/**
+ * Turn a raw reply into ordered parts. If the model returned the expected
+ * `{ parts: [...] }` JSON we use it; otherwise we degrade gracefully by
+ * splitting plain prose on blank lines so it still arrives in natural chunks.
+ */
+export function parseReplyParts(reply: string): ChatPart[] {
+  const json = extractJsonObject(reply);
+  const rawParts = json && Array.isArray(json.parts) ? json.parts : null;
+  if (rawParts) {
+    const parts: ChatPart[] = [];
+    for (const item of rawParts) {
+      if (!item || typeof item !== "object") continue;
+      const p = item as Record<string, unknown>;
+      if (p.type === "meme" && typeof p.memeId === "string" && p.memeId.trim()) {
+        parts.push({
+          type: "meme",
+          memeId: p.memeId.trim(),
+          caption: typeof p.caption === "string" && p.caption.trim() ? p.caption.trim() : undefined,
+        });
+      } else if (typeof p.text === "string" && p.text.trim()) {
+        parts.push({ type: "text", text: p.text.trim() });
+      }
+    }
+    if (parts.length > 0) return parts;
+  }
+  // fallback: not JSON (or empty) → split prose into paragraph chunks
+  const chunks = reply
+    .trim()
+    .split(/\n{2,}/)
+    .map((c) => c.trim())
+    .filter(Boolean);
+  return (chunks.length > 0 ? chunks : [reply]).map((text) => ({ type: "text", text }));
+}
+
+/** Resolve a meme id to its CloudFront URL via the backend map. */
+export async function fetchMemeUrl(memeId: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${apiBase()}/api/v1/meme/${encodeURIComponent(memeId)}`);
+    if (!response.ok) return null;
+    const data = (await response.json().catch(() => null)) as { url?: string } | null;
+    return data?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** A random delay (1–3s, with decimals) between consecutive reply parts. */
+export function nextPartDelay(): number {
+  return 1000 + Math.random() * 2000;
+}
+
 /** True if we have a chat id stored (meaning a conversation exists). */
 export function hasExistingChat(): boolean {
   try {
