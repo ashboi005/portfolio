@@ -1,13 +1,13 @@
 {
 "_comment": "Map meme IDs to their CloudFront URLs.",
-"meme_delete_feelings": "https://d1g02np2fk5d30.cloudfront.net/memes/delete_feelings.png",
-"meme_gandhi_hell_nah": "https://d1g02np2fk5d30.cloudfront.net/memes/gandhi_hell_nah.jpeg",
-"meme_gandhi_womp_womp": "https://d1g02np2fk5d30.cloudfront.net/memes/gandhi_womp_womp.jpeg",
-"meme_healing_hooling": "https://d1g02np2fk5d30.cloudfront.net/memes/healing_hooling.jpeg",
-"meme_hosla_tuta": "https://d1g02np2fk5d30.cloudfront.net/memes/hosla_tuta.jpeg",
-"meme_khair_ab_kya": "https://d1g02np2fk5d30.cloudfront.net/memes/khair_ab_kya.jpeg",
-"meme_larp_check": "https://d1g02np2fk5d30.cloudfront.net/memes/larp_check.png",
-"meme_lebron_1percent": "https://d1g02np2fk5d30.cloudfront.net/memes/lebron_1percent.jpeg",
-"meme_philosophy_circle": "https://d1g02np2fk5d30.cloudfront.net/memes/philosophy_circle.png",
-"meme_vro_support": "https://d1g02np2fk5d30.cloudfront.net/memes/vro_support.png"
+"meme-delete-feelings": "https://d1g02np2fk5d30.cloudfront.net/memes/delete_feelings.png",
+"meme-gandhi-hell-nah": "https://d1g02np2fk5d30.cloudfront.net/memes/gandhi_hell_nah.jpeg",
+"meme-gandhi-womp-womp": "https://d1g02np2fk5d30.cloudfront.net/memes/gandhi_womp_womp.jpeg",
+"meme-healing-hooling": "https://d1g02np2fk5d30.cloudfront.net/memes/healing_hooling.jpeg",
+"meme-hosla-tuta": "https://d1g02np2fk5d30.cloudfront.net/memes/hosla_tuta.jpeg",
+"meme-khair-ab-kya": "https://d1g02np2fk5d30.cloudfront.net/memes/khair_ab_kya.jpeg",
+"meme-larp-check": "https://d1g02np2fk5d30.cloudfront.net/memes/larp_check.png",
+"meme-lebron-1percent": "https://d1g02np2fk5d30.cloudfront.net/memes/lebron_1percent.jpeg",
+"meme-philosophy-circle": "https://d1g02np2fk5d30.cloudfront.net/memes/philosophy_circle.png",
+"meme-vro-support": "https://d1g02np2fk5d30.cloudfront.net/memes/vro_support.png"
 }
