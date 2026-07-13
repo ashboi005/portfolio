@@ -61,7 +61,18 @@ export default function WarpSequence({ children }: { children: React.ReactNode }
       return heroEl ? heroEl.offsetTop + heroEl.offsetHeight : window.innerHeight;
     };
 
-    // Unmount logic runs off scroll position (works for any scroll source).
+    // Remount is gated on `armed` (not a live scrollY read at wheel time — the
+    // wheel's own scroll advances scrollY before the handler runs, which is
+    // racy right at the threshold). `armed` only turns true once the visitor
+    // has genuinely scrolled back up into the hero (≥60% of it on screen), and
+    // turns off once they leave it. So nudging a few px up out of whoami and
+    // scrolling down again does NOT reload the corridor — you must actually
+    // return to the hero first. Seeded true so the very first descent works.
+    const HERO_ARM_RATIO = 0.4;
+    let armed = window.scrollY <= heroBottomPx() * HERO_ARM_RATIO;
+
+    // Runs off scroll position (any scroll source): unmount logic while
+    // mounted; arm/disarm tracking while flat.
     const onScroll = () => {
       if (raf) return;
       raf = requestAnimationFrame(() => {
@@ -69,36 +80,42 @@ export default function WarpSequence({ children }: { children: React.ReactNode }
         const cur = window.scrollY;
         const up = cur < lastY - 1;
         lastY = cur;
-        if (!mountedRef.current) return;
-        const corridor = document.getElementById("warp-corridor");
-        if (!corridor) return;
-        const vh = window.innerHeight;
-        const corridorTop = corridor.getBoundingClientRect().top + cur;
-        const corridorH = corridor.offsetHeight;
-        const whoamiTop = corridorTop + corridorH - vh;
-        if (cur >= whoamiTop) reachedWhoami = true;
-        if (reachedWhoami && up && cur > corridorTop + 4 && cur < whoamiTop) {
-          // leaving whoami upward → drop the corridor, keep whoami pinned so
-          // the remaining scroll up to the hero is short and smooth
-          reachedWhoami = false;
-          pendingScroll.current = Math.max(0, cur - (corridorH - vh));
-          setMounted(false);
-        } else if (cur <= 2) {
-          // reached the very top with the corridor still mounted — it's below
-          // the viewport here, so drop it with no compensation
-          reachedWhoami = false;
-          setMounted(false);
+        if (mountedRef.current) {
+          const corridor = document.getElementById("warp-corridor");
+          if (!corridor) return;
+          const vh = window.innerHeight;
+          const corridorTop = corridor.getBoundingClientRect().top + cur;
+          const corridorH = corridor.offsetHeight;
+          const whoamiTop = corridorTop + corridorH - vh;
+          if (cur >= whoamiTop) reachedWhoami = true;
+          if (reachedWhoami && up && cur > corridorTop + 4 && cur < whoamiTop) {
+            // leaving whoami upward → drop the corridor, keep whoami pinned so
+            // the remaining scroll up to the hero is short and smooth
+            reachedWhoami = false;
+            armed = false;
+            pendingScroll.current = Math.max(0, cur - (corridorH - vh));
+            setMounted(false);
+          } else if (cur <= 2) {
+            // reached the very top with the corridor still mounted — it's below
+            // the viewport here, so drop it with no compensation
+            reachedWhoami = false;
+            armed = false;
+            setMounted(false);
+          }
+        } else {
+          const heroBottom = heroBottomPx();
+          if (cur <= heroBottom * HERO_ARM_RATIO) armed = true;
+          else if (cur > heroBottom) armed = false;
         }
       });
     };
 
-    // Mount only on a genuine downward wheel/touch in the hero. Anchor-link
-    // navigation (nav rail, "scroll to traverse") fires programmatic scrolls
-    // with no wheel event, so those stay in the flat layout and jump straight
-    // to their target instead of desyncing against a corridor that mounts
-    // mid-animation.
+    // Mount on a genuine downward wheel/touch, but only while armed. Anchor-link
+    // navigation fires programmatic scrolls with no wheel event, so those stay
+    // flat and jump straight to their target instead of desyncing against a
+    // corridor that mounts mid-animation.
     const armMount = () => {
-      if (!mountedRef.current && window.scrollY < heroBottomPx()) setMounted(true);
+      if (!mountedRef.current && armed) setMounted(true);
     };
     const onWheel = (e: WheelEvent) => {
       if (e.deltaY > 0) armMount();

@@ -66,6 +66,10 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
   const revealToken = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Whether the view is pinned to the bottom. We only auto-scroll to keep up
+  // with new parts while the user is already at the bottom — if they've
+  // scrolled up to read, we leave the viewport exactly where they put it.
+  const atBottom = useRef(true);
 
   useEffect(() => setMounted(true), []);
 
@@ -102,9 +106,17 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
     if (open) inputRef.current?.focus({ preventScroll: true });
   }, [open]);
 
+  // Keep up with new content only if the user is already at the bottom.
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    const el = scrollRef.current;
+    if (el && atBottom.current) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages, thinking, restoring, typingNext]);
+
+  // Track whether they're at the bottom so a scroll-up pauses the auto-follow.
+  const onScrollTrack = () => {
+    const el = scrollRef.current;
+    if (el) atBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  };
 
   // Rotate the corny "thinking" one-liners every ~4s while waiting on the RAG.
   useEffect(() => {
@@ -158,6 +170,9 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
     const token = (revealToken.current += 1); // supersede any prior reveal
     setInput("");
     setTypingNext(false);
+    // sending your own message re-pins to the bottom (show what you just sent);
+    // if you then scroll up mid-reply, the auto-follow pauses.
+    atBottom.current = true;
     setMessages((prev) => [...prev, { role: "user", text: message }]);
     setBusy(true);
     let reply: string | null = null;
@@ -222,7 +237,11 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
           </div>
 
           {/* conversation */}
-          <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
+          <div
+            ref={scrollRef}
+            onScroll={onScrollTrack}
+            className="flex-1 space-y-3 overflow-y-auto p-4"
+          >
             {messages.map((message, index) => (
               <div
                 // biome-ignore lint: append-only log

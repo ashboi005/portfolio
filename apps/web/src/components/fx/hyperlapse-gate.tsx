@@ -157,19 +157,18 @@ export default function HyperlapseGate() {
       raf = 0;
       if (!active) return;
 
-      // downward scroll velocity → warp speed (decays to zero when the user
-      // stops; scrolling back up leaves the field frozen instead of reversing)
+      // scroll velocity → warp speed, signed: down flies forward, up flies
+      // in reverse (particles recede) instead of freezing to black
       const dy = window.scrollY - lastY;
       lastY = window.scrollY;
-      const target = reduced ? 0 : Math.max(0, Math.min(0.13, dy * 0.001));
+      const target = reduced ? 0 : Math.max(-0.13, Math.min(0.13, dy * 0.001));
       speed += (target - speed) * 0.16;
       if (Math.abs(speed) < 0.00001) speed = 0;
 
-      // scroll direction drives field visibility (down = show, up = hide)
-      if (!reduced) {
-        if (dy > 0.5) visTarget = 1;
-        else if (dy < -0.5) visTarget = 0;
-      }
+      // the field stays visible the whole time it's mounted — it fades in once
+      // on (re)entry (vis starts at 0) and then holds, so scrolling up shows
+      // the reverse warp rather than a black screen
+      if (!reduced) visTarget = 1;
       vis += (visTarget - vis) * 0.09;
       if (vis < 0.001) vis = 0;
       const visRounded = Math.round(vis * 1000) / 1000;
@@ -208,7 +207,8 @@ export default function HyperlapseGate() {
 
         if (stretch > 0.02) {
           // streak: where this particle was a few frames ago, projected
-          const zTail = Math.min(1.2, particle.z + speed * 6 * (0.4 + particle.z));
+          // (clamped both ends so reverse motion can't blow up the projection)
+          const zTail = Math.max(0.04, Math.min(1.2, particle.z + speed * 6 * (0.4 + particle.z)));
           const tx = cx + (particle.x * focal) / zTail;
           const ty = cy + (particle.y * focal) / zTail;
           const alpha =
