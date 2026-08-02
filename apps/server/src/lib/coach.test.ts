@@ -31,6 +31,38 @@ describe("buildGradePrompt", () => {
     expect(prompt).toContain("Why is PUT idempotent");
   });
 
+  test("frames the concept as the question and the probes as optional", () => {
+    // Regression: labelling the probes "EXPECTED COVERAGE" made the coach treat
+    // them as the question asked, so a correct on-concept answer that skipped a
+    // probe got marked off-topic.
+    const prompt = buildGradePrompt({
+      concept,
+      transcript: "hello",
+      limitSec: 90,
+      spokenSec: 45,
+      wordCount: 1,
+      fillerCount: 0,
+    });
+    expect(prompt).toContain("THE QUESTION THEY WERE ASKED: Idempotency in APIs");
+    expect(prompt).toContain("OPTIONAL NUDGES");
+    expect(prompt).toContain("NOT a checklist");
+    expect(prompt).toContain("85%");
+    expect(prompt).not.toContain("EXPECTED COVERAGE");
+  });
+
+  test("says so when a concept has no probes", () => {
+    const prompt = buildGradePrompt({
+      concept: { ...concept, probes: [] },
+      transcript: "hello",
+      limitSec: 90,
+      spokenSec: 45,
+      wordCount: 1,
+      fillerCount: 0,
+    });
+    expect(prompt).toContain("no nudges were shown");
+    expect(prompt).not.toContain("OPTIONAL NUDGES");
+  });
+
   test("neutralises a forged transcript delimiter", () => {
     const prompt = buildGradePrompt({
       concept,

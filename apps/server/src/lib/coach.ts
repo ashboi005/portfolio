@@ -75,10 +75,23 @@ export function buildGradePrompt(input: GradeInput): string {
   const transcript = sanitizeTranscript(input.transcript);
   const wpm = spokenSec > 0 ? Math.round((wordCount / spokenSec) * 60) : 0;
 
-  const coverage =
+  // These are hints the UI showed on screen to give the speaker somewhere to
+  // start. Labelling them "expected coverage" made the coach treat them as the
+  // question that was asked and mark correct on-topic answers as off-topic, so
+  // the framing here is deliberately emphatic.
+  const nudges =
     concept.probes.length > 0
-      ? concept.probes.map((p) => `- ${p}`).join("\n")
-      : "- (no specific probes; judge against what a strong answer on this topic would cover)";
+      ? [
+          "OPTIONAL NUDGES (secondary — read the rules below before using these):",
+          ...concept.probes.map((p) => `- ${p}`),
+          "",
+          "Those nudges were displayed on screen purely as inspiration, to give them",
+          "somewhere to start. They are NOT the question, NOT a checklist, and NOT",
+          "required. An answer that covers the concept well and ignores every nudge is a",
+          "full-marks answer. Weight your judgement roughly 85% on how well they handled",
+          "THE CONCEPT and at most 15% on the nudges.",
+        ].join("\n")
+      : "(no nudges were shown for this one — judge purely on the concept)";
 
   // On a follow-up the question you asked is the thing being answered; the
   // original concept is only background. Putting the probes first would have
@@ -103,10 +116,13 @@ export function buildGradePrompt(input: GradeInput): string {
     : [
         "DRILL EVALUATION REQUEST",
         "",
-        `CONCEPT: ${concept.title}`,
+        `THE QUESTION THEY WERE ASKED: ${concept.title}`,
         `LEVEL: ${concept.level}`,
-        "EXPECTED COVERAGE:",
-        coverage,
+        "",
+        "That concept line is the whole question. It is the only thing they were asked",
+        "to speak about. Grade how well they covered it.",
+        "",
+        nudges,
       ];
 
   return [
