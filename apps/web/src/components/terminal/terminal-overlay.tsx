@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -79,6 +80,7 @@ export default function TerminalOverlay({
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
+  const router = useRouter();
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -195,6 +197,7 @@ export default function TerminalOverlay({
         o("  stack               the arsenal", "output", true);
         o("  cat                 ...it's a cat", "output", true);
         o("  chat                talk to the maintainer directly", "output", true);
+        o("  drill               practice backend concepts out loud", "output", true);
         o("  contact             reach the maintainer", "output", true);
         o("  sudo hire-me        escalate privileges", "output", true);
         o("  matrix              follow the white rabbit", "output", true);
@@ -244,6 +247,15 @@ export default function TerminalOverlay({
           o(`ashwath ▸ ${CHAT_GREETING}`, "chat");
         }
         o('(type "exit" to detach)', "chat", true);
+        break;
+      case "drill":
+        o("spawning pid 099 · drill.exe…", "accent", true);
+        o("pick a level, talk at the clock, get graded. no mic? you can type.", "output", true);
+        // Let the two lines land before the route swaps out from under them.
+        setTimeout(() => {
+          onClose();
+          router.push("/drill");
+        }, 800);
         break;
       case "ls":
         for (const project of projects) {

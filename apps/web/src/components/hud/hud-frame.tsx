@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll } from "motion/react";
+import Link from "next/link";
 import { TerminalSquare } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -222,6 +223,25 @@ export default function HudFrame({ onOpenTerminal }: { onOpenTerminal: () => voi
               </li>
             );
           })}
+
+          {/* Not a section — a separate route. Set apart by the rule above it
+              so it doesn't read as more of the same page. */}
+          <li className="border-t border-line pt-3">
+            <Link
+              href="/drill"
+              className="group flex items-center gap-2.5 text-dim/70 transition-colors hover:text-cyan"
+            >
+              <span
+                className="h-px w-3 bg-dim/40 transition-all duration-300 group-hover:w-6 group-hover:bg-cyan"
+                aria-hidden
+              />
+              <span className="tabular-nums opacity-60">099</span>
+              <span>drill</span>
+              <span className="text-[9px] opacity-0 transition-opacity group-hover:opacity-60" aria-hidden>
+                ↗
+              </span>
+            </Link>
+          </li>
         </ul>
       </nav>
     </>
