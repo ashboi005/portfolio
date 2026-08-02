@@ -59,6 +59,19 @@ export type TranscriptResult = {
 export const DURATIONS = [30, 60, 90, 120, 180] as const;
 export const DEFAULT_DURATION = 90;
 
+/**
+ * Drives both halves of the exchange: how the coach replies, and what Deepgram
+ * expects to hear. Someone drilling in Hinglish will speak Hinglish, and
+ * transcribing that as English mangles it.
+ */
+export type DrillLanguage = "english" | "hinglish";
+export const DEFAULT_LANGUAGE: DrillLanguage = "english";
+
+export const LANGUAGE_OPTIONS: { value: DrillLanguage; label: string; hint: string }[] = [
+  { value: "english", label: "ENGLISH", hint: "graded in English" },
+  { value: "hinglish", label: "HINGLISH", hint: "bhai-mode, Roman script" },
+];
+
 export const LEVEL_FILTERS: { value: LevelFilter; label: string }[] = [
   { value: "all", label: "ALL" },
   { value: "beginner", label: "BEGINNER" },
@@ -111,13 +124,18 @@ export async function fetchConcept(
 }
 
 /** Upload one recorded answer and get the transcript back. */
-export async function transcribeAudio(audio: Blob, conceptId: string): Promise<TranscriptResult> {
+export async function transcribeAudio(
+  audio: Blob,
+  conceptId: string,
+  language: DrillLanguage,
+): Promise<TranscriptResult> {
   const form = new FormData();
   // Extension is cosmetic — Deepgram sniffs the container — but it keeps
   // server-side logs readable when an upload is rejected.
   const container = (audio.type.split("/")[1] ?? "webm").split(";")[0]!.trim() || "webm";
   form.append("audio", audio, `answer.${container}`);
   form.append("conceptId", conceptId);
+  form.append("language", language);
 
   const response = await fetch(`${apiBase()}/api/v1/drill/transcribe`, {
     method: "POST",
@@ -137,6 +155,7 @@ export async function gradeAnswer(input: {
   transcript: string;
   limitSec: number;
   spokenSec: number;
+  language: DrillLanguage;
   /** Present when answering the coach's previous question rather than the concept. */
   followUpId?: string;
 }): Promise<Verdict> {
@@ -158,45 +177,75 @@ export async function gradeAnswer(input: {
  * Hardcoded on purpose — the coach will happily keep producing questions
  * forever, so the sign-off has to come from us, not from it.
  */
-export const CHAIN_EXHAUSTED_LINES = [
-  "That's enough talk about this topic, dawg. Go pick another one.",
-  "We have officially squeezed this concept dry. Next topic.",
-  "Twenty-five rounds deep on one idea. Touch a different part of the stack.",
-  "I'm out of angles on this one. Genuinely. Deal yourself something else.",
-  "If you don't know it by now, another question isn't going to fix it. New topic.",
-  "This concept and I need some time apart. Pick a different one.",
-  "We've said everything there is to say here. Go break something else.",
-  "Chain's done. I refuse to ask a twenty-sixth question about this.",
-];
+export const CHAIN_EXHAUSTED_LINES: Record<DrillLanguage, string[]> = {
+  english: [
+    "That's enough talk about this topic, dawg. Go pick another one.",
+    "We have officially squeezed this concept dry. Next topic.",
+    "Twenty-five rounds deep on one idea. Touch a different part of the stack.",
+    "I'm out of angles on this one. Genuinely. Deal yourself something else.",
+    "If you don't know it by now, another question isn't going to fix it. New topic.",
+    "This concept and I need some time apart. Pick a different one.",
+    "We've said everything there is to say here. Go break something else.",
+    "Chain's done. I refuse to ask a twenty-sixth question about this.",
+  ],
+  hinglish: [
+    "bas bhai, is topic pe khel khtm. Naya utha le.",
+    "Iss concept ka ghee khtm, tel khtm. Aage badh.",
+    "25 round ho gaye ek hi cheez pe. Stack ka koi aur hissa dekh ab.",
+    "abey ab kya hi poochu isme. Dusra topic de mujhe.",
+    "Agar ab tak nahi aaya samajh, toh 26th question se bhi nahi aayega. Next.",
+    "Mujhe aur is concept ko thoda break chahiye. Kuch aur pick kar.",
+    "Sab keh diya jo kehna tha. Ja kuch aur tod ke aa.",
+    "Chain khtm bhai. Ek aur sawaal is pe main nahi puchne wala.",
+  ],
+};
 
-export function randomExhaustedLine(): string {
-  return CHAIN_EXHAUSTED_LINES[Math.floor(Math.random() * CHAIN_EXHAUSTED_LINES.length)]!;
+export function randomExhaustedLine(language: DrillLanguage): string {
+  const lines = CHAIN_EXHAUSTED_LINES[language];
+  return lines[Math.floor(Math.random() * lines.length)]!;
 }
 
 /**
  * Lines shown while the coach thinks. Same trick as the chat widget: cover the
  * wait with personality instead of a spinner.
  */
-export const GRADING_LINES = [
-  "Listening back to that...",
-  "Hmm.",
-  "Checking whether that's actually true...",
-  "Cross-referencing with things I've broken in production...",
-  "Counting how many times you said 'basically'...",
-  "Deciding how mean to be about this...",
-  "Consulting the part of me that's been paged at 3 AM...",
-  "Running your answer past the rubber duck...",
-  "Trying to give you the benefit of the doubt...",
-  "Grading on a curve. The curve is steep.",
-  "Rewinding the bit where you trailed off...",
-  "Weighing confidence against correctness. Usually a bad trade.",
-  "Looking for the trade-off you were supposed to mention...",
-  "One sec, a cat walked across the scoring rubric.",
-];
+export const GRADING_LINES: Record<DrillLanguage, string[]> = {
+  english: [
+    "Listening back to that...",
+    "Hmm.",
+    "Checking whether that's actually true...",
+    "Cross-referencing with things I've broken in production...",
+    "Counting how many times you said 'basically'...",
+    "Deciding how mean to be about this...",
+    "Consulting the part of me that's been paged at 3 AM...",
+    "Running your answer past the rubber duck...",
+    "Trying to give you the benefit of the doubt...",
+    "Grading on a curve. The curve is steep.",
+    "Rewinding the bit where you trailed off...",
+    "Weighing confidence against correctness. Usually a bad trade.",
+    "Looking for the trade-off you were supposed to mention...",
+    "One sec, a cat walked across the scoring rubric.",
+  ],
+  hinglish: [
+    "Sun raha hoon dobara...",
+    "Hmm.",
+    "Check kar raha hoon ye sach bhi hai ya nahi...",
+    "Mila raha hoon un cheezon se jo maine prod me todi hain...",
+    "Gin raha hoon kitni baar 'basically' bola tune...",
+    "Soch raha hoon kitna bura bolun...",
+    "3 baje raat ko page hone wale dimaag se pooch raha hoon...",
+    "Rubber duck se second opinion le raha hoon...",
+    "Benefit of the doubt dene ki koshish kar raha hoon...",
+    "Curve pe grade kar raha hoon. Curve kaafi steep hai.",
+    "Wo wala part dobara sun raha hoon jahan tu atak gaya tha...",
+    "Confidence aur correctness tol raha hoon. Usually bura trade hai.",
+    "Dhoond raha hoon wo trade-off jo tujhe bolna chahiye tha...",
+    "Ruk, ek billi rubric pe chal gayi.",
+  ],
+};
 
 /** Progress lines for the transcription step. Shorter — this one is quick. */
-export const TRANSCRIBING_LINES = [
-  "Uploading audio...",
-  "Running speech-to-text...",
-  "Working out what you actually said...",
-];
+export const TRANSCRIBING_LINES: Record<DrillLanguage, string> = {
+  english: "Working out what you actually said…",
+  hinglish: "Samajh raha hoon tune bola kya…",
+};

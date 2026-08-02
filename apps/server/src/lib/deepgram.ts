@@ -12,6 +12,7 @@
  */
 
 import { DEEPGRAM_API_KEY } from "./env";
+import { deepgramLanguage, supportsKeyterms, type DrillLanguage } from "./language";
 
 const ENDPOINT = "https://api.deepgram.com/v1/listen";
 
@@ -135,6 +136,7 @@ export async function transcribe(
   audio: ArrayBuffer,
   contentType: string,
   keyterms: readonly string[],
+  language: DrillLanguage = "english",
 ): Promise<TranscriptResult> {
   if (!DEEPGRAM_API_KEY) {
     throw new DeepgramError("unconfigured", "DEEPGRAM_API_KEY is not set.");
@@ -142,14 +144,19 @@ export async function transcribe(
 
   const params = new URLSearchParams({
     model: "nova-3",
-    language: "en",
+    // `multi` is nova-3's code-switching mode; it handles a sentence that
+    // starts in English and finishes in Hindi, which is what Hinglish is.
+    language: deepgramLanguage(language),
     smart_format: "true",
     punctuate: "true",
     // Kept in the transcript on purpose: "um" every four words is signal the
     // coach should be allowed to grade on.
     filler_words: "true",
   });
-  for (const term of keyterms) params.append("keyterm", term);
+  // Keyterms are English-only on nova-3, so multilingual runs go without.
+  if (supportsKeyterms(language)) {
+    for (const term of keyterms) params.append("keyterm", term);
+  }
 
   let response: Response;
   try {

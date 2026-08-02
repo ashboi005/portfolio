@@ -2,7 +2,14 @@
 
 import { motion, useReducedMotion } from "motion/react";
 
-import { DURATIONS, LEVEL_FILTERS, type ConceptCounts, type LevelFilter } from "@/lib/drill";
+import {
+  DURATIONS,
+  LANGUAGE_OPTIONS,
+  LEVEL_FILTERS,
+  type ConceptCounts,
+  type DrillLanguage,
+  type LevelFilter,
+} from "@/lib/drill";
 import type { DrillRun } from "@/lib/drill-history";
 
 /** Idle screen: pick a level, pick a clock, hit start. */
@@ -11,6 +18,8 @@ export default function LevelSelect({
   onLevelChange,
   duration,
   onDurationChange,
+  language,
+  onLanguageChange,
   onStart,
   counts,
   streak,
@@ -21,6 +30,8 @@ export default function LevelSelect({
   onLevelChange: (level: LevelFilter) => void;
   duration: number;
   onDurationChange: (seconds: number) => void;
+  language: DrillLanguage;
+  onLanguageChange: (language: DrillLanguage) => void;
   onStart: () => void;
   counts: ConceptCounts | null;
   streak: number;
@@ -97,6 +108,40 @@ export default function LevelSelect({
             );
           })}
         </div>
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3">
+        <legend className="eyebrow mb-1">language</legend>
+        <div className="grid grid-cols-2 gap-2">
+          {LANGUAGE_OPTIONS.map((option) => {
+            const selected = option.value === language;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onLanguageChange(option.value)}
+                aria-pressed={selected}
+                className={`flex flex-col gap-0.5 border px-3 py-2.5 text-left font-mono transition-colors ${
+                  selected
+                    ? "border-cyan/60 bg-cyan/10 text-cyan"
+                    : "border-line text-dim hover:border-cyan/30 hover:text-bright"
+                }`}
+              >
+                <span className="text-[11px] tracking-[0.12em]">{option.label}</span>
+                <span className="text-[10px] text-dim/70">{option.hint}</span>
+              </button>
+            );
+          })}
+        </div>
+        {language === "hinglish" && (
+          // Keyterm prompting is nova-3 English-only, so multilingual runs lose
+          // the technical-vocabulary boost. Better to say so than to let the
+          // transcript quietly get worse.
+          <p className="font-mono text-[10px] text-dim/70">
+            Speak Hinglish and I&apos;ll grade in Hinglish. Heads up: transcription accuracy on
+            technical terms drops a little in this mode.
+          </p>
+        )}
       </fieldset>
 
       <button

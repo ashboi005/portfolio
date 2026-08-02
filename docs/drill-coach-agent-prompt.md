@@ -54,9 +54,20 @@ stretched vowels for genuine surprise (`nah thats wilddd`), opening fillers (`Se
 `The thing is...`), and rare, end-of-line emoji. Five worked examples at the bottom of the
 VOICE section do most of the work — few-shot beats rules for tone.
 
-**English only for now.** Hindi and Hinglish are explicitly excluded, including `bhai`,
-`yaar`, `oyee`, and `pagal`. Deleting the "English only" paragraph is the one-line change
-that turns it back on.
+**Two language modes.** The idle screen has an English / Hinglish toggle, and every grade
+request ends with `RESPONSE LANGUAGE: english` or `RESPONSE LANGUAGE: hinglish`. The
+prompt carries both registers in full with worked examples for each:
+
+- **english** — all the slang, zero Hindi. No `bhai`, `yaar`, `oyee`, `pagal`; assume the
+  reader understands none of it.
+- **hinglish** — mixes freely, Roman script only (never Devanagari), and **technical terms
+  stay in English**. Sharding stays sharding. The Hindi is connective tissue between
+  English technical clauses, which is how the mixing actually works in speech.
+
+The choice also picks Deepgram's language: `en` versus nova-3's `multi` code-switching
+mode, because someone who drills in Hinglish will *speak* Hinglish. One consequence worth
+knowing: `keyterm` prompting is nova-3 English-only, so Hinglish runs lose the
+technical-vocabulary boost. The UI says so under the toggle.
 
 Two guardrails matter:
 

@@ -10,14 +10,17 @@ import VerdictCard from "@/components/drill/verdict-card";
 import CatColony from "@/components/fx/cat-colony";
 import {
   DEFAULT_DURATION,
+  DEFAULT_LANGUAGE,
   DrillError,
   fetchConcept,
   gradeAnswer,
   GRADING_LINES,
   randomExhaustedLine,
+  TRANSCRIBING_LINES,
   transcribeAudio,
   type Concept,
   type ConceptCounts,
+  type DrillLanguage,
   type LevelFilter,
   type Verdict,
 } from "@/lib/drill";
@@ -28,6 +31,7 @@ import {
   markSeen,
   readHistory,
   recordRun,
+  saveLanguage,
   type DrillHistory,
 } from "@/lib/drill-history";
 import { useRecorder } from "@/lib/use-recorder";
@@ -77,6 +81,7 @@ export default function DrillConsole() {
   const [stage, setStage] = useState<Stage>("idle");
   const [level, setLevel] = useState<LevelFilter>("all");
   const [duration, setDuration] = useState<number>(DEFAULT_DURATION);
+  const [language, setLanguage] = useState<DrillLanguage>(DEFAULT_LANGUAGE);
   const [concept, setConcept] = useState<Concept | null>(null);
   const [counts, setCounts] = useState<ConceptCounts | null>(null);
   const [countIn, setCountIn] = useState<number | null>(null);
@@ -85,7 +90,13 @@ export default function DrillConsole() {
   const [spokenSec, setSpokenSec] = useState(0);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [history, setHistory] = useState<DrillHistory>({ seen: [], runs: [], streak: 0, lastRunDay: null });
+  const [history, setHistory] = useState<DrillHistory>({
+    seen: [],
+    runs: [],
+    streak: 0,
+    lastRunDay: null,
+    language: DEFAULT_LANGUAGE,
+  });
   /**
    * Set while answering one of the coach's own questions. `concept` is then a
    * stand-in whose title is the question, so every stage below renders it
@@ -98,7 +109,7 @@ export default function DrillConsole() {
   const recorder = useRecorder({ limitSec: duration });
   const reduceMotion = useReducedMotion();
   const mountedRef = useRef(true);
-  const gradingLine = useRotatingLine(GRADING_LINES, stage === "grading");
+  const gradingLine = useRotatingLine(GRADING_LINES[language], stage === "grading");
 
   useEffect(() => {
     mountedRef.current = true;
@@ -107,8 +118,18 @@ export default function DrillConsole() {
     };
   }, []);
 
-  // localStorage is client-only, so history arrives after hydration.
-  useEffect(() => setHistory(readHistory()), []);
+  // localStorage is client-only, so history arrives after hydration. The
+  // language preference rides along with it.
+  useEffect(() => {
+    const stored = readHistory();
+    setHistory(stored);
+    setLanguage(stored.language);
+  }, []);
+
+  const handleLanguageChange = useCallback((next: DrillLanguage) => {
+    setLanguage(next);
+    setHistory(saveLanguage(next));
+  }, []);
 
   // Populate the pool counter on the idle screen. The concept it deals is
   // discarded — the endpoint is a pure read, so this costs nothing.
@@ -135,11 +156,12 @@ export default function DrillConsole() {
           transcript: text,
           limitSec: duration,
           spokenSec: seconds,
+          language,
           ...(followUp ? { followUpId: followUp.id } : {}),
         });
         if (!mountedRef.current) return;
         setVerdict(result);
-        setExhaustedLine(randomExhaustedLine());
+        setExhaustedLine(randomExhaustedLine(language));
         setHistory(
           recordRun({
             conceptId: forConcept.id,
@@ -171,7 +193,7 @@ export default function DrillConsole() {
         setStage("typing");
       }
     },
-    [duration, followUp],
+    [duration, followUp, language],
   );
 
   // ---- start / deal -------------------------------------------------------
@@ -269,7 +291,7 @@ export default function DrillConsole() {
 
     setStage("transcribing");
     try {
-      const stt = await transcribeAudio(result.blob, concept.id);
+      const stt = await transcribeAudio(result.blob, concept.id, language);
       if (!mountedRef.current) return;
       await submitForGrading(stt.transcript, stt.durationSec || result.seconds, concept);
     } catch (error) {
@@ -281,7 +303,7 @@ export default function DrillConsole() {
       );
       setStage("typing");
     }
-  }, [concept, recorder, submitForGrading]);
+  }, [concept, recorder, submitForGrading, language]);
 
   const handleStop = useCallback(() => recorder.stop(), [recorder]);
 
@@ -326,6 +348,8 @@ export default function DrillConsole() {
           onLevelChange={setLevel}
           duration={duration}
           onDurationChange={setDuration}
+          language={language}
+          onLanguageChange={handleLanguageChange}
           onStart={handleStart}
           counts={counts}
           streak={currentStreak(history)}
@@ -410,7 +434,7 @@ export default function DrillConsole() {
             <span className="sigil">▸</span> {stage === "transcribing" ? "transcribing" : "grading"}
           </p>
           <p className="font-mono text-sm text-dim">
-            {stage === "transcribing" ? "Working out what you actually said…" : gradingLine}
+            {stage === "transcribing" ? TRANSCRIBING_LINES[language] : gradingLine}
           </p>
           <div className="h-px w-40 overflow-hidden bg-line">
             <motion.div

@@ -32,6 +32,7 @@ import {
   transcribe,
 } from "../lib/deepgram";
 import { AUTOSAGE_COACH_AGENT_ID } from "../lib/env";
+import { parseLanguage } from "../lib/language";
 import { getFollowUp, issueFollowUp, MAX_FOLLOW_UP_DEPTH } from "../lib/follow-ups";
 import { clientIp, createRateLimiter } from "../lib/rate-limit";
 
@@ -154,6 +155,9 @@ export const drillRoutes = new Elysia({ name: "drill" })
           // a `video/webm` blob doesn't reach Deepgram claiming to be video.
           `audio/${container}`,
           buildKeyterms(concept.title, concept.tags),
+          // Someone drilling in Hinglish will speak Hinglish; transcribing that
+          // as English mangles it.
+          parseLanguage(body.language),
         );
         return result;
       } catch (error) {
@@ -171,6 +175,9 @@ export const drillRoutes = new Elysia({ name: "drill" })
         // browsers that pick a fatter container.
         audio: t.File({ maxSize: "6m" }),
         conceptId: t.String({ minLength: 1, maxLength: 80 }),
+        // Unrecognised values fall back to english rather than 422 — a bad
+        // language shouldn't cost someone a recording they can't redo.
+        language: t.Optional(t.String({ maxLength: 20 })),
       }),
       type: "multipart/form-data",
     },
@@ -224,6 +231,7 @@ export const drillRoutes = new Elysia({ name: "drill" })
         spokenSec,
         wordCount: countWords(transcript),
         fillerCount: countFillerWords(transcript),
+        language: parseLanguage(body.language),
         followUp: followUp ?? undefined,
       });
 
@@ -275,6 +283,8 @@ export const drillRoutes = new Elysia({ name: "drill" })
         transcript: t.String({ maxLength: 12_000 }),
         limitSec: t.Number({ minimum: 1, maximum: 600 }),
         spokenSec: t.Number({ minimum: 0, maximum: 600 }),
+        // Which voice the verdict comes back in. Unrecognised → english.
+        language: t.Optional(t.String({ maxLength: 20 })),
         // Set when answering the coach's own previous question. The topic then
         // comes from the server's store, never from the request.
         followUpId: t.Optional(t.String({ minLength: 8, maxLength: 64 })),

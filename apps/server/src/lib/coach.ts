@@ -12,6 +12,29 @@
 
 import { extractJsonObject } from "./extract-json";
 import type { Concept } from "./concepts";
+import type { DrillLanguage } from "./language";
+
+/**
+ * Told to the coach on every request. The system prompt carries both voices in
+ * full; this line picks which one is active for this verdict.
+ */
+const LANGUAGE_DIRECTIVE: Record<DrillLanguage, string> = {
+  english: [
+    "RESPONSE LANGUAGE: english",
+    "Write the verdict, the missed items, and the next question in English only.",
+    "Your usual slang stays (icl, ngl, dawg, blud, fr). No Hindi and no Hinglish:",
+    "no bhai, no yaar, no abey, no oyee, no pagal. The person reading this may not",
+    "understand any of it.",
+  ].join("\n"),
+  hinglish: [
+    "RESPONSE LANGUAGE: hinglish",
+    "The person explicitly asked for Hinglish, so talk the way you actually talk.",
+    "Mix Hindi into the English freely, in Roman script only, never Devanagari.",
+    "bhai, yaar, abey, oyee, arre, matlab, bas, thoda, sahi, bekaar all fair game.",
+    "Keep the technical terms in English: sharding stays sharding, idempotency stays",
+    "idempotency. It's Hinglish, not a translation exercise.",
+  ].join("\n"),
+};
 
 /** Transcripts longer than this are truncated before they reach the model. */
 const MAX_TRANSCRIPT_CHARS = 8000;
@@ -49,6 +72,8 @@ export type GradeInput = {
   spokenSec: number;
   wordCount: number;
   fillerCount: number;
+  /** Which voice the verdict comes back in. Also drove the transcription. */
+  language: DrillLanguage;
   /**
    * Present when this answer is a reply to the coach's own previous follow-up.
    * The coach is stateless per call, so the chain's context has to be restated
@@ -71,7 +96,7 @@ function sanitizeTranscript(raw: string): string {
 }
 
 export function buildGradePrompt(input: GradeInput): string {
-  const { concept, limitSec, spokenSec, wordCount, fillerCount, followUp } = input;
+  const { concept, limitSec, spokenSec, wordCount, fillerCount, followUp, language } = input;
   const transcript = sanitizeTranscript(input.transcript);
   const wpm = spokenSec > 0 ? Math.round((wordCount / spokenSec) * 60) : 0;
 
@@ -142,6 +167,10 @@ export function buildGradePrompt(input: GradeInput): string {
     "<<<TRANSCRIPT_START>>>",
     transcript || "(silence — nothing was said)",
     "<<<TRANSCRIPT_END>>>",
+    "",
+    // Last thing before the instruction, so it's the freshest constraint in
+    // context when the model starts writing.
+    LANGUAGE_DIRECTIVE[language],
     "",
     "Grade it against the rubric. Respond with the JSON object and nothing else.",
   ].join("\n");

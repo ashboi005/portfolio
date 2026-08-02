@@ -7,6 +7,8 @@
  * concept ids already seen so the reel stops dealing the same topic.
  */
 
+import { DEFAULT_LANGUAGE, type DrillLanguage } from "./drill";
+
 const KEY = "ashwath.sys/drill";
 
 /** Matches the server's exclude cap; sending more would be trimmed anyway. */
@@ -34,9 +36,21 @@ export type DrillHistory = {
   streak: number;
   /** Local YYYY-MM-DD of the most recent run, for streak arithmetic. */
   lastRunDay: string | null;
+  /**
+   * Persisted, unlike level and duration, because it's closer to an identity
+   * setting than a per-session choice. Someone who reads Hinglish still reads
+   * Hinglish tomorrow.
+   */
+  language: DrillLanguage;
 };
 
-const EMPTY: DrillHistory = { seen: [], runs: [], streak: 0, lastRunDay: null };
+const EMPTY: DrillHistory = {
+  seen: [],
+  runs: [],
+  streak: 0,
+  lastRunDay: null,
+  language: DEFAULT_LANGUAGE,
+};
 
 /** Local calendar day, not UTC — a streak should follow the user's midnight. */
 function dayKey(date: Date): string {
@@ -63,6 +77,7 @@ export function readHistory(): DrillHistory {
       runs: Array.isArray(parsed.runs) ? (parsed.runs.filter(Boolean) as DrillRun[]).slice(0, MAX_RUNS) : [],
       streak: typeof parsed.streak === "number" && parsed.streak >= 0 ? Math.floor(parsed.streak) : 0,
       lastRunDay: typeof parsed.lastRunDay === "string" ? parsed.lastRunDay : null,
+      language: parsed.language === "hinglish" ? "hinglish" : DEFAULT_LANGUAGE,
     };
   } catch {
     // Corrupt or unavailable storage shouldn't break the page.
@@ -119,6 +134,11 @@ export function recordRun(run: DrillRun, now = new Date()): DrillHistory {
     streak,
     lastRunDay: today,
   });
+}
+
+/** Remember the language choice across visits. */
+export function saveLanguage(language: DrillLanguage): DrillHistory {
+  return write({ ...readHistory(), language });
 }
 
 export function clearHistory(): DrillHistory {
