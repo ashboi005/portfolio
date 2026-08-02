@@ -106,8 +106,9 @@ export async function fetchConcept(
 export async function transcribeAudio(audio: Blob, conceptId: string): Promise<TranscriptResult> {
   const form = new FormData();
   // Extension is cosmetic — Deepgram sniffs the container — but it keeps
-  // server-side logs readable.
-  form.append("audio", audio, audio.type.includes("mp4") ? "answer.mp4" : "answer.webm");
+  // server-side logs readable when an upload is rejected.
+  const container = (audio.type.split("/")[1] ?? "webm").split(";")[0]!.trim() || "webm";
+  form.append("audio", audio, `answer.${container}`);
   form.append("conceptId", conceptId);
 
   const response = await fetch(`${apiBase()}/api/v1/drill/transcribe`, {

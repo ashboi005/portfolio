@@ -145,6 +145,37 @@ describe("parseVerdict", () => {
     expect(v.missed).toHaveLength(5);
   });
 
+  test("strips markdown the coach was told not to emit", () => {
+    const v = parseVerdict(
+      JSON.stringify({
+        ...JSON.parse(wellFormed),
+        verdict: "You nailed **idempotency** but hand-waved the `retry` path. See [the docs](http://x).",
+        missed: ["- Idempotency keys", "* Retry semantics"],
+        nextQuestion: "## How would you *dedupe* a retried charge?",
+      }),
+    );
+    expect(v.verdict).toBe("You nailed idempotency but hand-waved the retry path. See the docs.");
+    expect(v.missed).toEqual(["Idempotency keys", "Retry semantics"]);
+    expect(v.nextQuestion).toBe("How would you dedupe a retried charge?");
+  });
+
+  test("leaves snake_case and multiplication alone", () => {
+    const v = parseVerdict(
+      JSON.stringify({
+        ...JSON.parse(wellFormed),
+        verdict: "Your signal_to_noise was rough and 3 * 4 replicas is not a plan.",
+      }),
+    );
+    expect(v.verdict).toBe("Your signal_to_noise was rough and 3 * 4 replicas is not a plan.");
+  });
+
+  test("preserves intentional line breaks", () => {
+    const v = parseVerdict(
+      JSON.stringify({ ...JSON.parse(wellFormed), verdict: "First point.\n\nSecond point." }),
+    );
+    expect(v.verdict).toBe("First point.\n\nSecond point.");
+  });
+
   test("never throws on junk", () => {
     for (const junk of ["", "{", "null", "[]", "{}", '{"scores":null}']) {
       expect(() => parseVerdict(junk)).not.toThrow();

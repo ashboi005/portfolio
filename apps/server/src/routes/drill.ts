@@ -47,8 +47,32 @@ console.log(
 /** Durations the UI offers. Anything else is a client bug or a poke at the API. */
 const ALLOWED_LIMITS = [30, 60, 90, 120, 180] as const;
 
-/** Blob containers MediaRecorder actually produces across browsers. */
-const ALLOWED_AUDIO_TYPES = ["audio/webm", "audio/ogg", "audio/mp4", "audio/mpeg", "audio/wav", "audio/x-wav"];
+/**
+ * Containers MediaRecorder produces across browsers.
+ *
+ * Matched on the container, not the `audio/` prefix: WebM and MP4 are
+ * containers, and Chrome stamps `video/webm` on an audio-only recording
+ * whenever it chooses the container itself. Rejecting those meant refusing
+ * files Deepgram reads happily — it sniffs the bytes and ignores the label.
+ */
+const ALLOWED_CONTAINERS = new Set([
+  "webm",
+  "ogg",
+  "mp4",
+  "m4a",
+  "mpeg",
+  "mpga",
+  "wav",
+  "x-wav",
+  "aac",
+  "flac",
+]);
+
+export function containerOf(mime: string): string | null {
+  const [kind, container] = mime.split("/");
+  if (kind !== "audio" && kind !== "video") return null;
+  return container && ALLOWED_CONTAINERS.has(container) ? container : null;
+}
 
 const transcribeLimiter = createRateLimiter({ limit: 20, windowMs: 60 * 60 * 1000, label: "drill:transcribe" });
 const gradeLimiter = createRateLimiter({ limit: 25, windowMs: 60 * 60 * 1000, label: "drill:grade" });
@@ -115,7 +139,9 @@ export const drillRoutes = new Elysia({ name: "drill" })
       }
 
       const mime = (body.audio.type || "application/octet-stream").split(";")[0]!.trim().toLowerCase();
-      if (!ALLOWED_AUDIO_TYPES.includes(mime)) {
+      const container = containerOf(mime);
+      if (!container) {
+        console.warn(`[drill] rejected upload with content-type ${mime}`);
         set.status = 415;
         return { error: "unsupported_audio", message: `Can't read ${mime} audio.` };
       }
@@ -123,7 +149,9 @@ export const drillRoutes = new Elysia({ name: "drill" })
       try {
         const result = await transcribe(
           await body.audio.arrayBuffer(),
-          body.audio.type,
+          // Send the normalised container rather than the browser's label, so
+          // a `video/webm` blob doesn't reach Deepgram claiming to be video.
+          `audio/${container}`,
           buildKeyterms(concept.title, concept.tags),
         );
         return result;

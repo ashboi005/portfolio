@@ -45,6 +45,22 @@ function pickMimeType(): string | null {
   return "";
 }
 
+/**
+ * Report the recording as audio even when the browser labelled it video.
+ *
+ * WebM and MP4 are containers, not media types. When MediaRecorder picks the
+ * container itself rather than being handed an explicit `mimeType`, Chrome
+ * stamps `video/webm` on the blob even though the stream has only an audio
+ * track. The bytes are a valid audio-only WebM, so relabelling is accurate,
+ * not a lie — and it stops the upload from looking like a video file.
+ */
+function normalizeAudioType(mimeType: string): string {
+  const base = (mimeType || "audio/webm").split(";")[0]!.trim().toLowerCase();
+  const [kind, container] = base.split("/");
+  if (kind === "video" && container) return `audio/${container}`;
+  return base;
+}
+
 const ERROR_COPY: Record<RecorderErrorKind, string> = {
   denied: "Mic access denied. No problem — type your answer instead.",
   "no-device": "No microphone found. Type your answer instead.",
@@ -189,7 +205,7 @@ export function useRecorder({ limitSec }: { limitSec: number }) {
     recorder.onstop = () => {
       stopTicking();
       const seconds = Math.min(limitRef.current, (Date.now() - startedAtRef.current) / 1000);
-      const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+      const blob = new Blob(chunksRef.current, { type: normalizeAudioType(recorder.mimeType) });
       chunksRef.current = [];
       setStatus("processing");
       teardown();

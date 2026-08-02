@@ -103,11 +103,35 @@ function clampScore(value: unknown): number | null {
   return Math.max(0, Math.min(100, Math.round(n)));
 }
 
+/**
+ * Strip Markdown the coach was told not to emit.
+ *
+ * The verdict is rendered as literal text, so a stray `**` shows up on screen
+ * as asterisks. The system prompt forbids Markdown, but prompts drift and a
+ * visibly broken card is a worse failure than a slightly over-eager regex.
+ *
+ * Underscores are deliberately left alone: `signal_to_noise` and `snake_case`
+ * are plausible things to say about backend code, and mangling them would be a
+ * worse error than leaving one italic marker in place.
+ */
+function stripMarkdown(value: string): string {
+  return value
+    .replace(/`{1,3}([^`]*)`{1,3}/g, "$1") // `code` and ```fences```
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // **bold**
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g, "$1$2") // *italic*
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // [text](url)
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "") // # headings
+    .replace(/^\s{0,3}[-*+]\s+/gm, "") // - bullet prefixes
+    .replace(/^\s{0,3}>\s?/gm, "") // > blockquotes
+    .replace(/[ \t]+$/gm, "")
+    .trim();
+}
+
 function clampText(value: unknown, max: number): string | null {
   if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  return trimmed.length > max ? `${trimmed.slice(0, max - 1).trimEnd()}…` : trimmed;
+  const cleaned = stripMarkdown(value);
+  if (!cleaned) return null;
+  return cleaned.length > max ? `${cleaned.slice(0, max - 1).trimEnd()}…` : cleaned;
 }
 
 /**
