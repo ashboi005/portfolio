@@ -7,8 +7,12 @@ import { floaters } from "@/lib/content";
 /**
  * A global, fixed background layer of desaturated tool/tech icons drifting in
  * space with light physics — constant velocity, bouncing off the viewport
- * edges. Icons come from `content.json` → `floaters` (files in public/floaters).
- * Fewer icons on small screens; frozen for reduced motion.
+ * edges. Icons come from `content.json` → `floaters` (files in public/floaters
+ * and public/warp). Fewer icons on small screens; frozen for reduced motion.
+ *
+ * The home page keeps the count at one-of-each so the icons stay background
+ * texture behind dense sections. /drill has no sections to compete with, so it
+ * turns the density and scale up — see the props.
  */
 
 type Body = {
@@ -22,7 +26,24 @@ type Body = {
   rot: number;
 };
 
-export default function FloatingIcons() {
+export default function FloatingIcons({
+  /**
+   * Multiplier on the icon count. 1 draws one of each; above that the pool
+   * repeats, which is how /drill fills a page with nothing else on it.
+   */
+  density = 1,
+  /** Smallest icon, in px. */
+  minSize = 21,
+  /** Largest icon, in px. Bigger reads as background art rather than confetti. */
+  maxSize = 46,
+  /** Extra class on the layer, for pages that want a different opacity. */
+  className,
+}: {
+  density?: number;
+  minSize?: number;
+  maxSize?: number;
+  className?: string;
+} = {}) {
   const layerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,12 +52,11 @@ export default function FloatingIcons() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobile = window.innerWidth < 768;
-    // Show a good spread of the icon set without clutter. Desktop shows up to
-    // 18 (mobile 6); if there are more entries than that, a shuffle decides
-    // which appear so it isn't always just the first few in the list.
+    // Desktop draws the whole set (times density); mobile stays sparse because
+    // the same count on a phone is just clutter.
     const count = isMobile
-      ? Math.min(6, floaters.length)
-      : Math.min(21, floaters.length);
+      ? Math.min(Math.round(6 * density), floaters.length * Math.ceil(density))
+      : Math.round(floaters.length * density);
 
     const rng = (() => {
       let a = 991;
@@ -65,7 +85,7 @@ export default function FloatingIcons() {
       img.src = src;
       img.alt = "";
       el.appendChild(img);
-      const size = 21 + Math.round(rng() * 25);
+      const size = minSize + Math.round(rng() * (maxSize - minSize));
       el.style.width = `${size}px`;
       el.style.height = `${size}px`;
       layer.appendChild(el);
@@ -152,7 +172,7 @@ export default function FloatingIcons() {
       if (regionRaf) cancelAnimationFrame(regionRaf);
       for (const b of bodies) b.el.remove();
     };
-  }, []);
+  }, [density, minSize, maxSize]);
 
-  return <div ref={layerRef} className="floaters-layer" aria-hidden />;
+  return <div ref={layerRef} className={`floaters-layer ${className ?? ""}`} aria-hidden />;
 }

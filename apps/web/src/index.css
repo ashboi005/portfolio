@@ -665,6 +665,13 @@
   will-change: transform;
   filter: grayscale(1) brightness(1.6) opacity(0.12);
 }
+
+/* /drill has no sections competing for attention, so the layer carries more of
+   the page. Slightly brighter than the home page's 12% — at that value the
+   larger icons still read as almost nothing. */
+.floaters-layer--bold .floater {
+  filter: grayscale(1) brightness(1.6) opacity(0.2);
+}
 .floater img,
 .floater svg {
   display: block;

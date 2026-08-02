@@ -68,11 +68,13 @@ export default function DrillShell({
   return (
     <>
       <CustomCursor />
-      {/* Ambient tool icons drifting behind everything. Already desaturated to
-          12% opacity by the `.floater` filter, so it reads as texture rather
-          than motion — the page was flat void without it. The cats are the
-          part that had to stay conditional; see DrillConsole. */}
-      <FloatingIcons />
+      {/* Ambient tool icons drifting behind everything — the page was flat void
+          without them. Denser and much larger than on the home page: there are
+          no sections here for them to compete with, and at the home page's size
+          they read as specks rather than art. Still grayscale, still low
+          opacity, so they stay background. The cats are the part that had to
+          stay conditional; see DrillConsole. */}
+      <FloatingIcons density={2.5} minSize={34} maxSize={96} className="floaters-layer--bold" />
 
       <header className="fixed inset-x-0 top-0 z-40 border-b border-line bg-void/85 backdrop-blur-sm">
         <div className="mx-auto flex h-11 w-full max-w-5xl items-center justify-between gap-4 px-4 font-mono text-[11px] sm:px-6">

@@ -113,5 +113,12 @@ export type SiteContent = {
     iconScale: number;
     wordScale: number;
   };
-  footer: { note: string; copyright: string; stackLine: string };
+  footer: {
+    note: string;
+    copyright: string;
+    stackLine: string;
+    /** Pitch for the /drill page, shown as a footer call-out. */
+    drillNote: string;
+    drillCta: string;
+  };
 };
