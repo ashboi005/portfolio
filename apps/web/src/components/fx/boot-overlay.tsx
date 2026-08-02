@@ -7,10 +7,34 @@ import { boot } from "@/lib/content";
 
 const BOOT_LINES = boot.lines;
 
+/** Per-tab flag: the machine only powers on once. */
+const BOOTED_KEY = "ashwath.sys/booted";
+
+function alreadyBooted(): boolean {
+  try {
+    return window.sessionStorage.getItem(BOOTED_KEY) === "1";
+  } catch {
+    // Private mode or blocked storage — boot again rather than break.
+    return false;
+  }
+}
+
+function markBooted() {
+  try {
+    window.sessionStorage.setItem(BOOTED_KEY, "1");
+  } catch {
+    // ignore
+  }
+}
+
 /**
  * A power-on sequence: CRT line snaps to life, the boot log floods, a loader
  * fills, then the whole panel collapses like a switched-off monitor to reveal
  * the page. Skippable with a click or any key. Skipped entirely for reduced motion.
+ *
+ * Runs once per tab, tracked in sessionStorage. Without that, navigating back
+ * from another route (/drill) re-mounts this and replays the whole CRT
+ * sequence — charming the first time, hostile the third.
  */
 export default function BootOverlay({ onFinish }: { onFinish: () => void }) {
   const [visible, setVisible] = useState(true);
@@ -37,11 +61,13 @@ export default function BootOverlay({ onFinish }: { onFinish: () => void }) {
       }, 620);
     };
 
-    if (reduced) {
+    if (reduced || alreadyBooted()) {
+      markBooted();
       onFinish();
       setVisible(false);
       return;
     }
+    markBooted();
 
     document.body.style.overflow = "hidden";
 
