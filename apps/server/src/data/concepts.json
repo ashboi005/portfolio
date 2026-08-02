@@ -1,0 +1,1055 @@
+{
+  "_comment": "DRILL.EXE concept bank. Each entry: id, title, level (beginner|intermediate|advanced), tags, probes. `probes` are shown to the user as hints AND sent to the coach agent as the grading bar — keep them specific and answerable out loud in under two minutes.",
+  "concepts": [
+    {
+      "id": "c-http-methods",
+      "title": "HTTP methods and what each one promises",
+      "level": "beginner",
+      "tags": ["http", "rest", "api"],
+      "probes": [
+        "Which methods are safe, and which are idempotent?",
+        "When would you use PATCH instead of PUT?"
+      ]
+    },
+    {
+      "id": "c-status-codes",
+      "title": "HTTP status codes: picking the right one",
+      "level": "beginner",
+      "tags": ["http", "rest", "api"],
+      "probes": [
+        "What's the difference between 401 and 403?",
+        "When is 422 more honest than 400?"
+      ]
+    },
+    {
+      "id": "c-rest-basics",
+      "title": "What actually makes an API RESTful",
+      "level": "beginner",
+      "tags": ["rest", "api", "design"],
+      "probes": [
+        "What does statelessness buy you?",
+        "Name one thing most 'REST' APIs get wrong."
+      ]
+    },
+    {
+      "id": "c-request-response",
+      "title": "The lifecycle of an HTTP request",
+      "level": "beginner",
+      "tags": ["http", "networking"],
+      "probes": [
+        "Walk from DNS lookup to rendered response.",
+        "Where does TLS fit in?"
+      ]
+    },
+    {
+      "id": "c-json-vs-formdata",
+      "title": "JSON vs form-encoded vs multipart request bodies",
+      "level": "beginner",
+      "tags": ["http", "api"],
+      "probes": [
+        "Why can't you upload a file as plain JSON efficiently?",
+        "What does the boundary in multipart actually do?"
+      ]
+    },
+    {
+      "id": "c-sql-joins",
+      "title": "SQL joins: inner, left, right, full",
+      "level": "beginner",
+      "tags": ["sql", "database"],
+      "probes": [
+        "When does a LEFT JOIN silently become an INNER JOIN?",
+        "What does a full outer join give you that the others don't?"
+      ]
+    },
+    {
+      "id": "c-primary-foreign-keys",
+      "title": "Primary keys, foreign keys, and referential integrity",
+      "level": "beginner",
+      "tags": ["sql", "database", "modelling"],
+      "probes": [
+        "Natural key or surrogate key — how do you choose?",
+        "What does ON DELETE CASCADE actually do to your data?"
+      ]
+    },
+    {
+      "id": "c-normalization",
+      "title": "Database normalization, and when to stop",
+      "level": "beginner",
+      "tags": ["sql", "database", "modelling"],
+      "probes": [
+        "Explain third normal form without the textbook wording.",
+        "Give a case where denormalizing is the right call."
+      ]
+    },
+    {
+      "id": "c-env-vars",
+      "title": "Configuration and secrets management",
+      "level": "beginner",
+      "tags": ["infra", "security", "config"],
+      "probes": [
+        "Why shouldn't config live in the repo?",
+        "How do you rotate a leaked key without downtime?"
+      ]
+    },
+    {
+      "id": "c-auth-vs-authz",
+      "title": "Authentication vs authorization",
+      "level": "beginner",
+      "tags": ["auth", "security"],
+      "probes": [
+        "Where does each one belong in a request pipeline?",
+        "Give an example of getting authz wrong while authn is fine."
+      ]
+    },
+    {
+      "id": "c-password-storage",
+      "title": "Storing passwords correctly",
+      "level": "beginner",
+      "tags": ["auth", "security"],
+      "probes": [
+        "Why bcrypt or argon2 instead of SHA-256?",
+        "What is a salt protecting you from, specifically?"
+      ]
+    },
+    {
+      "id": "c-sessions-vs-tokens",
+      "title": "Server sessions vs stateless tokens",
+      "level": "beginner",
+      "tags": ["auth", "security"],
+      "probes": [
+        "What do you give up by going stateless?",
+        "How do you log someone out of a JWT?"
+      ]
+    },
+    {
+      "id": "c-cors",
+      "title": "CORS: what it actually protects",
+      "level": "beginner",
+      "tags": ["http", "security", "browser"],
+      "probes": [
+        "Why is a preflight request sent, and when?",
+        "Does CORS protect your server or the user's browser?"
+      ]
+    },
+    {
+      "id": "c-env-stages",
+      "title": "Dev, staging, and production environments",
+      "level": "beginner",
+      "tags": ["infra", "process"],
+      "probes": [
+        "What makes staging useful versus theatre?",
+        "How do you handle data differences between them?"
+      ]
+    },
+    {
+      "id": "c-logging-basics",
+      "title": "Logging: what to log and what never to",
+      "level": "beginner",
+      "tags": ["observability", "security"],
+      "probes": [
+        "Why structured logs over string concatenation?",
+        "Name three things that must never reach a log line."
+      ]
+    },
+    {
+      "id": "c-api-versioning",
+      "title": "Versioning a public API",
+      "level": "beginner",
+      "tags": ["api", "design"],
+      "probes": [
+        "URL path, header, or query param — pick one and defend it.",
+        "What counts as a breaking change?"
+      ]
+    },
+    {
+      "id": "c-pagination",
+      "title": "Pagination: offset vs cursor",
+      "level": "beginner",
+      "tags": ["api", "database", "performance"],
+      "probes": [
+        "Why does OFFSET get slower deeper into a table?",
+        "What breaks with offset pagination when rows are inserted mid-scroll?"
+      ]
+    },
+    {
+      "id": "c-http-caching",
+      "title": "HTTP caching headers",
+      "level": "beginner",
+      "tags": ["http", "caching", "performance"],
+      "probes": [
+        "Cache-Control, ETag, Last-Modified — what does each do?",
+        "What's the difference between no-cache and no-store?"
+      ]
+    },
+    {
+      "id": "c-sync-vs-async",
+      "title": "Synchronous vs asynchronous processing",
+      "level": "beginner",
+      "tags": ["architecture", "queues"],
+      "probes": [
+        "When should a request return 202 instead of doing the work?",
+        "How does the client find out it finished?"
+      ]
+    },
+    {
+      "id": "c-rest-vs-graphql",
+      "title": "REST vs GraphQL",
+      "level": "beginner",
+      "tags": ["api", "design", "graphql"],
+      "probes": [
+        "What problem was GraphQL actually built to solve?",
+        "What gets harder when you adopt it?"
+      ]
+    },
+    {
+      "id": "c-git-branching",
+      "title": "Branching strategies and why they matter",
+      "level": "beginner",
+      "tags": ["process", "git"],
+      "probes": [
+        "Trunk-based vs GitFlow — what drives the choice?",
+        "How does branching strategy affect deploy frequency?"
+      ]
+    },
+    {
+      "id": "c-docker-basics",
+      "title": "Containers: what Docker actually gives you",
+      "level": "beginner",
+      "tags": ["infra", "docker"],
+      "probes": [
+        "Image versus container versus layer.",
+        "Why isn't a container just a lightweight VM?"
+      ]
+    },
+    {
+      "id": "c-env-12factor",
+      "title": "The twelve-factor app, and which factors still hold",
+      "level": "beginner",
+      "tags": ["architecture", "infra"],
+      "probes": [
+        "Which factors matter most for a containerised service?",
+        "Which one do you think has aged badly?"
+      ]
+    },
+    {
+      "id": "c-input-validation",
+      "title": "Input validation and why the client can't be trusted",
+      "level": "beginner",
+      "tags": ["security", "api"],
+      "probes": [
+        "Where in the stack does validation belong?",
+        "Allowlist or denylist — which and why?"
+      ]
+    },
+    {
+      "id": "c-sql-injection",
+      "title": "SQL injection and parameterized queries",
+      "level": "beginner",
+      "tags": ["security", "sql"],
+      "probes": [
+        "Why doesn't escaping quotes fix it properly?",
+        "How do prepared statements actually prevent it?"
+      ]
+    },
+    {
+      "id": "c-indexes-intro",
+      "title": "What a database index is and what it costs",
+      "level": "beginner",
+      "tags": ["database", "performance", "sql"],
+      "probes": [
+        "Why isn't every column indexed?",
+        "What does an index do to write throughput?"
+      ]
+    },
+    {
+      "id": "c-env-http-versions",
+      "title": "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+      "level": "beginner",
+      "tags": ["http", "networking", "performance"],
+      "probes": [
+        "What is head-of-line blocking, and where does it happen?",
+        "Why did HTTP/3 move to UDP?"
+      ]
+    },
+    {
+      "id": "c-dns",
+      "title": "How DNS resolution works",
+      "level": "beginner",
+      "tags": ["networking", "infra"],
+      "probes": [
+        "Walk through a recursive lookup.",
+        "Why does TTL matter during a migration?"
+      ]
+    },
+    {
+      "id": "c-load-balancer-intro",
+      "title": "What a load balancer does",
+      "level": "beginner",
+      "tags": ["infra", "networking", "scaling"],
+      "probes": [
+        "Round-robin, least-connections, IP-hash — when does each fit?",
+        "What is a health check actually checking?"
+      ]
+    },
+    {
+      "id": "c-webhooks",
+      "title": "Webhooks: delivery, retries, and verification",
+      "level": "beginner",
+      "tags": ["api", "integration"],
+      "probes": [
+        "How does the receiver verify the sender is genuine?",
+        "What should the receiver do with a duplicate delivery?"
+      ]
+    },
+    {
+      "id": "c-idempotency",
+      "title": "Idempotency in APIs",
+      "level": "intermediate",
+      "tags": ["api", "reliability", "http"],
+      "probes": [
+        "Why is PUT idempotent but POST isn't?",
+        "How would you implement an idempotency key for payments?"
+      ]
+    },
+    {
+      "id": "c-acid",
+      "title": "ACID transactions",
+      "level": "intermediate",
+      "tags": ["database", "transactions"],
+      "probes": [
+        "Define each letter with a failure it prevents.",
+        "Which one is hardest to keep in a distributed system?"
+      ]
+    },
+    {
+      "id": "c-isolation-levels",
+      "title": "Transaction isolation levels",
+      "level": "intermediate",
+      "tags": ["database", "transactions", "concurrency"],
+      "probes": [
+        "Dirty read, non-repeatable read, phantom read — which level stops which?",
+        "What is the default in Postgres, and why does that surprise people?"
+      ]
+    },
+    {
+      "id": "c-optimistic-pessimistic",
+      "title": "Optimistic vs pessimistic locking",
+      "level": "intermediate",
+      "tags": ["database", "concurrency"],
+      "probes": [
+        "How does a version column implement optimistic locking?",
+        "Which one would you pick for a seat-booking system?"
+      ]
+    },
+    {
+      "id": "c-nplus1",
+      "title": "The N+1 query problem",
+      "level": "intermediate",
+      "tags": ["database", "orm", "performance"],
+      "probes": [
+        "How does an ORM produce it without you noticing?",
+        "Eager loading versus a dataloader — trade-offs?"
+      ]
+    },
+    {
+      "id": "c-index-types",
+      "title": "Index types: B-tree, hash, GIN, composite",
+      "level": "intermediate",
+      "tags": ["database", "performance", "sql"],
+      "probes": [
+        "Why does column order matter in a composite index?",
+        "When does a query planner ignore your index entirely?"
+      ]
+    },
+    {
+      "id": "c-query-plans",
+      "title": "Reading a query execution plan",
+      "level": "intermediate",
+      "tags": ["database", "performance", "sql"],
+      "probes": [
+        "Sequential scan versus index scan — when is a seq scan correct?",
+        "What does a bad row estimate do downstream?"
+      ]
+    },
+    {
+      "id": "c-connection-pooling",
+      "title": "Database connection pooling",
+      "level": "intermediate",
+      "tags": ["database", "performance", "infra"],
+      "probes": [
+        "Why is opening a connection per request a problem?",
+        "How do you size a pool, and what happens when it's exhausted?"
+      ]
+    },
+    {
+      "id": "c-cache-invalidation",
+      "title": "Cache invalidation strategies",
+      "level": "intermediate",
+      "tags": ["caching", "performance"],
+      "probes": [
+        "TTL, write-through, write-behind, explicit bust — pick per use case.",
+        "How do you avoid serving stale data after a write?"
+      ]
+    },
+    {
+      "id": "c-cache-stampede",
+      "title": "Cache stampedes and how to stop them",
+      "level": "intermediate",
+      "tags": ["caching", "performance", "reliability"],
+      "probes": [
+        "What happens the moment a hot key expires?",
+        "Explain request coalescing or probabilistic early expiry."
+      ]
+    },
+    {
+      "id": "c-redis-patterns",
+      "title": "Redis beyond caching",
+      "level": "intermediate",
+      "tags": ["caching", "redis", "architecture"],
+      "probes": [
+        "Rate limiting, distributed locks, leaderboards — how does each map to a Redis structure?",
+        "What are the risks of using Redis as a lock?"
+      ]
+    },
+    {
+      "id": "c-message-queues",
+      "title": "Message queues and why you'd add one",
+      "level": "intermediate",
+      "tags": ["queues", "architecture", "reliability"],
+      "probes": [
+        "What does a queue buy you beyond 'async'?",
+        "What new failure modes does it introduce?"
+      ]
+    },
+    {
+      "id": "c-delivery-semantics",
+      "title": "At-most-once, at-least-once, exactly-once delivery",
+      "level": "intermediate",
+      "tags": ["queues", "distributed", "reliability"],
+      "probes": [
+        "Why is exactly-once mostly a lie?",
+        "How does consumer-side idempotency rescue at-least-once?"
+      ]
+    },
+    {
+      "id": "c-dead-letter-queues",
+      "title": "Dead-letter queues and poison messages",
+      "level": "intermediate",
+      "tags": ["queues", "reliability"],
+      "probes": [
+        "What should happen after N failed processing attempts?",
+        "How do you replay a DLQ safely?"
+      ]
+    },
+    {
+      "id": "c-kafka-vs-rabbit",
+      "title": "Kafka vs a traditional message broker",
+      "level": "intermediate",
+      "tags": ["queues", "kafka", "architecture"],
+      "probes": [
+        "Log-based versus queue-based — what changes for the consumer?",
+        "When is RabbitMQ the better answer?"
+      ]
+    },
+    {
+      "id": "c-rate-limiting",
+      "title": "Rate limiting algorithms",
+      "level": "intermediate",
+      "tags": ["api", "reliability", "algorithms"],
+      "probes": [
+        "Token bucket, leaky bucket, sliding window — compare them.",
+        "How do you rate limit across multiple server instances?"
+      ]
+    },
+    {
+      "id": "c-jwt-tradeoffs",
+      "title": "JWTs: the real trade-offs",
+      "level": "intermediate",
+      "tags": ["auth", "security"],
+      "probes": [
+        "Why is revocation the hard part?",
+        "Where should you store one in a browser, and why is every option bad?"
+      ]
+    },
+    {
+      "id": "c-oauth-flows",
+      "title": "OAuth 2.0 flows",
+      "level": "intermediate",
+      "tags": ["auth", "security", "oauth"],
+      "probes": [
+        "Walk through authorization code with PKCE.",
+        "Why did implicit flow get deprecated?"
+      ]
+    },
+    {
+      "id": "c-refresh-tokens",
+      "title": "Refresh token rotation",
+      "level": "intermediate",
+      "tags": ["auth", "security"],
+      "probes": [
+        "What does rotation detect that a static refresh token can't?",
+        "How do you handle a race between two tabs refreshing at once?"
+      ]
+    },
+    {
+      "id": "c-rbac-abac",
+      "title": "RBAC vs ABAC",
+      "level": "intermediate",
+      "tags": ["auth", "security", "design"],
+      "probes": [
+        "When does a role model stop scaling?",
+        "How do you keep permission checks fast?"
+      ]
+    },
+    {
+      "id": "c-csrf",
+      "title": "CSRF and how to defend against it",
+      "level": "intermediate",
+      "tags": ["security", "http", "browser"],
+      "probes": [
+        "Why is a cookie-authenticated API vulnerable but a bearer-token one usually isn't?",
+        "What does SameSite actually cover, and what does it miss?"
+      ]
+    },
+    {
+      "id": "c-owasp-top10",
+      "title": "The OWASP Top 10, in your own words",
+      "level": "intermediate",
+      "tags": ["security"],
+      "probes": [
+        "Pick three and describe a real exploit path.",
+        "Which one do you think is most under-rated?"
+      ]
+    },
+    {
+      "id": "c-microservices-tradeoff",
+      "title": "Monolith vs microservices",
+      "level": "intermediate",
+      "tags": ["architecture", "distributed"],
+      "probes": [
+        "What organisational problem do microservices actually solve?",
+        "Name three costs teams underestimate."
+      ]
+    },
+    {
+      "id": "c-service-discovery",
+      "title": "Service discovery",
+      "level": "intermediate",
+      "tags": ["distributed", "infra", "networking"],
+      "probes": [
+        "Client-side versus server-side discovery.",
+        "How does a service mesh change the picture?"
+      ]
+    },
+    {
+      "id": "c-circuit-breaker",
+      "title": "Circuit breakers and bulkheads",
+      "level": "intermediate",
+      "tags": ["reliability", "distributed", "patterns"],
+      "probes": [
+        "Walk through closed, open, and half-open states.",
+        "What failure does a bulkhead contain that a breaker doesn't?"
+      ]
+    },
+    {
+      "id": "c-retries-backoff",
+      "title": "Retries, exponential backoff, and jitter",
+      "level": "intermediate",
+      "tags": ["reliability", "distributed"],
+      "probes": [
+        "Why is naive retrying dangerous during an outage?",
+        "What problem does jitter specifically solve?"
+      ]
+    },
+    {
+      "id": "c-timeouts",
+      "title": "Timeouts and deadline propagation",
+      "level": "intermediate",
+      "tags": ["reliability", "distributed"],
+      "probes": [
+        "What happens when an inner timeout exceeds the outer one?",
+        "How do you propagate a deadline across service hops?"
+      ]
+    },
+    {
+      "id": "c-observability",
+      "title": "Logs, metrics, and traces",
+      "level": "intermediate",
+      "tags": ["observability"],
+      "probes": [
+        "What question does each pillar answer best?",
+        "Why is a trace id worth threading through everything?"
+      ]
+    },
+    {
+      "id": "c-slos",
+      "title": "SLIs, SLOs, and error budgets",
+      "level": "intermediate",
+      "tags": ["observability", "process", "reliability"],
+      "probes": [
+        "Why measure percentiles rather than averages?",
+        "What should a team do once the error budget is spent?"
+      ]
+    },
+    {
+      "id": "c-blue-green",
+      "title": "Deployment strategies: blue-green, canary, rolling",
+      "level": "intermediate",
+      "tags": ["infra", "deployment"],
+      "probes": [
+        "Which gives the fastest rollback, and at what cost?",
+        "How do database migrations complicate each one?"
+      ]
+    },
+    {
+      "id": "c-zero-downtime-migrations",
+      "title": "Zero-downtime schema migrations",
+      "level": "intermediate",
+      "tags": ["database", "deployment"],
+      "probes": [
+        "Explain the expand-migrate-contract pattern.",
+        "How do you rename a column without breaking the running app?"
+      ]
+    },
+    {
+      "id": "c-orm-tradeoffs",
+      "title": "ORMs: what they cost you",
+      "level": "intermediate",
+      "tags": ["database", "orm", "design"],
+      "probes": [
+        "Where does an ORM stop helping?",
+        "How do you keep raw SQL maintainable when you drop down to it?"
+      ]
+    },
+    {
+      "id": "c-soft-deletes",
+      "title": "Soft deletes and their consequences",
+      "level": "intermediate",
+      "tags": ["database", "modelling"],
+      "probes": [
+        "What do soft deletes do to unique constraints?",
+        "How does GDPR erasure interact with them?"
+      ]
+    },
+    {
+      "id": "c-uuid-vs-int",
+      "title": "UUID vs auto-increment primary keys",
+      "level": "intermediate",
+      "tags": ["database", "modelling", "performance"],
+      "probes": [
+        "What does a random UUID do to B-tree locality?",
+        "What is UUIDv7 trying to fix?"
+      ]
+    },
+    {
+      "id": "c-file-uploads",
+      "title": "Handling large file uploads",
+      "level": "intermediate",
+      "tags": ["api", "infra", "storage"],
+      "probes": [
+        "Why use a presigned URL instead of proxying through your server?",
+        "How do you handle resumable uploads?"
+      ]
+    },
+    {
+      "id": "c-background-jobs",
+      "title": "Background job design",
+      "level": "intermediate",
+      "tags": ["queues", "architecture", "reliability"],
+      "probes": [
+        "How do you make a job safe to run twice?",
+        "Where do you put the job's progress so a user can see it?"
+      ]
+    },
+    {
+      "id": "c-cron-scheduling",
+      "title": "Scheduled jobs in a multi-instance deployment",
+      "level": "intermediate",
+      "tags": ["infra", "distributed", "reliability"],
+      "probes": [
+        "How do you stop three replicas running the same cron?",
+        "What happens to a missed run during a deploy?"
+      ]
+    },
+    {
+      "id": "c-websockets",
+      "title": "WebSockets vs SSE vs long polling",
+      "level": "intermediate",
+      "tags": ["networking", "realtime", "api"],
+      "probes": [
+        "When is SSE the better choice?",
+        "How do you scale WebSocket connections across instances?"
+      ]
+    },
+    {
+      "id": "c-grpc",
+      "title": "gRPC and protocol buffers",
+      "level": "intermediate",
+      "tags": ["api", "networking", "grpc"],
+      "probes": [
+        "What does binary framing plus HTTP/2 buy you over JSON-over-HTTP?",
+        "How do you evolve a proto schema without breaking clients?"
+      ]
+    },
+    {
+      "id": "c-api-gateway",
+      "title": "The API gateway pattern",
+      "level": "intermediate",
+      "tags": ["architecture", "infra", "api"],
+      "probes": [
+        "What belongs in the gateway and what absolutely doesn't?",
+        "How do you avoid it becoming a distributed monolith?"
+      ]
+    },
+    {
+      "id": "c-feature-flags",
+      "title": "Feature flags",
+      "level": "intermediate",
+      "tags": ["process", "deployment", "architecture"],
+      "probes": [
+        "How do flags decouple deploy from release?",
+        "What's your plan for removing them?"
+      ]
+    },
+    {
+      "id": "c-testing-pyramid",
+      "title": "The testing pyramid in backend services",
+      "level": "intermediate",
+      "tags": ["testing", "process"],
+      "probes": [
+        "Where do integration tests earn their runtime?",
+        "How do you test code that talks to a third-party API?"
+      ]
+    },
+    {
+      "id": "c-cap-theorem",
+      "title": "The CAP theorem, stated precisely",
+      "level": "advanced",
+      "tags": ["distributed", "theory"],
+      "probes": [
+        "What does the P actually mean, and why is 'pick two' misleading?",
+        "How does PACELC extend it?"
+      ]
+    },
+    {
+      "id": "c-consistency-models",
+      "title": "Consistency models",
+      "level": "advanced",
+      "tags": ["distributed", "theory", "database"],
+      "probes": [
+        "Strong, causal, eventual, read-your-writes — order them by cost.",
+        "Which model does a typical read replica setup give you?"
+      ]
+    },
+    {
+      "id": "c-consensus",
+      "title": "Distributed consensus: Raft and Paxos",
+      "level": "advanced",
+      "tags": ["distributed", "theory", "algorithms"],
+      "probes": [
+        "Walk through Raft leader election.",
+        "Why does a quorum need a majority rather than any two nodes?"
+      ]
+    },
+    {
+      "id": "c-two-phase-commit",
+      "title": "Two-phase commit and its failure mode",
+      "level": "advanced",
+      "tags": ["distributed", "transactions"],
+      "probes": [
+        "What happens if the coordinator dies after prepare?",
+        "Why do most systems avoid 2PC entirely?"
+      ]
+    },
+    {
+      "id": "c-saga-pattern",
+      "title": "The saga pattern for distributed transactions",
+      "level": "advanced",
+      "tags": ["distributed", "architecture", "patterns"],
+      "probes": [
+        "Choreography versus orchestration — trade-offs.",
+        "How do you design a compensating action for a sent email?"
+      ]
+    },
+    {
+      "id": "c-outbox-pattern",
+      "title": "The transactional outbox pattern",
+      "level": "advanced",
+      "tags": ["distributed", "queues", "patterns"],
+      "probes": [
+        "What dual-write problem does it solve?",
+        "How does change data capture relate to it?"
+      ]
+    },
+    {
+      "id": "c-event-sourcing",
+      "title": "Event sourcing",
+      "level": "advanced",
+      "tags": ["architecture", "patterns", "database"],
+      "probes": [
+        "What do you gain over storing current state?",
+        "How do you handle a schema change to a historical event?"
+      ]
+    },
+    {
+      "id": "c-cqrs",
+      "title": "CQRS",
+      "level": "advanced",
+      "tags": ["architecture", "patterns"],
+      "probes": [
+        "What problem justifies splitting read and write models?",
+        "How do you handle the read model lagging behind?"
+      ]
+    },
+    {
+      "id": "c-sharding",
+      "title": "Database sharding",
+      "level": "advanced",
+      "tags": ["database", "scaling", "distributed"],
+      "probes": [
+        "How do you choose a shard key, and what happens if you choose badly?",
+        "How do you run a query that spans shards?"
+      ]
+    },
+    {
+      "id": "c-resharding",
+      "title": "Resharding a live database",
+      "level": "advanced",
+      "tags": ["database", "scaling", "operations"],
+      "probes": [
+        "How does consistent hashing reduce data movement?",
+        "How do you keep serving traffic during the move?"
+      ]
+    },
+    {
+      "id": "c-consistent-hashing",
+      "title": "Consistent hashing",
+      "level": "advanced",
+      "tags": ["distributed", "algorithms", "scaling"],
+      "probes": [
+        "What breaks with plain modulo hashing when a node leaves?",
+        "What are virtual nodes for?"
+      ]
+    },
+    {
+      "id": "c-replication",
+      "title": "Replication: leader-follower, multi-leader, leaderless",
+      "level": "advanced",
+      "tags": ["database", "distributed", "scaling"],
+      "probes": [
+        "What conflicts appear with multi-leader, and how are they resolved?",
+        "Explain quorum reads and writes in a leaderless system."
+      ]
+    },
+    {
+      "id": "c-replication-lag",
+      "title": "Replication lag and the anomalies it causes",
+      "level": "advanced",
+      "tags": ["database", "distributed"],
+      "probes": [
+        "How does a user 'lose' their own write?",
+        "Name two ways to get read-your-writes back."
+      ]
+    },
+    {
+      "id": "c-mvcc",
+      "title": "MVCC and how Postgres implements it",
+      "level": "advanced",
+      "tags": ["database", "concurrency", "internals"],
+      "probes": [
+        "How do readers avoid blocking writers?",
+        "Why does Postgres need VACUUM, and what is transaction ID wraparound?"
+      ]
+    },
+    {
+      "id": "c-wal",
+      "title": "Write-ahead logging",
+      "level": "advanced",
+      "tags": ["database", "internals", "reliability"],
+      "probes": [
+        "How does a WAL give you durability and crash recovery?",
+        "How does it enable point-in-time recovery and replication?"
+      ]
+    },
+    {
+      "id": "c-lsm-vs-btree",
+      "title": "LSM trees vs B-trees",
+      "level": "advanced",
+      "tags": ["database", "internals", "performance"],
+      "probes": [
+        "Which favours writes, and why?",
+        "What is write amplification, and where does compaction fit?"
+      ]
+    },
+    {
+      "id": "c-bloom-filters",
+      "title": "Bloom filters",
+      "level": "advanced",
+      "tags": ["algorithms", "database", "performance"],
+      "probes": [
+        "Why are false positives acceptable but false negatives not?",
+        "Where does a database actually use one?"
+      ]
+    },
+    {
+      "id": "c-idempotent-consumers",
+      "title": "Building idempotent consumers at scale",
+      "level": "advanced",
+      "tags": ["queues", "distributed", "reliability"],
+      "probes": [
+        "How long do you keep the dedupe key, and where?",
+        "How do you handle ordering when processing in parallel?"
+      ]
+    },
+    {
+      "id": "c-backpressure",
+      "title": "Backpressure and flow control",
+      "level": "advanced",
+      "tags": ["distributed", "reliability", "performance"],
+      "probes": [
+        "What happens to an unbounded queue under sustained overload?",
+        "How do you shed load deliberately rather than collapsing?"
+      ]
+    },
+    {
+      "id": "c-thundering-herd",
+      "title": "Thundering herd and retry storms",
+      "level": "advanced",
+      "tags": ["reliability", "distributed", "performance"],
+      "probes": [
+        "How does a cold cache after a restart take down a database?",
+        "What role does jittered backoff play in recovery?"
+      ]
+    },
+    {
+      "id": "c-tail-latency",
+      "title": "Tail latency and why p99 dominates",
+      "level": "advanced",
+      "tags": ["performance", "distributed", "observability"],
+      "probes": [
+        "Why does fan-out amplify tail latency?",
+        "What is a hedged request, and when is it worth it?"
+      ]
+    },
+    {
+      "id": "c-clock-skew",
+      "title": "Clocks in distributed systems",
+      "level": "advanced",
+      "tags": ["distributed", "theory"],
+      "probes": [
+        "Why is last-write-wins by wall clock dangerous?",
+        "What do Lamport clocks and vector clocks give you instead?"
+      ]
+    },
+    {
+      "id": "c-crdt",
+      "title": "CRDTs",
+      "level": "advanced",
+      "tags": ["distributed", "algorithms", "theory"],
+      "probes": [
+        "What properties make a merge function conflict-free?",
+        "Give a use case where a CRDT beats a lock."
+      ]
+    },
+    {
+      "id": "c-distributed-locks",
+      "title": "Distributed locks and why they leak",
+      "level": "advanced",
+      "tags": ["distributed", "reliability", "redis"],
+      "probes": [
+        "What goes wrong when a lock holder pauses for GC?",
+        "What is a fencing token, and what does it fix?"
+      ]
+    },
+    {
+      "id": "c-multi-tenancy",
+      "title": "Multi-tenant data isolation",
+      "level": "advanced",
+      "tags": ["architecture", "database", "security"],
+      "probes": [
+        "Shared schema, schema per tenant, database per tenant — trade-offs.",
+        "How does row-level security help, and how can it be bypassed?"
+      ]
+    },
+    {
+      "id": "c-search-architecture",
+      "title": "Designing full-text search",
+      "level": "advanced",
+      "tags": ["search", "architecture", "database"],
+      "probes": [
+        "How does an inverted index work?",
+        "How do you keep the search index in sync with the source of truth?"
+      ]
+    },
+    {
+      "id": "c-rag-architecture",
+      "title": "Retrieval-augmented generation, from the backend side",
+      "level": "advanced",
+      "tags": ["ai", "architecture", "search"],
+      "probes": [
+        "What does chunking strategy do to retrieval quality?",
+        "How do you evaluate whether the retrieval step is any good?"
+      ]
+    },
+    {
+      "id": "c-vector-databases",
+      "title": "Vector databases and approximate nearest neighbour search",
+      "level": "advanced",
+      "tags": ["ai", "database", "algorithms"],
+      "probes": [
+        "Why approximate rather than exact?",
+        "What does HNSW trade for its speed?"
+      ]
+    },
+    {
+      "id": "c-graceful-shutdown",
+      "title": "Graceful shutdown",
+      "level": "advanced",
+      "tags": ["infra", "reliability", "operations"],
+      "probes": [
+        "What must happen between SIGTERM and exit?",
+        "How does this interact with a load balancer's health check?"
+      ]
+    },
+    {
+      "id": "c-k8s-scheduling",
+      "title": "Kubernetes requests, limits, and eviction",
+      "level": "advanced",
+      "tags": ["infra", "kubernetes", "operations"],
+      "probes": [
+        "What is the difference between a request and a limit in practice?",
+        "Why is a CPU limit sometimes worse than no limit?"
+      ]
+    },
+    {
+      "id": "c-autoscaling",
+      "title": "Autoscaling that actually works",
+      "level": "advanced",
+      "tags": ["infra", "scaling", "operations"],
+      "probes": [
+        "Why is CPU often the wrong scaling signal?",
+        "How do you handle a cold start during a traffic spike?"
+      ]
+    },
+    {
+      "id": "c-capacity-planning",
+      "title": "Capacity planning and load testing",
+      "level": "advanced",
+      "tags": ["performance", "operations", "scaling"],
+      "probes": [
+        "How do you find the knee in the latency curve?",
+        "What makes a load test realistic rather than reassuring?"
+      ]
+    },
+    {
+      "id": "c-postmortems",
+      "title": "Incident response and blameless postmortems",
+      "level": "advanced",
+      "tags": ["process", "operations", "reliability"],
+      "probes": [
+        "What separates a root cause from a contributing factor?",
+        "What makes an action item actually get done?"
+      ]
+    }
+  ]
+}
