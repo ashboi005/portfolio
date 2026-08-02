@@ -4294,6 +4294,1154 @@
         "How do you turn a recurring page into a permanent fix?",
         "What's the difference between toil and work?"
       ]
+    },
+    {
+      "id": "c-do-pipeline-stages",
+      "title": "Designing a CI pipeline",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "ci"
+      ],
+      "probes": [
+        "What runs on every push versus only on main?",
+        "What should fail the build outright?"
+      ]
+    },
+    {
+      "id": "c-do-build-cache",
+      "title": "Build caching in CI",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "ci",
+        "performance"
+      ],
+      "probes": [
+        "What's a good cache key for a dependency install?",
+        "How does a stale cache cause a heisenbug?"
+      ]
+    },
+    {
+      "id": "c-do-artifacts",
+      "title": "Build artifacts and promotion",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "deployment"
+      ],
+      "probes": [
+        "Why build once and promote rather than rebuild per environment?",
+        "What identifies an artifact across environments?"
+      ]
+    },
+    {
+      "id": "c-do-github-actions",
+      "title": "GitHub Actions workflow design",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "ci"
+      ],
+      "probes": [
+        "Jobs versus steps versus matrix — when do you reach for each?",
+        "How do you share state between two jobs?"
+      ]
+    },
+    {
+      "id": "c-do-runner-security",
+      "title": "Securing CI runners",
+      "level": "advanced",
+      "tags": [
+        "devops",
+        "ci",
+        "security"
+      ],
+      "probes": [
+        "Why is a pull request from a fork dangerous to a self-hosted runner?",
+        "How do you scope a deploy credential to one workflow?"
+      ]
+    },
+    {
+      "id": "c-do-monorepo-ci",
+      "title": "CI for a monorepo",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "ci",
+        "process"
+      ],
+      "probes": [
+        "How do you only test what changed?",
+        "What breaks when affected-detection gets it wrong?"
+      ]
+    },
+    {
+      "id": "c-do-ephemeral-envs",
+      "title": "Preview and ephemeral environments",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "deployment",
+        "process"
+      ],
+      "probes": [
+        "What do you do about the database for a per-PR environment?",
+        "How do you stop them piling up and costing money?"
+      ]
+    },
+    {
+      "id": "c-do-terraform-state",
+      "title": "Terraform state management",
+      "level": "advanced",
+      "tags": [
+        "devops",
+        "iac"
+      ],
+      "probes": [
+        "Why does remote state need locking?",
+        "What happens when state drifts from reality, and how do you recover?"
+      ]
+    },
+    {
+      "id": "c-do-terraform-modules",
+      "title": "Structuring infrastructure code",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "iac"
+      ],
+      "probes": [
+        "When is a module worth extracting?",
+        "How do you keep environments similar without copy-paste?"
+      ]
+    },
+    {
+      "id": "c-do-gitops",
+      "title": "GitOps",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "deployment",
+        "kubernetes"
+      ],
+      "probes": [
+        "What does declaring desired state in git buy you over a push-based deploy?",
+        "How do you handle a hotfix when the repo is the source of truth?"
+      ]
+    },
+    {
+      "id": "c-do-helm",
+      "title": "Templating Kubernetes manifests",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "kubernetes"
+      ],
+      "probes": [
+        "What problem does Helm actually solve?",
+        "When does templating YAML become worse than the duplication?"
+      ]
+    },
+    {
+      "id": "c-do-k8s-objects",
+      "title": "Kubernetes objects: pods, deployments, services",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "kubernetes"
+      ],
+      "probes": [
+        "What does a Deployment manage that a Pod doesn't?",
+        "How does a Service find its pods?"
+      ]
+    },
+    {
+      "id": "c-do-configmaps-secrets",
+      "title": "ConfigMaps and Secrets",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "kubernetes",
+        "config"
+      ],
+      "probes": [
+        "What's the difference, and is a Secret actually secret?",
+        "How does a config change reach a running pod?"
+      ]
+    },
+    {
+      "id": "c-do-k8s-rbac",
+      "title": "Kubernetes RBAC and service accounts",
+      "level": "advanced",
+      "tags": [
+        "devops",
+        "kubernetes",
+        "security"
+      ],
+      "probes": [
+        "What can a pod do with the default service account?",
+        "How do you scope a role to one namespace?"
+      ]
+    },
+    {
+      "id": "c-do-ingress",
+      "title": "Ingress controllers and TLS",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "kubernetes",
+        "networking"
+      ],
+      "probes": [
+        "What does the controller actually do with an Ingress resource?",
+        "Where do certificates come from and who renews them?"
+      ]
+    },
+    {
+      "id": "c-do-hpa",
+      "title": "Horizontal pod autoscaling",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "kubernetes",
+        "scaling"
+      ],
+      "probes": [
+        "What metric would you scale a queue consumer on?",
+        "Why does scaling on CPU mislead for an I/O-bound service?"
+      ]
+    },
+    {
+      "id": "c-do-taints-affinity",
+      "title": "Scheduling: taints, tolerations, and affinity",
+      "level": "advanced",
+      "tags": [
+        "devops",
+        "kubernetes"
+      ],
+      "probes": [
+        "How do you keep two replicas off the same node?",
+        "When would you dedicate a node pool, and what does it cost?"
+      ]
+    },
+    {
+      "id": "c-do-persistent-volumes",
+      "title": "Persistent volumes and storage classes",
+      "level": "advanced",
+      "tags": [
+        "devops",
+        "kubernetes",
+        "storage"
+      ],
+      "probes": [
+        "What happens to a volume when the pod moves nodes?",
+        "What does ReadWriteOnce actually constrain?"
+      ]
+    },
+    {
+      "id": "c-do-docker-compose",
+      "title": "Docker Compose for local development",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "docker"
+      ],
+      "probes": [
+        "What belongs in Compose and what shouldn't?",
+        "How do you wait for the database to actually be ready?"
+      ]
+    },
+    {
+      "id": "c-do-image-registry",
+      "title": "Container registries and image tagging",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "docker"
+      ],
+      "probes": [
+        "Why is deploying `latest` a bad idea?",
+        "What's a good tagging scheme for traceability?"
+      ]
+    },
+    {
+      "id": "c-do-image-size",
+      "title": "Shrinking a container image",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "docker",
+        "performance"
+      ],
+      "probes": [
+        "Where does the weight usually come from?",
+        "What does image size actually cost you at deploy time?"
+      ]
+    },
+    {
+      "id": "c-do-linux-processes",
+      "title": "Linux processes, signals, and exit codes",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "linux"
+      ],
+      "probes": [
+        "What's the difference between SIGTERM and SIGKILL?",
+        "What is PID 1 responsible for inside a container?"
+      ]
+    },
+    {
+      "id": "c-do-linux-permissions",
+      "title": "Linux file permissions and ownership",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "linux",
+        "security"
+      ],
+      "probes": [
+        "Read the permission bits on a file out loud and explain them.",
+        "Why does a volume mount sometimes come up unwritable?"
+      ]
+    },
+    {
+      "id": "c-do-systemd",
+      "title": "Running a service with systemd",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "linux"
+      ],
+      "probes": [
+        "What does the unit file need to survive a reboot and a crash?",
+        "How do you read its logs and its restart history?"
+      ]
+    },
+    {
+      "id": "c-do-debug-box",
+      "title": "Debugging a box you've never seen",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "linux",
+        "operations"
+      ],
+      "probes": [
+        "The service is down. What are your first five commands?",
+        "How do you tell disk, memory, and CPU exhaustion apart?"
+      ]
+    },
+    {
+      "id": "c-do-disk-full",
+      "title": "When the disk fills up",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "linux",
+        "operations"
+      ],
+      "probes": [
+        "What usually eats the space on an app server?",
+        "Why can deleting a file not free any space?"
+      ]
+    },
+    {
+      "id": "c-do-nginx-config",
+      "title": "Configuring nginx as a reverse proxy",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "networking"
+      ],
+      "probes": [
+        "What headers must you forward for the app to see the real client?",
+        "What do proxy timeouts protect against?"
+      ]
+    },
+    {
+      "id": "c-do-firewalls",
+      "title": "Firewalls and security groups",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "networking",
+        "security"
+      ],
+      "probes": [
+        "Default-deny or default-allow, and why?",
+        "What ports should a database server actually expose?"
+      ]
+    },
+    {
+      "id": "c-do-ssh",
+      "title": "SSH keys and bastion hosts",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "linux",
+        "security"
+      ],
+      "probes": [
+        "Why keys rather than passwords?",
+        "What does a bastion give you that direct access doesn't?"
+      ]
+    },
+    {
+      "id": "c-do-vpc",
+      "title": "VPCs, subnets, and routing",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "networking",
+        "cloud"
+      ],
+      "probes": [
+        "What makes a subnet public versus private?",
+        "How does a private instance reach the internet to pull updates?"
+      ]
+    },
+    {
+      "id": "c-do-dns-records",
+      "title": "DNS record types in practice",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "networking"
+      ],
+      "probes": [
+        "A, AAAA, CNAME, ALIAS, TXT, MX — what's each for?",
+        "Why can't you CNAME a root domain?"
+      ]
+    },
+    {
+      "id": "c-do-certificates",
+      "title": "TLS certificates and automatic renewal",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "security",
+        "networking"
+      ],
+      "probes": [
+        "How does ACME prove you own the domain?",
+        "What breaks when renewal quietly fails?"
+      ]
+    },
+    {
+      "id": "c-do-cloud-iam",
+      "title": "Cloud IAM roles and policies",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "cloud",
+        "security"
+      ],
+      "probes": [
+        "Why attach a role to a machine rather than ship it a key?",
+        "How do you debug an access-denied without granting admin?"
+      ]
+    },
+    {
+      "id": "c-do-object-lifecycle",
+      "title": "Object storage lifecycle and tiering",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "cloud",
+        "storage",
+        "cost"
+      ],
+      "probes": [
+        "When does moving data to cold storage pay off?",
+        "What's the trap with retrieval costs?"
+      ]
+    },
+    {
+      "id": "c-do-prometheus",
+      "title": "Metrics with Prometheus",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "observability"
+      ],
+      "probes": [
+        "Pull versus push — what does scraping assume about your service?",
+        "Counter, gauge, histogram — pick the right one for latency."
+      ]
+    },
+    {
+      "id": "c-do-dashboards",
+      "title": "Dashboards worth looking at",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "observability"
+      ],
+      "probes": [
+        "What are the four golden signals?",
+        "What makes a dashboard useless during an actual incident?"
+      ]
+    },
+    {
+      "id": "c-do-log-aggregation",
+      "title": "Centralised log aggregation",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "observability"
+      ],
+      "probes": [
+        "What has to be true of your logs for aggregation to help?",
+        "How do you keep the ingest bill from exploding?"
+      ]
+    },
+    {
+      "id": "c-do-oncall",
+      "title": "On-call rotations that don't burn people out",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "process",
+        "operations"
+      ],
+      "probes": [
+        "What makes a rotation sustainable?",
+        "How do you handle a follow-the-sun handover?"
+      ]
+    },
+    {
+      "id": "c-do-incident-comms",
+      "title": "Communicating during an incident",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "process",
+        "operations"
+      ],
+      "probes": [
+        "Who needs to know what, and how often?",
+        "Why separate the incident commander from the person fixing it?"
+      ]
+    },
+    {
+      "id": "c-do-rollback",
+      "title": "Rolling back safely",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "deployment",
+        "operations"
+      ],
+      "probes": [
+        "What makes a deploy un-rollbackable?",
+        "Roll back or roll forward — how do you decide under pressure?"
+      ]
+    },
+    {
+      "id": "c-do-config-drift",
+      "title": "Configuration drift",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "infra",
+        "operations"
+      ],
+      "probes": [
+        "How does a server end up unlike its siblings?",
+        "How would you detect drift before it bites?"
+      ]
+    },
+    {
+      "id": "c-do-golden-image",
+      "title": "Golden images and base image hygiene",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "docker",
+        "security"
+      ],
+      "probes": [
+        "Who is responsible for patching the base image?",
+        "How do you roll a base image update across every service?"
+      ]
+    },
+    {
+      "id": "c-do-env-parity",
+      "title": "Dev/prod parity",
+      "level": "beginner",
+      "tags": [
+        "devops",
+        "process"
+      ],
+      "probes": [
+        "Which differences are acceptable and which are dangerous?",
+        "What bug class only ever appears in production?"
+      ]
+    },
+    {
+      "id": "c-do-scheduled-maintenance",
+      "title": "Planned maintenance without an outage",
+      "level": "advanced",
+      "tags": [
+        "devops",
+        "operations",
+        "reliability"
+      ],
+      "probes": [
+        "How do you take a node out of rotation cleanly?",
+        "What's your abort criteria once the window has started?"
+      ]
+    },
+    {
+      "id": "c-do-cost-tagging",
+      "title": "Attributing cloud spend",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "cost",
+        "process"
+      ],
+      "probes": [
+        "How do you find out which team a bill line belongs to?",
+        "What's the cheapest change that usually saves the most?"
+      ]
+    },
+    {
+      "id": "c-do-serverless-vs-containers",
+      "title": "Serverless versus containers",
+      "level": "intermediate",
+      "tags": [
+        "devops",
+        "infra",
+        "architecture"
+      ],
+      "probes": [
+        "What workload shape suits each?",
+        "What operational work does serverless actually remove, and what does it add?"
+      ]
+    },
+    {
+      "id": "c-sec-cia-triad",
+      "title": "Confidentiality, integrity, availability",
+      "level": "beginner",
+      "tags": [
+        "security"
+      ],
+      "probes": [
+        "Give a real incident that breaks each one.",
+        "Which is hardest to restore after a breach?"
+      ]
+    },
+    {
+      "id": "c-sec-threat-modelling",
+      "title": "Threat modelling a feature",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "design",
+        "process"
+      ],
+      "probes": [
+        "Walk through STRIDE on a file-upload feature.",
+        "When in the design process is it worth doing?"
+      ]
+    },
+    {
+      "id": "c-sec-defense-in-depth",
+      "title": "Defence in depth",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "architecture"
+      ],
+      "probes": [
+        "Why not rely on the firewall alone?",
+        "Give three layers protecting one database row."
+      ]
+    },
+    {
+      "id": "c-sec-xss",
+      "title": "Cross-site scripting",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "browser"
+      ],
+      "probes": [
+        "Stored, reflected, DOM-based — what's the difference?",
+        "Why is output encoding the fix rather than input filtering?"
+      ]
+    },
+    {
+      "id": "c-sec-csp",
+      "title": "Content Security Policy",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "browser",
+        "http"
+      ],
+      "probes": [
+        "What does a good CSP actually stop?",
+        "Why does 'unsafe-inline' undo most of the benefit?"
+      ]
+    },
+    {
+      "id": "c-sec-headers",
+      "title": "Security headers worth setting",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "http"
+      ],
+      "probes": [
+        "What do HSTS, X-Content-Type-Options, and Referrer-Policy each do?",
+        "Which one would you set first on a new service?"
+      ]
+    },
+    {
+      "id": "c-sec-clickjacking",
+      "title": "Clickjacking and frame protection",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "browser"
+      ],
+      "probes": [
+        "How does an invisible iframe steal a click?",
+        "What stops your page being framed?"
+      ]
+    },
+    {
+      "id": "c-sec-idor",
+      "title": "IDOR and broken access control",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "api",
+        "auth"
+      ],
+      "probes": [
+        "How does changing an id in a URL leak someone else's data?",
+        "Why isn't an unguessable id a real fix?"
+      ]
+    },
+    {
+      "id": "c-sec-path-traversal",
+      "title": "Path traversal",
+      "level": "beginner",
+      "tags": [
+        "security"
+      ],
+      "probes": [
+        "How does a filename parameter escape its directory?",
+        "Why is stripping '../' insufficient?"
+      ]
+    },
+    {
+      "id": "c-sec-open-redirect",
+      "title": "Open redirects",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "http"
+      ],
+      "probes": [
+        "Why does a redirect parameter matter if it only sends users elsewhere?",
+        "How does it get chained into a phishing or OAuth attack?"
+      ]
+    },
+    {
+      "id": "c-sec-credential-stuffing",
+      "title": "Credential stuffing and brute force",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "auth"
+      ],
+      "probes": [
+        "Why do breaches elsewhere become your problem?",
+        "What defences work without punishing real users?"
+      ]
+    },
+    {
+      "id": "c-sec-session-fixation",
+      "title": "Session fixation and rotation",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "auth"
+      ],
+      "probes": [
+        "Why must the session id change on login?",
+        "What else should be invalidated on a password change?"
+      ]
+    },
+    {
+      "id": "c-sec-jwt-algnone",
+      "title": "JWT implementation pitfalls",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "auth"
+      ],
+      "probes": [
+        "What is the alg=none attack?",
+        "Why must you validate the issuer and audience, not just the signature?"
+      ]
+    },
+    {
+      "id": "c-sec-oauth-mistakes",
+      "title": "Common OAuth misconfigurations",
+      "level": "advanced",
+      "tags": [
+        "security",
+        "auth",
+        "oauth"
+      ],
+      "probes": [
+        "What does a loose redirect_uri allowlist enable?",
+        "What is the state parameter protecting against?"
+      ]
+    },
+    {
+      "id": "c-sec-cors-misconfig",
+      "title": "CORS misconfiguration",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "http"
+      ],
+      "probes": [
+        "Why is reflecting the Origin header dangerous?",
+        "What does allowing credentials with a wildcard actually do?"
+      ]
+    },
+    {
+      "id": "c-sec-mass-assignment",
+      "title": "Mass assignment",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "api"
+      ],
+      "probes": [
+        "How does binding a request body straight to a model grant someone admin?",
+        "Allowlist or denylist the fields — which and why?"
+      ]
+    },
+    {
+      "id": "c-sec-deserialization",
+      "title": "Unsafe deserialization",
+      "level": "advanced",
+      "tags": [
+        "security"
+      ],
+      "probes": [
+        "How does deserializing attacker data become code execution?",
+        "What's the safe alternative to a generic object deserializer?"
+      ]
+    },
+    {
+      "id": "c-sec-xxe",
+      "title": "XML external entities",
+      "level": "advanced",
+      "tags": [
+        "security"
+      ],
+      "probes": [
+        "How does an XML parser end up reading /etc/passwd?",
+        "What's the one-line mitigation?"
+      ]
+    },
+    {
+      "id": "c-sec-secrets-in-git",
+      "title": "Secrets committed to version control",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "Why doesn't deleting the commit fix it?",
+        "How would you catch this before it merges?"
+      ]
+    },
+    {
+      "id": "c-sec-dependency-cves",
+      "title": "Vulnerable dependencies",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "How do you triage a CVE that your scanner just flagged?",
+        "What makes a CVE actually exploitable in your app?"
+      ]
+    },
+    {
+      "id": "c-sec-supply-chain",
+      "title": "Supply chain attacks",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "What is typosquatting, and how does a package get in?",
+        "What does pinning plus a lockfile actually protect against?"
+      ]
+    },
+    {
+      "id": "c-sec-sbom",
+      "title": "SBOMs and knowing what you shipped",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "devops",
+        "process"
+      ],
+      "probes": [
+        "What question does an SBOM answer during an incident?",
+        "Why did Log4Shell make this mainstream?"
+      ]
+    },
+    {
+      "id": "c-sec-encryption-at-rest",
+      "title": "Encryption at rest versus in transit",
+      "level": "beginner",
+      "tags": [
+        "security"
+      ],
+      "probes": [
+        "What threat does disk encryption actually stop?",
+        "Why doesn't it protect against a compromised application?"
+      ]
+    },
+    {
+      "id": "c-sec-key-management",
+      "title": "Key management and rotation",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "infra"
+      ],
+      "probes": [
+        "What does a KMS give you over a key in an env var?",
+        "How do you rotate a key that encrypted existing data?"
+      ]
+    },
+    {
+      "id": "c-sec-hashing-choice",
+      "title": "Choosing a hash for the job",
+      "level": "beginner",
+      "tags": [
+        "security"
+      ],
+      "probes": [
+        "Why is a fast hash right for integrity and wrong for passwords?",
+        "What do the cost parameters on argon2 control?"
+      ]
+    },
+    {
+      "id": "c-sec-randomness",
+      "title": "Secure randomness",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "correctness"
+      ],
+      "probes": [
+        "Why is Math.random wrong for a token?",
+        "How long does a token need to be to resist guessing?"
+      ]
+    },
+    {
+      "id": "c-sec-mitm",
+      "title": "Man-in-the-middle attacks",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "networking"
+      ],
+      "probes": [
+        "What can someone on the same coffee-shop wifi see?",
+        "How does certificate validation stop them?"
+      ]
+    },
+    {
+      "id": "c-sec-ddos",
+      "title": "DDoS, in outline",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "reliability",
+        "networking"
+      ],
+      "probes": [
+        "Volumetric versus application-layer — how do the defences differ?",
+        "Why is an expensive endpoint a bigger risk than a cheap one?"
+      ]
+    },
+    {
+      "id": "c-sec-waf",
+      "title": "Web application firewalls",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "infra"
+      ],
+      "probes": [
+        "What does a WAF buy you, and what does it give false confidence about?",
+        "Why is it a stopgap rather than a fix?"
+      ]
+    },
+    {
+      "id": "c-sec-zero-trust",
+      "title": "Zero trust, beyond the buzzword",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "architecture"
+      ],
+      "probes": [
+        "What assumption does it drop about the internal network?",
+        "What has to exist before you can actually do it?"
+      ]
+    },
+    {
+      "id": "c-sec-logging-secrets",
+      "title": "Keeping secrets out of logs and errors",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "observability"
+      ],
+      "probes": [
+        "Which fields leak most often, and from where?",
+        "How do stack traces betray you in production?"
+      ]
+    },
+    {
+      "id": "c-sec-siem",
+      "title": "Security logging and detection",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "observability"
+      ],
+      "probes": [
+        "What events would you want logged to spot an account takeover?",
+        "Why is log integrity itself a security property?"
+      ]
+    },
+    {
+      "id": "c-sec-incident-response",
+      "title": "Responding to a suspected breach",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "process",
+        "operations"
+      ],
+      "probes": [
+        "What are the first three things you do, and in what order?",
+        "Why is pulling the plug sometimes the wrong move?"
+      ]
+    },
+    {
+      "id": "c-sec-disclosure",
+      "title": "Responsible disclosure and bug bounties",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "What should a security.txt or disclosure policy say?",
+        "How should you respond to a researcher's first email?"
+      ]
+    },
+    {
+      "id": "c-sec-pentest-vs-scan",
+      "title": "Pen testing versus vulnerability scanning",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "What does a human find that a scanner never will?",
+        "How often is each worth doing?"
+      ]
+    },
+    {
+      "id": "c-sec-social-engineering",
+      "title": "Phishing and social engineering",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "Why is the human the easiest way in?",
+        "What technical controls limit the damage of one successful phish?"
+      ]
+    },
+    {
+      "id": "c-sec-insider-risk",
+      "title": "Insider risk and access reviews",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "What happens to access when someone changes teams?",
+        "Why does offboarding fail so often?"
+      ]
+    },
+    {
+      "id": "c-sec-compliance",
+      "title": "Compliance basics for engineers",
+      "level": "beginner",
+      "tags": [
+        "security",
+        "process"
+      ],
+      "probes": [
+        "What does SOC 2 or ISO 27001 actually ask of you day to day?",
+        "Why is compliant not the same as secure?"
+      ]
+    },
+    {
+      "id": "c-sec-api-top10",
+      "title": "The OWASP API Security Top 10",
+      "level": "intermediate",
+      "tags": [
+        "security",
+        "api"
+      ],
+      "probes": [
+        "How does it differ from the classic web top ten?",
+        "Which entry do you think bites APIs hardest?"
+      ]
+    },
+    {
+      "id": "c-sec-rate-limit-bypass",
+      "title": "Bypassing rate limits",
+      "level": "advanced",
+      "tags": [
+        "security",
+        "api"
+      ],
+      "probes": [
+        "How does an attacker get around a per-IP limit?",
+        "What do you key on instead, and what does that cost?"
+      ]
     }
   ]
 }

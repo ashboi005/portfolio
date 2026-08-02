@@ -21,6 +21,11 @@ export type DrillRun = {
   overall: number | null;
   /** Epoch millis. */
   at: number;
+  /**
+   * 0 for an opening answer, 1+ for a follow-up. Without this the recent-runs
+   * list looks like the same topic was dealt five times in a row.
+   */
+  chainDepth?: number;
 };
 
 export type DrillHistory = {

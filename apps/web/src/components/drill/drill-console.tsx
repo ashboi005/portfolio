@@ -7,12 +7,14 @@ import ConceptSlot from "@/components/drill/concept-slot";
 import LevelSelect from "@/components/drill/level-select";
 import RecordStage from "@/components/drill/record-stage";
 import VerdictCard from "@/components/drill/verdict-card";
+import CatColony from "@/components/fx/cat-colony";
 import {
   DEFAULT_DURATION,
   DrillError,
   fetchConcept,
   gradeAnswer,
   GRADING_LINES,
+  randomExhaustedLine,
   transcribeAudio,
   type Concept,
   type ConceptCounts,
@@ -56,6 +58,9 @@ const CONCEPT_TIMEOUT_MS = 5000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** Placeholder until a verdict arrives; never rendered on its own. */
+const CHAIN_FALLBACK = "That's enough on this topic. Pick another one.";
+
 /** Rotates the coach's thinking lines so the wait has a pulse instead of a spinner. */
 function useRotatingLine(lines: readonly string[], active: boolean) {
   const [index, setIndex] = useState(0);
@@ -81,6 +86,14 @@ export default function DrillConsole() {
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [history, setHistory] = useState<DrillHistory>({ seen: [], runs: [], streak: 0, lastRunDay: null });
+  /**
+   * Set while answering one of the coach's own questions. `concept` is then a
+   * stand-in whose title is the question, so every stage below renders it
+   * without needing to know a follow-up is in progress.
+   */
+  const [followUp, setFollowUp] = useState<{ id: string; question: string } | null>(null);
+  // Picked once per verdict so it doesn't reshuffle on every re-render.
+  const [exhaustedLine, setExhaustedLine] = useState(CHAIN_FALLBACK);
 
   const recorder = useRecorder({ limitSec: duration });
   const reduceMotion = useReducedMotion();
@@ -122,9 +135,11 @@ export default function DrillConsole() {
           transcript: text,
           limitSec: duration,
           spokenSec: seconds,
+          ...(followUp ? { followUpId: followUp.id } : {}),
         });
         if (!mountedRef.current) return;
         setVerdict(result);
+        setExhaustedLine(randomExhaustedLine());
         setHistory(
           recordRun({
             conceptId: forConcept.id,
@@ -132,19 +147,31 @@ export default function DrillConsole() {
             level: forConcept.level,
             overall: result.overall,
             at: Date.now(),
+            chainDepth: result.chainDepth,
           }),
         );
+        // The chain advances on the server; clear ours so a retry from the
+        // result screen doesn't re-submit against a spent question.
+        setFollowUp(null);
         setStage("result");
       } catch (error) {
         if (!mountedRef.current) return;
-        // Drop back to the typing stage with the text intact so retrying costs
-        // nothing — no re-recording, no second transcription.
+        // A stale follow-up can't be retried — the server has forgotten the
+        // question, so send them back to the top rather than looping.
+        if (error instanceof DrillError && error.kind === "followup_expired") {
+          setFollowUp(null);
+          setNotice(error.message);
+          setStage("idle");
+          return;
+        }
+        // Otherwise drop back to the typing stage with the text intact so
+        // retrying costs nothing — no re-recording, no second transcription.
         setNotice(error instanceof DrillError ? error.message : "Grading failed. Try again?");
         setTyped(text);
         setStage("typing");
       }
     },
-    [duration],
+    [duration, followUp],
   );
 
   // ---- start / deal -------------------------------------------------------
@@ -156,6 +183,7 @@ export default function DrillConsole() {
     setTranscript("");
     setTyped("");
     setNotice(null);
+    setFollowUp(null);
 
     const seen = readHistory().seen;
     const controller = new AbortController();
@@ -182,6 +210,28 @@ export default function DrillConsole() {
     setStage("armed");
     if (concept) setHistory(markSeen(concept.id));
   }, [concept]);
+
+  /**
+   * Answer one of the coach's own questions instead of a fresh concept.
+   *
+   * Skips the reel — the question is already on screen — and swaps the concept
+   * for a stand-in whose title is the question. Keeping the real concept id
+   * matters: it still drives Deepgram's keyterms, and the server resolves the
+   * actual topic from the follow-up token regardless.
+   */
+  const handleAnswerFollowUp = useCallback(
+    (followUpId: string, question: string) => {
+      if (!concept) return;
+      setFollowUp({ id: followUpId, question });
+      setConcept({ ...concept, title: question, probes: [] });
+      setVerdict(null);
+      setTranscript("");
+      setTyped("");
+      setNotice(null);
+      setStage("armed");
+    },
+    [concept],
+  );
 
   // ---- record -------------------------------------------------------------
 
@@ -238,6 +288,7 @@ export default function DrillConsole() {
   const handleBackToStart = useCallback(() => {
     recorder.cancel();
     setCountIn(null);
+    setFollowUp(null);
     setStage("idle");
     setNotice(null);
   }, [recorder]);
@@ -246,8 +297,18 @@ export default function DrillConsole() {
 
   const showSlot = stage === "spinning" || stage === "armed";
 
+  /**
+   * Cats roam while you're browsing or reading a verdict, and clear out the
+   * moment a topic is dealt. They're the best part of the site and the worst
+   * possible thing to have wandering past while someone is ninety seconds into
+   * explaining consensus — so they're mounted by stage rather than globally.
+   */
+  const catsWelcome = stage === "idle" || stage === "result";
+
   return (
     <div className="flex w-full flex-col items-center gap-6">
+      {catsWelcome && <CatColony />}
+
       {notice && (
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: -6 }}
@@ -275,12 +336,25 @@ export default function DrillConsole() {
 
       {showSlot && (
         <div className="flex w-full max-w-2xl flex-col items-center gap-8">
-          <ConceptSlot
-            spinning={stage === "spinning"}
-            target={concept}
-            minSpinMs={MIN_SPIN_MS}
-            onSettled={handleSettled}
-          />
+          {followUp ? (
+            // A follow-up skips the reel — the question is already on screen
+            // from the verdict, so re-dealing it would be theatre.
+            <div className="flex flex-col items-center gap-3 text-center">
+              <p className="eyebrow">
+                <span className="sigil">▸</span> follow-up
+              </p>
+              <h2 className="font-display text-xl leading-tight font-semibold text-bright sm:text-2xl">
+                {followUp.question}
+              </h2>
+            </div>
+          ) : (
+            <ConceptSlot
+              spinning={stage === "spinning"}
+              target={concept}
+              minSpinMs={MIN_SPIN_MS}
+              onSettled={handleSettled}
+            />
+          )}
 
           {stage === "armed" && concept && (
             <motion.div
@@ -308,10 +382,10 @@ export default function DrillConsole() {
               </button>
               <button
                 type="button"
-                onClick={handleBackToStart}
+                onClick={followUp ? handleStart : handleBackToStart}
                 className="font-mono text-[10px] tracking-[0.14em] text-dim/60 uppercase transition-colors hover:text-dim"
               >
-                deal a different topic
+                {followUp ? "skip — deal a new topic" : "deal a different topic"}
               </button>
             </motion.div>
           )}
@@ -402,6 +476,8 @@ export default function DrillConsole() {
           verdict={verdict}
           transcript={transcript}
           spokenSec={spokenSec}
+          exhaustedLine={exhaustedLine}
+          onAnswerFollowUp={handleAnswerFollowUp}
           onAgain={handleStart}
           onBackToStart={handleBackToStart}
         />

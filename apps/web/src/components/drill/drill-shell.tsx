@@ -6,6 +6,7 @@ import { TerminalSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import CustomCursor from "@/components/fx/custom-cursor";
+import FloatingIcons from "@/components/fx/floating-icons";
 import type { ProfilePayload, ProjectPayload } from "@/types/portfolio";
 
 const TerminalOverlay = dynamic(() => import("@/components/terminal/terminal-overlay"), { ssr: false });
@@ -67,6 +68,11 @@ export default function DrillShell({
   return (
     <>
       <CustomCursor />
+      {/* Ambient tool icons drifting behind everything. Already desaturated to
+          12% opacity by the `.floater` filter, so it reads as texture rather
+          than motion — the page was flat void without it. The cats are the
+          part that had to stay conditional; see DrillConsole. */}
+      <FloatingIcons />
 
       <header className="fixed inset-x-0 top-0 z-40 border-b border-line bg-void/85 backdrop-blur-sm">
         <div className="mx-auto flex h-11 w-full max-w-5xl items-center justify-between gap-4 px-4 font-mono text-[11px] sm:px-6">

@@ -32,6 +32,7 @@ import {
   transcribe,
 } from "../lib/deepgram";
 import { AUTOSAGE_COACH_AGENT_ID } from "../lib/env";
+import { getFollowUp, issueFollowUp, MAX_FOLLOW_UP_DEPTH } from "../lib/follow-ups";
 import { clientIp, createRateLimiter } from "../lib/rate-limit";
 
 export const coachConfigured = isAgentConfigured(AUTOSAGE_COACH_AGENT_ID);
@@ -191,9 +192,22 @@ export const drillRoutes = new Elysia({ name: "drill" })
         return { error: "rate_limited", message: RATE_LIMITED_MESSAGE };
       }
 
+      // A follow-up carries its own topic and its own concept id. Resolving it
+      // server-side is the whole point: the question is model-generated text,
+      // and accepting it from the client would undo the injection defence.
+      const followUp = body.followUpId ? getFollowUp(body.followUpId) : null;
+      if (body.followUpId && !followUp) {
+        set.status = 410;
+        return {
+          error: "followup_expired",
+          message: "That follow-up went stale — start the topic again from the top.",
+        };
+      }
+
       // Look the concept up rather than trusting a client-supplied title, so the
       // prompt can't be steered by editing the request.
-      const concept = CONCEPTS.find((c) => c.id === body.conceptId);
+      const conceptId = followUp?.conceptId ?? body.conceptId;
+      const concept = CONCEPTS.find((c) => c.id === conceptId);
       if (!concept) {
         set.status = 400;
         return { error: "unknown_concept", message: "That concept id isn't in the bank." };
@@ -210,6 +224,7 @@ export const drillRoutes = new Elysia({ name: "drill" })
         spokenSec,
         wordCount: countWords(transcript),
         fillerCount: countFillerWords(transcript),
+        followUp: followUp ?? undefined,
       });
 
       try {
@@ -218,7 +233,34 @@ export const drillRoutes = new Elysia({ name: "drill" })
           timeoutMs: 90_000,
           label: "drill:grade",
         });
-        return parseVerdict(reply);
+        const verdict = parseVerdict(reply);
+
+        const chainDepth = followUp?.depth ?? 0;
+        const nextDepth = chainDepth + 1;
+
+        // Past the cap we stop offering to continue and drop the question
+        // entirely, so the UI can't render it by accident. The coach will keep
+        // producing one; twenty-five rounds on a single concept is enough.
+        const nextFollowUpId =
+          verdict.nextQuestion && nextDepth <= MAX_FOLLOW_UP_DEPTH
+            ? issueFollowUp({
+                conceptId: concept.id,
+                question: verdict.nextQuestion,
+                depth: nextDepth,
+                previousAnswer: transcript,
+              })
+            : null;
+
+        const exhausted = Boolean(verdict.nextQuestion) && nextFollowUpId === null;
+
+        return {
+          ...verdict,
+          nextQuestion: exhausted ? null : verdict.nextQuestion,
+          chainDepth,
+          followUpId: nextFollowUpId,
+          followUpExhausted: exhausted,
+          maxFollowUps: MAX_FOLLOW_UP_DEPTH,
+        };
       } catch (error) {
         const kind = error instanceof AutoSageError ? error.kind : "network";
         set.status = kind === "unconfigured" ? 503 : 502;
@@ -233,6 +275,9 @@ export const drillRoutes = new Elysia({ name: "drill" })
         transcript: t.String({ maxLength: 12_000 }),
         limitSec: t.Number({ minimum: 1, maximum: 600 }),
         spokenSec: t.Number({ minimum: 0, maximum: 600 }),
+        // Set when answering the coach's own previous question. The topic then
+        // comes from the server's store, never from the request.
+        followUpId: t.Optional(t.String({ minLength: 8, maxLength: 64 })),
       }),
     },
   );

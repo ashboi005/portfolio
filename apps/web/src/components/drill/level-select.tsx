@@ -135,7 +135,12 @@ export default function LevelSelect({
                 key={`${run.conceptId}-${run.at}`}
                 className="flex items-center justify-between gap-4 px-3 py-2 font-mono text-[11px]"
               >
-                <span className="truncate text-dim">{run.conceptTitle}</span>
+                <span className="truncate text-dim">
+                  {/* Without this, a chased topic looks like the same concept
+                      was dealt five times in a row. */}
+                  {run.chainDepth ? <span className="mr-1 text-cyan/50">↳</span> : null}
+                  {run.conceptTitle}
+                </span>
                 <span className={run.overall === null ? "text-dim" : scoreColor(run.overall)}>
                   {run.overall === null ? "—" : run.overall}
                 </span>

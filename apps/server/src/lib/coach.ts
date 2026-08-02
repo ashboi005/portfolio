@@ -49,6 +49,16 @@ export type GradeInput = {
   spokenSec: number;
   wordCount: number;
   fillerCount: number;
+  /**
+   * Present when this answer is a reply to the coach's own previous follow-up.
+   * The coach is stateless per call, so the chain's context has to be restated
+   * every time — bounded, since only the immediately previous answer travels.
+   */
+  followUp?: {
+    question: string;
+    depth: number;
+    previousAnswer: string;
+  };
 };
 
 /**
@@ -61,7 +71,7 @@ function sanitizeTranscript(raw: string): string {
 }
 
 export function buildGradePrompt(input: GradeInput): string {
-  const { concept, limitSec, spokenSec, wordCount, fillerCount } = input;
+  const { concept, limitSec, spokenSec, wordCount, fillerCount, followUp } = input;
   const transcript = sanitizeTranscript(input.transcript);
   const wpm = spokenSec > 0 ? Math.round((wordCount / spokenSec) * 60) : 0;
 
@@ -70,13 +80,37 @@ export function buildGradePrompt(input: GradeInput): string {
       ? concept.probes.map((p) => `- ${p}`).join("\n")
       : "- (no specific probes; judge against what a strong answer on this topic would cover)";
 
+  // On a follow-up the question you asked is the thing being answered; the
+  // original concept is only background. Putting the probes first would have
+  // the coach grading against a bar that no longer applies.
+  const header = followUp
+    ? [
+        "DRILL EVALUATION REQUEST — FOLLOW-UP",
+        "",
+        `This is follow-up ${followUp.depth} in a chain on one topic. You asked the question`,
+        "below at the end of your last verdict; this is their answer to it. Grade the answer",
+        "to YOUR question, not the original concept. Judge whether they actually patched the",
+        "gap you poked at, and don't re-litigate points they already covered.",
+        "",
+        `ORIGINAL CONCEPT: ${concept.title}`,
+        `LEVEL: ${concept.level}`,
+        "",
+        `THE QUESTION YOU ASKED: ${sanitizeTranscript(followUp.question)}`,
+        "",
+        "THEIR PREVIOUS ANSWER (for context, already graded — do not re-grade it):",
+        sanitizeTranscript(followUp.previousAnswer) || "(not captured)",
+      ]
+    : [
+        "DRILL EVALUATION REQUEST",
+        "",
+        `CONCEPT: ${concept.title}`,
+        `LEVEL: ${concept.level}`,
+        "EXPECTED COVERAGE:",
+        coverage,
+      ];
+
   return [
-    "DRILL EVALUATION REQUEST",
-    "",
-    `CONCEPT: ${concept.title}`,
-    `LEVEL: ${concept.level}`,
-    "EXPECTED COVERAGE:",
-    coverage,
+    ...header,
     "",
     `TIME LIMIT: ${limitSec}s`,
     `TIME SPOKEN: ${spokenSec}s`,

@@ -46,6 +46,22 @@ Everything is defended server-side in `apps/server/src/lib/coach.ts` regardless 
 the model returns: scores are clamped to 0–100, strings are length-capped, and a reply
 that isn't parseable JSON degrades to showing the raw prose instead of erroring.
 
+## Follow-ups
+
+`nextQuestion` is answerable. The user can record a reply to it, which gets graded as a
+follow-up, which produces another question — a rolling interview on one topic.
+
+The chain is **capped at 25 rounds** (`MAX_FOLLOW_UP_DEPTH` in
+`apps/server/src/lib/follow-ups.ts`). At the cap the server drops the question entirely
+and the UI shows one of the hardcoded sign-offs in `CHAIN_EXHAUSTED_LINES`. The coach is
+told not to wind the chain down itself — it keeps asking real questions and the system
+stops it.
+
+The question text never travels through the browser. The grade route stores it against a
+random `followUpId` with a 30-minute TTL and returns only the id; answering sends the id
+back. That preserves the rule that the client can never supply the topic — which is what
+keeps the injection surface closed.
+
 ## Verifying it works
 
 With the UUID in `.env` and the server running:

@@ -61,7 +61,9 @@ export function QuestProvider({ children }: { children: React.ReactNode }) {
 }
 
 /* pixel Sprite-style can */
-function CanSprite({ u = 3 }: { u?: number }) {
+/** The pixel can itself. Exported so /drill can hand one out as a reward
+ *  without dragging in the whole quest provider and its HUD counter. */
+export function CanSprite({ u = 3 }: { u?: number }) {
   const body = "#3fe0b0";
   const shade = "#1fae86";
   const light = "#d8fff0";

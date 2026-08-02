@@ -35,9 +35,17 @@ export type Verdict = {
   overall: number | null;
   scores: RubricScores | null;
   verdict: string;
-  missed: string[];
+  /** Null once the chain is exhausted, so it can't be rendered by accident. */
   nextQuestion: string | null;
+  missed: string[];
   degraded: boolean;
+  /** 0 for an opening answer, 1+ for each follow-up in the chain. */
+  chainDepth: number;
+  /** Opaque token for answering `nextQuestion`. Null when there's nothing to answer. */
+  followUpId: string | null;
+  /** True when the coach still had a question but the chain hit its cap. */
+  followUpExhausted: boolean;
+  maxFollowUps: number;
 };
 
 export type TranscriptResult = {
@@ -123,12 +131,14 @@ export async function transcribeAudio(audio: Blob, conceptId: string): Promise<T
   return (await response.json()) as TranscriptResult;
 }
 
-/** Grade a transcript. Also the entry point for typed answers. */
+/** Grade a transcript. Also the entry point for typed answers and follow-ups. */
 export async function gradeAnswer(input: {
   conceptId: string;
   transcript: string;
   limitSec: number;
   spokenSec: number;
+  /** Present when answering the coach's previous question rather than the concept. */
+  followUpId?: string;
 }): Promise<Verdict> {
   const response = await fetch(`${apiBase()}/api/v1/drill/grade`, {
     method: "POST",
@@ -141,6 +151,26 @@ export async function gradeAnswer(input: {
   if (!response.ok) throw await readError(response, "Grading failed. Your answer's still here — retry.");
 
   return (await response.json()) as Verdict;
+}
+
+/**
+ * Shown instead of another follow-up once a topic has been chased to the cap.
+ * Hardcoded on purpose — the coach will happily keep producing questions
+ * forever, so the sign-off has to come from us, not from it.
+ */
+export const CHAIN_EXHAUSTED_LINES = [
+  "That's enough talk about this topic, dawg. Go pick another one.",
+  "We have officially squeezed this concept dry. Next topic.",
+  "Twenty-five rounds deep on one idea. Touch a different part of the stack.",
+  "I'm out of angles on this one. Genuinely. Deal yourself something else.",
+  "If you don't know it by now, another question isn't going to fix it. New topic.",
+  "This concept and I need some time apart. Pick a different one.",
+  "We've said everything there is to say here. Go break something else.",
+  "Chain's done. I refuse to ask a twenty-sixth question about this.",
+];
+
+export function randomExhaustedLine(): string {
+  return CHAIN_EXHAUSTED_LINES[Math.floor(Math.random() * CHAIN_EXHAUSTED_LINES.length)]!;
 }
 
 /**

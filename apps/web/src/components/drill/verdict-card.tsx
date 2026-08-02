@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 
 import RichText from "@/components/drill/rich-text";
+import SpriteReward from "@/components/drill/sprite-reward";
 import Cat from "@/components/fx/cat";
 import CountUp from "@/components/fx/count-up";
 import type { Concept, Verdict } from "@/lib/drill";
@@ -57,6 +58,8 @@ export default function VerdictCard({
   verdict,
   transcript,
   spokenSec,
+  exhaustedLine,
+  onAnswerFollowUp,
   onAgain,
   onBackToStart,
 }: {
@@ -64,6 +67,9 @@ export default function VerdictCard({
   verdict: Verdict;
   transcript: string;
   spokenSec: number;
+  /** Picked once by the console so it doesn't reshuffle on every render. */
+  exhaustedLine: string;
+  onAnswerFollowUp: (followUpId: string, question: string) => void;
   onAgain: () => void;
   onBackToStart: () => void;
 }) {
@@ -82,7 +88,8 @@ export default function VerdictCard({
     >
       <header className="flex flex-col items-center gap-2 text-center">
         <p className="eyebrow">
-          <span className="sigil">▸</span> verdict
+          <span className="sigil">▸</span>{" "}
+          {verdict.chainDepth > 0 ? `verdict · follow-up ${verdict.chainDepth}` : "verdict"}
         </p>
         <h2 className="font-display text-lg font-semibold text-bright sm:text-xl">{concept.title}</h2>
       </header>
@@ -97,6 +104,12 @@ export default function VerdictCard({
             <span className="font-mono text-sm text-dim">/100</span>
           </div>
           <span className={`font-mono text-[11px] tracking-[0.18em] ${band.className}`}>{band.label}</span>
+        </div>
+      )}
+
+      {verdict.overall !== null && (
+        <div className="flex justify-center">
+          <SpriteReward score={verdict.overall} />
         </div>
       )}
 
@@ -144,10 +157,33 @@ export default function VerdictCard({
 
       {verdict.nextQuestion && (
         <section className="border-l-2 border-cyan/40 pl-4">
-          <p className="eyebrow mb-1.5">what I'd ask next</p>
+          <p className="eyebrow mb-1.5">
+            {verdict.followUpId ? "follow-up" : "what I'd ask next"}
+            {verdict.chainDepth > 0 && (
+              <span className="ml-2 text-dim/60">
+                {verdict.chainDepth + 1}/{verdict.maxFollowUps}
+              </span>
+            )}
+          </p>
           <p className="text-sm text-bright/85 italic">
             <RichText text={verdict.nextQuestion} />
           </p>
+          {verdict.followUpId && (
+            <button
+              type="button"
+              onClick={() => onAnswerFollowUp(verdict.followUpId!, verdict.nextQuestion!)}
+              className="mt-3 border border-cyan/40 px-4 py-2 font-mono text-[11px] tracking-[0.14em] text-cyan uppercase transition-colors hover:border-cyan hover:bg-cyan/10"
+            >
+              ● answer this
+            </button>
+          )}
+        </section>
+      )}
+
+      {verdict.followUpExhausted && (
+        <section className="border-l-2 border-gold/40 pl-4">
+          <p className="eyebrow mb-1.5">chain complete</p>
+          <p className="text-sm text-gold/90">{exhaustedLine}</p>
         </section>
       )}
 
