@@ -246,6 +246,36 @@ describe("parseVerdict", () => {
     expect(v.missed).toEqual(["Idempotency keys", "Retry semantics"]);
   });
 
+  test("replaces em-dashes, which are the loudest not-Ashwath tell", () => {
+    const v = parseVerdict(
+      JSON.stringify({
+        ...JSON.parse(wellFormed),
+        verdict: "Clean delivery — genuinely good. But you stopped short—by a lot.",
+        missed: ["Retry semantics — the interesting half"],
+      }),
+    );
+    expect(v.verdict).toBe("Clean delivery, genuinely good. But you stopped short, by a lot.");
+    expect(v.missed).toEqual(["Retry semantics, the interesting half"]);
+    expect(v.verdict).not.toContain("—");
+  });
+
+  test("dash cleanup doesn't leave doubled or dangling punctuation", () => {
+    const v = parseVerdict(
+      JSON.stringify({ ...JSON.parse(wellFormed), verdict: "Solid, — but shallow —" }),
+    );
+    expect(v.verdict).toBe("Solid, but shallow");
+  });
+
+  test("leaves plain hyphens alone", () => {
+    const v = parseVerdict(
+      JSON.stringify({
+        ...JSON.parse(wellFormed),
+        verdict: "Your write-through cache is fine, run it with --verbose next time.",
+      }),
+    );
+    expect(v.verdict).toBe("Your write-through cache is fine, run it with --verbose next time.");
+  });
+
   test("leaves snake_case and multiplication alone", () => {
     const v = parseVerdict(
       JSON.stringify({

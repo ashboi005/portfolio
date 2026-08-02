@@ -176,6 +176,23 @@ function sanitizeMarkdown(value: string): string {
     .trim();
 }
 
+/**
+ * Ashwath does not write em-dashes. Models reach for them constantly, and in a
+ * verdict that is supposed to sound like a specific person texting you, it is
+ * the loudest possible tell that it didn't. The system prompt forbids them
+ * twice; this catches the ones that get through.
+ *
+ * Only em and en dashes. Plain hyphens are left alone so compound words and
+ * flags like `--verbose` survive.
+ */
+function normalizeDashes(value: string): string {
+  return value
+    .replace(/\s*[—–]\s*/g, ", ")
+    .replace(/,(\s*,)+/g, ",") // a dash next to existing punctuation
+    .replace(/\s+([,.!?;:])/g, "$1")
+    .replace(/,\s*$/, "");
+}
+
 /** A leading bullet is noise when the value is already a list item. */
 function stripBullet(value: string): string {
   return value.replace(/^\s{0,3}[-*+•]\s+/, "").trim();
@@ -183,7 +200,7 @@ function stripBullet(value: string): string {
 
 function clampText(value: unknown, max: number, listItem = false): string | null {
   if (typeof value !== "string") return null;
-  let cleaned = sanitizeMarkdown(value);
+  let cleaned = normalizeDashes(sanitizeMarkdown(value));
   if (listItem) cleaned = stripBullet(cleaned);
   if (!cleaned) return null;
   return cleaned.length > max ? `${cleaned.slice(0, max - 1).trimEnd()}…` : cleaned;

@@ -46,6 +46,26 @@ Everything is defended server-side in `apps/server/src/lib/coach.ts` regardless 
 the model returns: scores are clamped to 0–100, strings are length-capped, and a reply
 that isn't parseable JSON degrades to showing the raw prose instead of erroring.
 
+## Voice
+
+The prompt carries Ashwath's actual lingo, not a generic blunt-mentor persona: Gen-Z
+slang he really uses (`icl`, `ngl`, `fr`, `dawg`, `blud`, `cooked`, `skill issue`),
+stretched vowels for genuine surprise (`nah thats wilddd`), opening fillers (`See...`,
+`The thing is...`), and rare, end-of-line emoji. Five worked examples at the bottom of the
+VOICE section do most of the work — few-shot beats rules for tone.
+
+**English only for now.** Hindi and Hinglish are explicitly excluded, including `bhai`,
+`yaar`, `oyee`, and `pagal`. Deleting the "English only" paragraph is the one-line change
+that turns it back on.
+
+Two guardrails matter:
+
+- **The lingo does not soften the score.** Stated explicitly, because casual delivery
+  drifts toward being nice. A 20 is still a 20, just delivered as *"icl that was rough"*.
+- **No em-dashes or en-dashes.** They're the loudest tell that a verdict wasn't written in
+  his voice. The prompt bans them twice and `normalizeDashes` in `coach.ts` rewrites any
+  that survive to commas, so this holds regardless of model drift.
+
 ## Follow-ups
 
 `nextQuestion` is answerable. The user can record a reply to it, which gets graded as a
