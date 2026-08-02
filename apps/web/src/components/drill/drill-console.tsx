@@ -176,13 +176,12 @@ export default function DrillConsole() {
       .finally(() => clearTimeout(timeout));
   }, [level]);
 
+  // ConceptSlot holds this in a ref, so depending on `concept` doesn't restart
+  // the reel mid-spin.
   const handleSettled = useCallback(() => {
     setStage("armed");
-    setConcept((current) => {
-      if (current) setHistory(markSeen(current.id));
-      return current;
-    });
-  }, []);
+    if (concept) setHistory(markSeen(concept.id));
+  }, [concept]);
 
   // ---- record -------------------------------------------------------------
 
