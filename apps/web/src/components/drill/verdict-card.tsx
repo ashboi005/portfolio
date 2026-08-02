@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useState } from "react";
 
+import RichText from "@/components/drill/rich-text";
 import Cat from "@/components/fx/cat";
 import CountUp from "@/components/fx/count-up";
 import type { Concept, Verdict } from "@/lib/drill";
@@ -119,7 +120,9 @@ export default function VerdictCard({
         </div>
         <div className="flex flex-col gap-3">
           <p className="eyebrow">ashwath says</p>
-          <p className="text-sm leading-relaxed whitespace-pre-line text-bright/90">{verdict.verdict}</p>
+          <p className="text-sm leading-relaxed whitespace-pre-line text-bright/90">
+            <RichText text={verdict.verdict} />
+          </p>
         </div>
       </div>
 
@@ -130,7 +133,9 @@ export default function VerdictCard({
             {verdict.missed.map((item) => (
               <li key={item} className="flex gap-2">
                 <span className="text-signal/60">×</span>
-                <span>{item}</span>
+                <span>
+                  <RichText text={item} />
+                </span>
               </li>
             ))}
           </ul>
@@ -140,7 +145,9 @@ export default function VerdictCard({
       {verdict.nextQuestion && (
         <section className="border-l-2 border-cyan/40 pl-4">
           <p className="eyebrow mb-1.5">what I'd ask next</p>
-          <p className="text-sm text-bright/85 italic">{verdict.nextQuestion}</p>
+          <p className="text-sm text-bright/85 italic">
+            <RichText text={verdict.nextQuestion} />
+          </p>
         </section>
       )}
 

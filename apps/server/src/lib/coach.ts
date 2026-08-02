@@ -104,32 +104,37 @@ function clampScore(value: unknown): number | null {
 }
 
 /**
- * Strip Markdown the coach was told not to emit.
+ * Remove the Markdown the verdict card does not render, and leave the rest.
  *
- * The verdict is rendered as literal text, so a stray `**` shows up on screen
- * as asterisks. The system prompt forbids Markdown, but prompts drift and a
- * visibly broken card is a worse failure than a slightly over-eager regex.
+ * The card renders inline emphasis — bold, italics, inline code — so those are
+ * kept and passed through. Block-level constructs have no renderer, so a
+ * heading or a code fence would show up on screen as literal `#` and backticks.
+ * Those get flattened here rather than displayed raw. The prompt already asks
+ * the coach to avoid them; this is the backstop for when it drifts.
  *
- * Underscores are deliberately left alone: `signal_to_noise` and `snake_case`
- * are plausible things to say about backend code, and mangling them would be a
- * worse error than leaving one italic marker in place.
+ * Underscore emphasis is deliberately left alone: `signal_to_noise` and
+ * `snake_case` are plausible things to say about backend code, and mangling
+ * them would be a worse error than leaving one italic marker in place.
  */
-function stripMarkdown(value: string): string {
+function sanitizeMarkdown(value: string): string {
   return value
-    .replace(/`{1,3}([^`]*)`{1,3}/g, "$1") // `code` and ```fences```
-    .replace(/\*\*([^*]+)\*\*/g, "$1") // **bold**
-    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,;:!?]|$)/g, "$1$2") // *italic*
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // [text](url)
+    .replace(/```[a-z]*\n?/gi, "") // ``` fences — keep the contents, drop the fence
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // [text](url) — links aren't rendered
     .replace(/^\s{0,3}#{1,6}\s+/gm, "") // # headings
-    .replace(/^\s{0,3}[-*+]\s+/gm, "") // - bullet prefixes
     .replace(/^\s{0,3}>\s?/gm, "") // > blockquotes
     .replace(/[ \t]+$/gm, "")
     .trim();
 }
 
-function clampText(value: unknown, max: number): string | null {
+/** A leading bullet is noise when the value is already a list item. */
+function stripBullet(value: string): string {
+  return value.replace(/^\s{0,3}[-*+•]\s+/, "").trim();
+}
+
+function clampText(value: unknown, max: number, listItem = false): string | null {
   if (typeof value !== "string") return null;
-  const cleaned = stripMarkdown(value);
+  let cleaned = sanitizeMarkdown(value);
+  if (listItem) cleaned = stripBullet(cleaned);
   if (!cleaned) return null;
   return cleaned.length > max ? `${cleaned.slice(0, max - 1).trimEnd()}…` : cleaned;
 }
@@ -182,7 +187,7 @@ export function parseVerdict(reply: string): Verdict {
 
   const missed = Array.isArray(json.missed)
     ? json.missed
-        .map((m) => clampText(m, MAX_MISSED_CHARS))
+        .map((m) => clampText(m, MAX_MISSED_CHARS, true))
         .filter((m): m is string => m !== null)
         .slice(0, MAX_MISSED_ITEMS)
     : [];

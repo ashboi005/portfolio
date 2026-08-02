@@ -145,18 +145,33 @@ describe("parseVerdict", () => {
     expect(v.missed).toHaveLength(5);
   });
 
-  test("strips markdown the coach was told not to emit", () => {
+  test("keeps inline emphasis, which the verdict card renders", () => {
     const v = parseVerdict(
       JSON.stringify({
         ...JSON.parse(wellFormed),
-        verdict: "You nailed **idempotency** but hand-waved the `retry` path. See [the docs](http://x).",
-        missed: ["- Idempotency keys", "* Retry semantics"],
-        nextQuestion: "## How would you *dedupe* a retried charge?",
+        verdict: "You nailed **idempotency** but hand-waved the `retry` path.",
       }),
     );
-    expect(v.verdict).toBe("You nailed idempotency but hand-waved the retry path. See the docs.");
-    expect(v.missed).toEqual(["Idempotency keys", "Retry semantics"]);
+    expect(v.verdict).toBe("You nailed **idempotency** but hand-waved the `retry` path.");
+  });
+
+  test("flattens block constructs that have no renderer", () => {
+    const v = parseVerdict(
+      JSON.stringify({
+        ...JSON.parse(wellFormed),
+        verdict: "## Verdict\n> You waffled.\nSee [the docs](http://x).",
+        nextQuestion: "### How would you dedupe a retried charge?",
+      }),
+    );
+    expect(v.verdict).toBe("Verdict\nYou waffled.\nSee the docs.");
     expect(v.nextQuestion).toBe("How would you dedupe a retried charge?");
+  });
+
+  test("drops bullet prefixes on missed items, since the array is the list", () => {
+    const v = parseVerdict(
+      JSON.stringify({ ...JSON.parse(wellFormed), missed: ["- Idempotency keys", "• Retry semantics"] }),
+    );
+    expect(v.missed).toEqual(["Idempotency keys", "Retry semantics"]);
   });
 
   test("leaves snake_case and multiplication alone", () => {
